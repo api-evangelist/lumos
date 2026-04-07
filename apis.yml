@@ -9,14 +9,14 @@ description: >-
 type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
-  - SaaS Management
-  - Identity Governance
   - Access Management
-  - Identity Platform
   - Access Reviews
+  - Deprovisioning
+  - Identity Governance
+  - Identity Platform
   - Least Privilege
   - Provisioning
-  - Deprovisioning
+  - SaaS Management
   - Shadow IT
 url: >-
   https://raw.githubusercontent.com/api-evangelist/lumos/refs/heads/main/apis.yml
@@ -33,10 +33,10 @@ apis:
       (prefixed lsk_) in the Authorization header.
     humanURL: https://developers.lumos.com/docs/rest-api
     tags:
-      - Identity
       - Access Management
       - Automation
       - Governance
+      - Identity
     properties:
       - url: https://developers.lumos.com/reference/lumos-api
         type: Documentation
@@ -53,9 +53,9 @@ apis:
       not yet supported natively.
     humanURL: https://developers.lumos.com/docs/connector-sdk
     tags:
-      - SDK
       - Connectors
       - Integrations
+      - SDK
     properties:
       - url: https://developers.lumos.com/docs/connector-sdk
         type: Documentation
