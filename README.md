@@ -1,22 +1,83 @@
 # Lumos (lumos)
-Lumos provides API capabilities.
+
+Lumos is the first Autonomous Identity Platform that helps organizations discover and manage access to all apps with enhanced security, increased productivity, and reduced cost. Lumos automates access requests, enforces least privilege, speeds up user access reviews, and eliminates extra SaaS app spending through 80+ connectors and an API.
 
 **URL:** [Visit APIs.json URL](https://raw.githubusercontent.com/api-evangelist/lumos/refs/heads/main/apis.yml)
 
 ## Scope
 
-- **Type:** Index 
-- **Position:** Consuming 
-- **Access:** 3rd-Party 
+- **Type:** Index
+- **Position:** Consuming
+- **Access:** 3rd-Party
 
-## Tags:
+## Tags
 
- - API
+- Access Management
+- Access Reviews
+- Deprovisioning
+- Identity Governance
+- Identity Platform
+- Least Privilege
+- Provisioning
+- SaaS Management
+- Shadow IT
 
 ## Timestamps
 
-- **Created:** 2026-03-16 
-- **Modified:** 2026-03-16 
+- **Created:** 2026-03-16
+- **Modified:** 2026-03-27
+
+## APIs
+
+### Lumos REST API
+
+The Lumos REST API enables programmatic access to the Lumos identity platform for automating tasks such as managing users, apps, access requests, and governance workflows. All requests require a bearer token (prefixed `lsk_`) in the Authorization header.
+
+**Human URL:** [https://developers.lumos.com/docs/rest-api](https://developers.lumos.com/docs/rest-api)
+
+#### Tags
+
+- Access Management
+- Automation
+- Governance
+- Identity
+
+#### Properties
+
+- [Documentation](https://developers.lumos.com/reference/lumos-api)
+- [GettingStarted](https://developers.lumos.com/docs/quick-start)
+- [Authentication](https://developers.lumos.com/docs/rest-api)
+
+### Lumos Connector SDK
+
+The Lumos Connector SDK allows developers to build custom connectors that integrate third-party applications with the Lumos platform, enabling automated provisioning, deprovisioning, and access management for apps not yet supported natively.
+
+**Human URL:** [https://developers.lumos.com/docs/connector-sdk](https://developers.lumos.com/docs/connector-sdk)
+
+#### Tags
+
+- Connectors
+- Integrations
+- SDK
+
+#### Properties
+
+- [Documentation](https://developers.lumos.com/docs/connector-sdk)
+- [GettingStarted](https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial)
+
+## Common Properties
+
+- [Website](https://www.lumos.com/)
+- [Documentation](https://developers.lumos.com/)
+- [Support](https://support.lumos.com/)
+- [GettingStarted](https://developers.lumos.com/docs/getting-started)
+- [Blog](https://www.lumos.com/blog)
+- [Login](https://app.lumosidentity.com/)
+- [SignUp](https://www.lumos.com/demo)
+- [GitHub](https://github.com/Lumos-Labs)
+- [LinkedIn](https://www.linkedin.com/company/lumosidentity)
+- [CLI](https://developers.lumos.com/docs/cli)
+- [ProductDocumentation](https://docs.lumos.com/)
 
 ## Maintainers
 
