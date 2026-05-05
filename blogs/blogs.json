@@ -1,0 +1,13 @@
+{
+  "repo": "lumos",
+  "feeds": [
+    {
+      "source": "https://www.lumos.com/blog",
+      "feed_url": "https://www.lumos.com/blog/rss.xml",
+      "saved": 10,
+      "title": "Lumos Blog"
+    }
+  ],
+  "post_count": 10,
+  "fetched": "2026-05-03T23:31:04Z"
+}
