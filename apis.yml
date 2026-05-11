@@ -84,6 +84,10 @@ common:
     url: https://developers.lumos.com/docs/cli
   - type: ProductDocumentation
     url: https://docs.lumos.com/
+  - type: Integrations
+    url: https://www.lumos.com/integrations
+integrations:
+  - name: websights
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
