@@ -86,6 +86,8 @@ common:
     url: https://docs.lumos.com/
   - type: Integrations
     url: https://www.lumos.com/integrations
+  - type: LLMsTxt
+    url: https://developers.lumos.com/llms.txt
 integrations:
   - name: websights
 maintainers:
