@@ -1,0 +1,988 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST API
+  description: |
+    The Lumos REST API enables programmatic access to the Lumos identity
+    platform for automating user, group, app, account, access policy, access
+    request, access review, pre-approval rule, task, vendor agreement, and
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+    in the Authorization header.
+  version: "1.0"
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+  - url: https://api.lumos.com
+    description: Lumos API
+security:
+  - BearerAuth: []
+tags:
+  - name: Apps
+  - name: Users
+  - name: Accounts
+  - name: Groups
+  - name: Activity
+  - name: AppStore
+  - name: AccessRequests
+  - name: PreApprovalRules
+  - name: AccessPolicies
+  - name: AccessReviews
+  - name: Tasks
+  - name: Vendors
+  - name: Webhooks
+  - name: Utility
+paths:
+  /apps:
+    get:
+      tags: [Apps]
+      summary: List all company apps
+      operationId: listApps
+      responses:
+        '200':
+          description: A list of apps
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [Apps]
+      summary: Create app
+      operationId: createApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created app
+          content:
+            application/json:
+              schema: { type: object }
+  /apps/{app_id}:
+    parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Apps]
+      summary: Retrieve specific app
+      operationId: getApp
+      responses:
+        '200':
+          description: The app
+          content:
+            application/json:
+              schema: { type: object }
+    patch:
+      tags: [Apps]
+      summary: Update app
+      operationId: updateApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated app
+          content:
+            application/json:
+              schema: { type: object }
+  /apps/categories:
+    get:
+      tags: [Apps]
+      summary: Fetch app categories
+      operationId: listAppCategories
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema: { type: object }
+  /apps/{app_id}/settings:
+    parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Apps]
+      summary: Get app settings
+      operationId: getAppSettings
+      responses:
+        '200':
+          description: App settings
+          content:
+            application/json:
+              schema: { type: object }
+    patch:
+      tags: [Apps]
+      summary: Update app settings
+      operationId: updateAppSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema: { type: object }
+  /users:
+    get:
+      tags: [Users]
+      summary: List company users
+      operationId: listUsers
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema: { type: object }
+  /users/current:
+    get:
+      tags: [Users]
+      summary: Get authenticated user info
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema: { type: object }
+  /users/{user_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Users]
+      summary: Get specific user
+      operationId: getUser
+      responses:
+        '200':
+          description: A user
+          content:
+            application/json:
+              schema: { type: object }
+  /users/{user_id}/accounts:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Users]
+      summary: List user accounts
+      operationId: listUserAccounts
+      responses:
+        '200':
+          description: A list of accounts for the user
+          content:
+            application/json:
+              schema: { type: object }
+  /users/{user_id}/roles:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Users]
+      summary: Retrieve user roles
+      operationId: listUserRoles
+      responses:
+        '200':
+          description: A list of roles
+          content:
+            application/json:
+              schema: { type: object }
+  /users/{user_id}/roles/{role_name}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: role_name
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Users]
+      summary: Assign role to user
+      operationId: assignUserRole
+      responses:
+        '204':
+          description: Role assigned
+    delete:
+      tags: [Users]
+      summary: Remove role from user
+      operationId: removeUserRole
+      responses:
+        '204':
+          description: Role removed
+  /accounts:
+    get:
+      tags: [Accounts]
+      summary: List all accounts
+      operationId: listAccounts
+      responses:
+        '200':
+          description: A list of accounts
+          content:
+            application/json:
+              schema: { type: object }
+  /accounts/upload:
+    post:
+      tags: [Accounts]
+      summary: Upload accounts
+      operationId: uploadAccounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '202':
+          description: Upload accepted
+          content:
+            application/json:
+              schema: { type: object }
+  /accounts/upload/{job_id}:
+    parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Accounts]
+      summary: Check upload status
+      operationId: getAccountsUploadStatus
+      responses:
+        '200':
+          description: Upload status
+          content:
+            application/json:
+              schema: { type: object }
+  /groups:
+    get:
+      tags: [Groups]
+      summary: List groups
+      operationId: listGroups
+      responses:
+        '200':
+          description: A list of groups
+          content:
+            application/json:
+              schema: { type: object }
+  /groups/{group_id}:
+    parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Groups]
+      summary: Get specific group
+      operationId: getGroup
+      responses:
+        '200':
+          description: A group
+          content:
+            application/json:
+              schema: { type: object }
+  /groups/{group_id}/users:
+    parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Groups]
+      summary: List group members
+      operationId: listGroupMembers
+      responses:
+        '200':
+          description: A list of members
+          content:
+            application/json:
+              schema: { type: object }
+  /activity_logs:
+    get:
+      tags: [Activity]
+      summary: Retrieve activity logs
+      operationId: listActivityLogs
+      responses:
+        '200':
+          description: Activity logs
+          content:
+            application/json:
+              schema: { type: object }
+  /activity_records:
+    post:
+      tags: [Activity]
+      summary: Update activity records
+      operationId: createActivityRecords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema: { type: object }
+  /activity_records/job/{job_id}:
+    parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Activity]
+      summary: Check activity job status
+      operationId: getActivityJobStatus
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema: { type: object }
+  /identity_events:
+    get:
+      tags: [Activity]
+      summary: Get user identity events
+      operationId: listIdentityEvents
+      responses:
+        '200':
+          description: Identity events
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/apps:
+    get:
+      tags: [AppStore]
+      summary: List AppStore apps
+      operationId: listAppStoreApps
+      responses:
+        '200':
+          description: AppStore apps
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [AppStore]
+      summary: Add app to AppStore
+      operationId: createAppStoreApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/apps/{app_id}:
+    parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [AppStore]
+      summary: Get AppStore app details
+      operationId: getAppStoreApp
+      responses:
+        '200':
+          description: AppStore app
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [AppStore]
+      summary: Remove app from AppStore
+      operationId: deleteAppStoreApp
+      responses:
+        '204':
+          description: Removed
+  /appstore/requestable_permissions:
+    get:
+      tags: [AppStore]
+      summary: List requestable permissions
+      operationId: listRequestablePermissions
+      responses:
+        '200':
+          description: Permissions
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [AppStore]
+      summary: Create requestable permission
+      operationId: createRequestablePermission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/requestable_permissions/{permission_id}:
+    parameters:
+      - name: permission_id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [AppStore]
+      summary: Update requestable permission
+      operationId: updateRequestablePermission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [AppStore]
+      summary: Delete requestable permission
+      operationId: deleteRequestablePermission
+      responses:
+        '204':
+          description: Deleted
+  /appstore/access_request:
+    post:
+      tags: [AccessRequests]
+      summary: Create access request
+      operationId: createAccessRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Access request created
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/access_requests:
+    get:
+      tags: [AccessRequests]
+      summary: List access requests
+      operationId: listAccessRequests
+      responses:
+        '200':
+          description: Access requests
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/access_requests/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [AccessRequests]
+      summary: Get access request details
+      operationId: getAccessRequest
+      responses:
+        '200':
+          description: Access request
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [AccessRequests]
+      summary: Cancel access request
+      operationId: cancelAccessRequest
+      responses:
+        '204':
+          description: Cancelled
+  /appstore/pre_approval_rules:
+    get:
+      tags: [PreApprovalRules]
+      summary: List pre-approval rules
+      operationId: listPreApprovalRules
+      responses:
+        '200':
+          description: Pre-approval rules
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [PreApprovalRules]
+      summary: Create pre-approval rule
+      operationId: createPreApprovalRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { type: object }
+  /appstore/pre_approval_rules/{pre_approval_rule_id}:
+    parameters:
+      - name: pre_approval_rule_id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [PreApprovalRules]
+      summary: Update pre-approval rule
+      operationId: updatePreApprovalRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [PreApprovalRules]
+      summary: Delete pre-approval rule
+      operationId: deletePreApprovalRule
+      responses:
+        '204':
+          description: Deleted
+  /access_policies:
+    get:
+      tags: [AccessPolicies]
+      summary: List access policies
+      operationId: listAccessPolicies
+      responses:
+        '200':
+          description: Access policies
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [AccessPolicies]
+      summary: Create access policy
+      operationId: createAccessPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { type: object }
+  /access_policies/{access_policy_id}:
+    parameters:
+      - name: access_policy_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [AccessPolicies]
+      summary: Get access policy details
+      operationId: getAccessPolicy
+      responses:
+        '200':
+          description: Access policy
+          content:
+            application/json:
+              schema: { type: object }
+    put:
+      tags: [AccessPolicies]
+      summary: Update access policy
+      operationId: updateAccessPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [AccessPolicies]
+      summary: Delete access policy
+      operationId: deleteAccessPolicy
+      responses:
+        '204':
+          description: Deleted
+  /access_reviews:
+    get:
+      tags: [AccessReviews]
+      summary: List access reviews
+      operationId: listAccessReviews
+      responses:
+        '200':
+          description: Access reviews
+          content:
+            application/json:
+              schema: { type: object }
+    post:
+      tags: [AccessReviews]
+      summary: Create access review campaign
+      operationId: createAccessReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { type: object }
+  /access_reviews/{access_review_id}:
+    parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [AccessReviews]
+      summary: Get access review details
+      operationId: getAccessReview
+      responses:
+        '200':
+          description: Access review
+          content:
+            application/json:
+              schema: { type: object }
+    patch:
+      tags: [AccessReviews]
+      summary: Update access review
+      operationId: updateAccessReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { type: object }
+    delete:
+      tags: [AccessReviews]
+      summary: Delete access review
+      operationId: deleteAccessReview
+      responses:
+        '204':
+          description: Deleted
+  /access_reviews/{access_review_id}/apps:
+    parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [AccessReviews]
+      summary: Add apps to access review
+      operationId: addAppsToAccessReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Apps added
+          content:
+            application/json:
+              schema: { type: object }
+  /access_reviews/{access_review_id}/apps/{arda_id}:
+    parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: arda_id
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [AccessReviews]
+      summary: Remove app from access review
+      operationId: removeAppFromAccessReview
+      responses:
+        '204':
+          description: Removed
+  /access_reviews/scope_options:
+    get:
+      tags: [AccessReviews]
+      summary: Get scope filter options
+      operationId: getAccessReviewScopeOptions
+      responses:
+        '200':
+          description: Scope options
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks:
+    get:
+      tags: [Tasks]
+      summary: List tasks
+      operationId: listTasks
+      responses:
+        '200':
+          description: Tasks
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Tasks]
+      summary: Get task details
+      operationId: getTask
+      responses:
+        '200':
+          description: A task
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/actions:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Tasks]
+      summary: Get available actions
+      operationId: getTaskActions
+      responses:
+        '200':
+          description: Available actions
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/perform-action:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Tasks]
+      summary: Execute action on task
+      operationId: performTaskAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/reassign:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Tasks]
+      summary: Reassign task
+      operationId: reassignTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Reassigned
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/comments:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Tasks]
+      summary: Add comment to task
+      operationId: addTaskComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Comment added
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/complete:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Tasks]
+      summary: Complete task
+      operationId: completeTask
+      responses:
+        '200':
+          description: Task completed
+          content:
+            application/json:
+              schema: { type: object }
+  /tasks/{task_id}/dismiss:
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Tasks]
+      summary: Dismiss task
+      operationId: dismissTask
+      responses:
+        '200':
+          description: Task dismissed
+          content:
+            application/json:
+              schema: { type: object }
+  /vendor_agreements:
+    get:
+      tags: [Vendors]
+      summary: List vendor agreements
+      operationId: listVendorAgreements
+      responses:
+        '200':
+          description: Vendor agreements
+          content:
+            application/json:
+              schema: { type: object }
+  /vendor_agreements/{vendor_agreement_id}/custom_attributes/{label}:
+    parameters:
+      - name: vendor_agreement_id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: label
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      tags: [Vendors]
+      summary: Update vendor agreement custom attribute
+      operationId: updateVendorAgreementAttribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { type: object }
+  /found_documents:
+    post:
+      tags: [Vendors]
+      summary: Upload discovered documents
+      operationId: uploadFoundDocuments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Uploaded
+          content:
+            application/json:
+              schema: { type: object }
+  /orders:
+    post:
+      tags: [Vendors]
+      summary: Upload order information
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { type: object }
+  /inline_webhooks:
+    get:
+      tags: [Webhooks]
+      summary: List available inline webhooks
+      operationId: listInlineWebhooks
+      responses:
+        '200':
+          description: Inline webhooks
+          content:
+            application/json:
+              schema: { type: object }
+  /info:
+    get:
+      tags: [Utility]
+      summary: Check API liveness
+      operationId: getInfo
+      responses:
+        '200':
+          description: API info
+          content:
+            application/json:
+              schema: { type: object }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)
