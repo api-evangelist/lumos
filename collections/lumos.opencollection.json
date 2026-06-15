@@ -1,0 +1,1232 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Apps",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all company apps",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/apps"
+          },
+          "docs": "List all company apps"
+        },
+        {
+          "info": {
+            "name": "Create app",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/apps",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create app"
+        },
+        {
+          "info": {
+            "name": "Retrieve specific app",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve specific app"
+        },
+        {
+          "info": {
+            "name": "Update app",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update app"
+        },
+        {
+          "info": {
+            "name": "Fetch app categories",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/apps/categories"
+          },
+          "docs": "Fetch app categories"
+        },
+        {
+          "info": {
+            "name": "Get app settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/apps/:app_id/settings",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get app settings"
+        },
+        {
+          "info": {
+            "name": "Update app settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/apps/:app_id/settings",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update app settings"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List company users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users"
+          },
+          "docs": "List company users"
+        },
+        {
+          "info": {
+            "name": "Get authenticated user info",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/current"
+          },
+          "docs": "Get authenticated user info"
+        },
+        {
+          "info": {
+            "name": "Get specific user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get specific user"
+        },
+        {
+          "info": {
+            "name": "List user accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id/accounts",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List user accounts"
+        },
+        {
+          "info": {
+            "name": "Retrieve user roles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id/roles",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve user roles"
+        },
+        {
+          "info": {
+            "name": "Assign role to user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/users/:user_id/roles/:role_name",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "role_name",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Assign role to user"
+        },
+        {
+          "info": {
+            "name": "Remove role from user",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/users/:user_id/roles/:role_name",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "role_name",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove role from user"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Accounts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/accounts"
+          },
+          "docs": "List all accounts"
+        },
+        {
+          "info": {
+            "name": "Upload accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/accounts/upload",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Upload accounts"
+        },
+        {
+          "info": {
+            "name": "Check upload status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/accounts/upload/:job_id",
+            "params": [
+              {
+                "name": "job_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Check upload status"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/groups"
+          },
+          "docs": "List groups"
+        },
+        {
+          "info": {
+            "name": "Get specific group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/groups/:group_id",
+            "params": [
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get specific group"
+        },
+        {
+          "info": {
+            "name": "List group members",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/groups/:group_id/users",
+            "params": [
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List group members"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Activity",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve activity logs",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/activity_logs"
+          },
+          "docs": "Retrieve activity logs"
+        },
+        {
+          "info": {
+            "name": "Update activity records",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/activity_records",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update activity records"
+        },
+        {
+          "info": {
+            "name": "Check activity job status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/activity_records/job/:job_id",
+            "params": [
+              {
+                "name": "job_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Check activity job status"
+        },
+        {
+          "info": {
+            "name": "Get user identity events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/identity_events"
+          },
+          "docs": "Get user identity events"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "AppStore",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List AppStore apps",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/apps"
+          },
+          "docs": "List AppStore apps"
+        },
+        {
+          "info": {
+            "name": "Add app to AppStore",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/apps",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add app to AppStore"
+        },
+        {
+          "info": {
+            "name": "Get AppStore app details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get AppStore app details"
+        },
+        {
+          "info": {
+            "name": "Remove app from AppStore",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove app from AppStore"
+        },
+        {
+          "info": {
+            "name": "List requestable permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/requestable_permissions"
+          },
+          "docs": "List requestable permissions"
+        },
+        {
+          "info": {
+            "name": "Create requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/requestable_permissions",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create requestable permission"
+        },
+        {
+          "info": {
+            "name": "Update requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/appstore/requestable_permissions/:permission_id",
+            "params": [
+              {
+                "name": "permission_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update requestable permission"
+        },
+        {
+          "info": {
+            "name": "Delete requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/requestable_permissions/:permission_id",
+            "params": [
+              {
+                "name": "permission_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete requestable permission"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "AccessRequests",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create access request",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/access_request",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create access request"
+        },
+        {
+          "info": {
+            "name": "List access requests",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/access_requests"
+          },
+          "docs": "List access requests"
+        },
+        {
+          "info": {
+            "name": "Get access request details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/access_requests/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get access request details"
+        },
+        {
+          "info": {
+            "name": "Cancel access request",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/access_requests/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel access request"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "PreApprovalRules",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List pre-approval rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules"
+          },
+          "docs": "List pre-approval rules"
+        },
+        {
+          "info": {
+            "name": "Create pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create pre-approval rule"
+        },
+        {
+          "info": {
+            "name": "Update pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules/:pre_approval_rule_id",
+            "params": [
+              {
+                "name": "pre_approval_rule_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update pre-approval rule"
+        },
+        {
+          "info": {
+            "name": "Delete pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules/:pre_approval_rule_id",
+            "params": [
+              {
+                "name": "pre_approval_rule_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete pre-approval rule"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "AccessPolicies",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List access policies",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_policies"
+          },
+          "docs": "List access policies"
+        },
+        {
+          "info": {
+            "name": "Create access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/access_policies",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create access policy"
+        },
+        {
+          "info": {
+            "name": "Get access policy details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get access policy details"
+        },
+        {
+          "info": {
+            "name": "Update access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update access policy"
+        },
+        {
+          "info": {
+            "name": "Delete access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete access policy"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "AccessReviews",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List access reviews",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_reviews"
+          },
+          "docs": "List access reviews"
+        },
+        {
+          "info": {
+            "name": "Create access review campaign",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/access_reviews",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create access review campaign"
+        },
+        {
+          "info": {
+            "name": "Get access review details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_reviews/:access_review_id",
+            "params": [
+              {
+                "name": "access_review_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get access review details"
+        },
+        {
+          "info": {
+            "name": "Update access review",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/access_reviews/:access_review_id",
+            "params": [
+              {
+                "name": "access_review_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update access review"
+        },
+        {
+          "info": {
+            "name": "Delete access review",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/access_reviews/:access_review_id",
+            "params": [
+              {
+                "name": "access_review_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete access review"
+        },
+        {
+          "info": {
+            "name": "Add apps to access review",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/access_reviews/:access_review_id/apps",
+            "params": [
+              {
+                "name": "access_review_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add apps to access review"
+        },
+        {
+          "info": {
+            "name": "Remove app from access review",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/access_reviews/:access_review_id/apps/:arda_id",
+            "params": [
+              {
+                "name": "access_review_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "arda_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove app from access review"
+        },
+        {
+          "info": {
+            "name": "Get scope filter options",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_reviews/scope_options"
+          },
+          "docs": "Get scope filter options"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Tasks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List tasks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/tasks"
+          },
+          "docs": "List tasks"
+        },
+        {
+          "info": {
+            "name": "Get task details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/tasks/:task_id",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get task details"
+        },
+        {
+          "info": {
+            "name": "Get available actions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/tasks/:task_id/actions",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get available actions"
+        },
+        {
+          "info": {
+            "name": "Execute action on task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/tasks/:task_id/perform-action",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Execute action on task"
+        },
+        {
+          "info": {
+            "name": "Reassign task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/tasks/:task_id/reassign",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reassign task"
+        },
+        {
+          "info": {
+            "name": "Add comment to task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/tasks/:task_id/comments",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add comment to task"
+        },
+        {
+          "info": {
+            "name": "Complete task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/tasks/:task_id/complete",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Complete task"
+        },
+        {
+          "info": {
+            "name": "Dismiss task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/tasks/:task_id/dismiss",
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Dismiss task"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Vendors",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List vendor agreements",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/vendor_agreements"
+          },
+          "docs": "List vendor agreements"
+        },
+        {
+          "info": {
+            "name": "Update vendor agreement custom attribute",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.lumos.com/vendor_agreements/:vendor_agreement_id/custom_attributes/:label",
+            "params": [
+              {
+                "name": "vendor_agreement_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "label",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update vendor agreement custom attribute"
+        },
+        {
+          "info": {
+            "name": "Upload discovered documents",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/found_documents",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Upload discovered documents"
+        },
+        {
+          "info": {
+            "name": "Upload order information",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/orders",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Upload order information"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List available inline webhooks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/inline_webhooks"
+          },
+          "docs": "List available inline webhooks"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Utility",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Check API liveness",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/info"
+          },
+          "docs": "Check API liveness"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
