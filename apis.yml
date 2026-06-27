@@ -74,7 +74,7 @@ common:
     url: https://www.lumos.com/blog
   - type: Login
     url: https://app.lumosidentity.com/
-  - type: SignUp
+  - type: Signup
     url: https://www.lumos.com/demo
   - type: GitHub
     url: https://github.com/Lumos-Labs
@@ -86,7 +86,7 @@ common:
     url: https://docs.lumos.com/
   - type: Integrations
     url: https://www.lumos.com/integrations
-  - type: LLMsTxt
+  - type: LlmsText
     url: https://developers.lumos.com/llms.txt
 integrations:
   - name: websights
