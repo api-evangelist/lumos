@@ -1,0 +1,13 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/lumos-openapi.yml
+summary:
+  types:
+  - http
+schemes:
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: Lumos API key (lsk_ prefix)
+  sources:
+  - openapi/lumos-openapi.yml

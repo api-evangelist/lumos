@@ -62,6 +62,10 @@ apis:
       - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
         type: GettingStarted
 common:
+  - type: DomainSecurity
+    url: security/lumos-domain-security.yml
+  - type: Authentication
+    url: authentication/lumos-authentication.yml
   - type: Website
     url: https://www.lumos.com/
   - type: Documentation
