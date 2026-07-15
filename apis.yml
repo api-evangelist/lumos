@@ -62,6 +62,8 @@ apis:
       - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
         type: GettingStarted
 common:
+  - type: AgenticAccess
+    url: agentic-access/lumos-agentic-access.yml
   - type: DomainSecurity
     url: security/lumos-domain-security.yml
   - type: Authentication
