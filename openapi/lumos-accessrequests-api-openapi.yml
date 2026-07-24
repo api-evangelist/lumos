@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies AccessRequests API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: AccessRequests
+paths:
+  /appstore/access_request:
+    post:
+      tags:
+      - AccessRequests
+      summary: Create access request
+      operationId: createAccessRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Access request created
+          content:
+            application/json:
+              schema:
+                type: object
+  /appstore/access_requests:
+    get:
+      tags:
+      - AccessRequests
+      summary: List access requests
+      operationId: listAccessRequests
+      responses:
+        '200':
+          description: Access requests
+          content:
+            application/json:
+              schema:
+                type: object
+  /appstore/access_requests/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - AccessRequests
+      summary: Get access request details
+      operationId: getAccessRequest
+      responses:
+        '200':
+          description: Access request
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+      - AccessRequests
+      summary: Cancel access request
+      operationId: cancelAccessRequest
+      responses:
+        '204':
+          description: Cancelled
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

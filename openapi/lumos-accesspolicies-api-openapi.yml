@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: AccessPolicies
+paths:
+  /access_policies:
+    get:
+      tags:
+      - AccessPolicies
+      summary: List access policies
+      operationId: listAccessPolicies
+      responses:
+        '200':
+          description: Access policies
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags:
+      - AccessPolicies
+      summary: Create access policy
+      operationId: createAccessPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+  /access_policies/{access_policy_id}:
+    parameters:
+    - name: access_policy_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - AccessPolicies
+      summary: Get access policy details
+      operationId: getAccessPolicy
+      responses:
+        '200':
+          description: Access policy
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags:
+      - AccessPolicies
+      summary: Update access policy
+      operationId: updateAccessPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+      - AccessPolicies
+      summary: Delete access policy
+      operationId: deleteAccessPolicy
+      responses:
+        '204':
+          description: Deleted
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

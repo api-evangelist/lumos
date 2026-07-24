@@ -1,0 +1,199 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Tasks API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Tasks
+paths:
+  /tasks:
+    get:
+      tags:
+      - Tasks
+      summary: List tasks
+      operationId: listTasks
+      responses:
+        '200':
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Tasks
+      summary: Get task details
+      operationId: getTask
+      responses:
+        '200':
+          description: A task
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/actions:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Tasks
+      summary: Get available actions
+      operationId: getTaskActions
+      responses:
+        '200':
+          description: Available actions
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/perform-action:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Tasks
+      summary: Execute action on task
+      operationId: performTaskAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/reassign:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Tasks
+      summary: Reassign task
+      operationId: reassignTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Reassigned
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/comments:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Tasks
+      summary: Add comment to task
+      operationId: addTaskComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/complete:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Tasks
+      summary: Complete task
+      operationId: completeTask
+      responses:
+        '200':
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                type: object
+  /tasks/{task_id}/dismiss:
+    parameters:
+    - name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Tasks
+      summary: Dismiss task
+      operationId: dismissTask
+      responses:
+        '200':
+          description: Task dismissed
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

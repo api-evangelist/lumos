@@ -1,0 +1,157 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies AppStore API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: AppStore
+paths:
+  /appstore/apps:
+    get:
+      tags:
+      - AppStore
+      summary: List AppStore apps
+      operationId: listAppStoreApps
+      responses:
+        '200':
+          description: AppStore apps
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags:
+      - AppStore
+      summary: Add app to AppStore
+      operationId: createAppStoreApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+  /appstore/apps/{app_id}:
+    parameters:
+    - name: app_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - AppStore
+      summary: Get AppStore app details
+      operationId: getAppStoreApp
+      responses:
+        '200':
+          description: AppStore app
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+      - AppStore
+      summary: Remove app from AppStore
+      operationId: deleteAppStoreApp
+      responses:
+        '204':
+          description: Removed
+  /appstore/requestable_permissions:
+    get:
+      tags:
+      - AppStore
+      summary: List requestable permissions
+      operationId: listRequestablePermissions
+      responses:
+        '200':
+          description: Permissions
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags:
+      - AppStore
+      summary: Create requestable permission
+      operationId: createRequestablePermission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+  /appstore/requestable_permissions/{permission_id}:
+    parameters:
+    - name: permission_id
+      in: path
+      required: true
+      schema:
+        type: string
+    patch:
+      tags:
+      - AppStore
+      summary: Update requestable permission
+      operationId: updateRequestablePermission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+      - AppStore
+      summary: Delete requestable permission
+      operationId: deleteRequestablePermission
+      responses:
+        '204':
+          description: Deleted
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

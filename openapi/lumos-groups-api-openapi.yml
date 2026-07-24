@@ -1,0 +1,86 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Groups API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Groups
+paths:
+  /groups:
+    get:
+      tags:
+      - Groups
+      summary: List groups
+      operationId: listGroups
+      responses:
+        '200':
+          description: A list of groups
+          content:
+            application/json:
+              schema:
+                type: object
+  /groups/{group_id}:
+    parameters:
+    - name: group_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Groups
+      summary: Get specific group
+      operationId: getGroup
+      responses:
+        '200':
+          description: A group
+          content:
+            application/json:
+              schema:
+                type: object
+  /groups/{group_id}/users:
+    parameters:
+    - name: group_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Groups
+      summary: List group members
+      operationId: listGroupMembers
+      responses:
+        '200':
+          description: A list of members
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

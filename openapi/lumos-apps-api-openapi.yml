@@ -1,0 +1,153 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Apps API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Apps
+paths:
+  /apps:
+    get:
+      tags:
+      - Apps
+      summary: List all company apps
+      operationId: listApps
+      responses:
+        '200':
+          description: A list of apps
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      tags:
+      - Apps
+      summary: Create app
+      operationId: createApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created app
+          content:
+            application/json:
+              schema:
+                type: object
+  /apps/{app_id}:
+    parameters:
+    - name: app_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Apps
+      summary: Retrieve specific app
+      operationId: getApp
+      responses:
+        '200':
+          description: The app
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      tags:
+      - Apps
+      summary: Update app
+      operationId: updateApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated app
+          content:
+            application/json:
+              schema:
+                type: object
+  /apps/categories:
+    get:
+      tags:
+      - Apps
+      summary: Fetch app categories
+      operationId: listAppCategories
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: object
+  /apps/{app_id}/settings:
+    parameters:
+    - name: app_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Apps
+      summary: Get app settings
+      operationId: getAppSettings
+      responses:
+        '200':
+          description: App settings
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      tags:
+      - Apps
+      summary: Update app settings
+      operationId: updateAppSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

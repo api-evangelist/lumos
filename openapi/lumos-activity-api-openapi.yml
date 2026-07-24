@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Activity API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Activity
+paths:
+  /activity_logs:
+    get:
+      tags:
+      - Activity
+      summary: Retrieve activity logs
+      operationId: listActivityLogs
+      responses:
+        '200':
+          description: Activity logs
+          content:
+            application/json:
+              schema:
+                type: object
+  /activity_records:
+    post:
+      tags:
+      - Activity
+      summary: Update activity records
+      operationId: createActivityRecords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+  /activity_records/job/{job_id}:
+    parameters:
+    - name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Activity
+      summary: Check activity job status
+      operationId: getActivityJobStatus
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                type: object
+  /identity_events:
+    get:
+      tags:
+      - Activity
+      summary: Get user identity events
+      operationId: listIdentityEvents
+      responses:
+        '200':
+          description: Identity events
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

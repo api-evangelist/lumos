@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Users API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Users
+paths:
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List company users
+      operationId: listUsers
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/current:
+    get:
+      tags:
+      - Users
+      summary: Get authenticated user info
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/{user_id}:
+    parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Users
+      summary: Get specific user
+      operationId: getUser
+      responses:
+        '200':
+          description: A user
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/{user_id}/accounts:
+    parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Users
+      summary: List user accounts
+      operationId: listUserAccounts
+      responses:
+        '200':
+          description: A list of accounts for the user
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/{user_id}/roles:
+    parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Users
+      summary: Retrieve user roles
+      operationId: listUserRoles
+      responses:
+        '200':
+          description: A list of roles
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/{user_id}/roles/{role_name}:
+    parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: role_name
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Users
+      summary: Assign role to user
+      operationId: assignUserRole
+      responses:
+        '204':
+          description: Role assigned
+    delete:
+      tags:
+      - Users
+      summary: Remove role from user
+      operationId: removeUserRole
+      responses:
+        '204':
+          description: Role removed
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)

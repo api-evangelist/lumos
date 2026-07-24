@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Lumos REST AccessPolicies Vendors API
+  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+
+    platform for automating user, group, app, account, access policy, access
+
+    request, access review, pre-approval rule, task, vendor agreement, and
+
+    activity log management. All requests use a Bearer token (prefixed `lsk_`)
+
+    in the Authorization header.
+
+    '
+  version: '1.0'
+  contact:
+    name: Lumos Developers
+    url: https://developers.lumos.com/
+  license:
+    name: Proprietary
+    url: https://www.lumos.com/terms
+servers:
+- url: https://api.lumos.com
+  description: Lumos API
+security:
+- BearerAuth: []
+tags:
+- name: Vendors
+paths:
+  /vendor_agreements:
+    get:
+      tags:
+      - Vendors
+      summary: List vendor agreements
+      operationId: listVendorAgreements
+      responses:
+        '200':
+          description: Vendor agreements
+          content:
+            application/json:
+              schema:
+                type: object
+  /vendor_agreements/{vendor_agreement_id}/custom_attributes/{label}:
+    parameters:
+    - name: vendor_agreement_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: label
+      in: path
+      required: true
+      schema:
+        type: string
+    put:
+      tags:
+      - Vendors
+      summary: Update vendor agreement custom attribute
+      operationId: updateVendorAgreementAttribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+  /found_documents:
+    post:
+      tags:
+      - Vendors
+      summary: Upload discovered documents
+      operationId: uploadFoundDocuments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+  /orders:
+    post:
+      tags:
+      - Vendors
+      summary: Upload order information
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Lumos API key (lsk_ prefix)
