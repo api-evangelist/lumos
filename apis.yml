@@ -7,7 +7,20 @@ description: >-
   least privilege, speeds up user access reviews, and eliminates extra SaaS app
   spending through 80+ connectors and an API.
 type: Index
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: freemium
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Freemium · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/lumos.png
 tags:
   - Access Management
   - Access Reviews
@@ -24,43 +37,167 @@ created: '2026-03-16'
 modified: '2026-03-27'
 specificationVersion: '0.19'
 apis:
-  - aid: lumos:rest-api
-    name: Lumos REST API
-    description: >-
-      The Lumos REST API enables programmatic access to the Lumos identity
-      platform for automating tasks such as managing users, apps, access
-      requests, and governance workflows. All requests require a bearer token
-      (prefixed lsk_) in the Authorization header.
-    humanURL: https://developers.lumos.com/docs/rest-api
-    tags:
-      - Access Management
-      - Automation
-      - Governance
-      - Identity
-    properties:
-      - url: https://developers.lumos.com/reference/lumos-api
-        type: Documentation
-      - url: https://developers.lumos.com/docs/quick-start
-        type: GettingStarted
-      - url: https://developers.lumos.com/docs/rest-api
-        type: Authentication
-  - aid: lumos:connector-sdk
-    name: Lumos Connector SDK
-    description: >-
-      The Lumos Connector SDK allows developers to build custom connectors that
-      integrate third-party applications with the Lumos platform, enabling
-      automated provisioning, deprovisioning, and access management for apps
-      not yet supported natively.
-    humanURL: https://developers.lumos.com/docs/connector-sdk
-    tags:
-      - Connectors
-      - Integrations
-      - SDK
-    properties:
-      - url: https://developers.lumos.com/docs/connector-sdk
-        type: Documentation
-      - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
-        type: GettingStarted
+- aid: lumos:rest-api
+  name: Lumos REST API
+  description: >-
+    The Lumos REST API enables programmatic access to the Lumos identity platform for automating tasks
+    such as managing users, apps, access requests, and governance workflows. All requests require a bearer
+    token (prefixed lsk_) in the Authorization header.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Access Management
+  - Automation
+  - Governance
+  - Identity
+  properties:
+  - url: https://developers.lumos.com/reference/lumos-api
+    type: Documentation
+  - url: https://developers.lumos.com/docs/quick-start
+    type: GettingStarted
+  - url: https://developers.lumos.com/docs/rest-api
+    type: Authentication
+- aid: lumos:connector-sdk
+  name: Lumos Connector SDK
+  description: >-
+    The Lumos Connector SDK allows developers to build custom connectors that integrate third-party applications
+    with the Lumos platform, enabling automated provisioning, deprovisioning, and access management for
+    apps not yet supported natively.
+  humanURL: https://developers.lumos.com/docs/connector-sdk
+  tags:
+  - Connectors
+  - Integrations
+  - SDK
+  properties:
+  - url: https://developers.lumos.com/docs/connector-sdk
+    type: Documentation
+  - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
+    type: GettingStarted
+- aid: lumos:lumos-accesspolicies-api
+  name: Lumos AccessPolicies API
+  description: The AccessPolicies API from Lumos — 2 operation(s) for accesspolicies.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - AccessPolicies
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-accesspolicies-api-openapi.yml
+- aid: lumos:lumos-accessrequests-api
+  name: Lumos AccessRequests API
+  description: The AccessRequests API from Lumos — 3 operation(s) for accessrequests.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - AccessRequests
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-accessrequests-api-openapi.yml
+- aid: lumos:lumos-accessreviews-api
+  name: Lumos AccessReviews API
+  description: The AccessReviews API from Lumos — 5 operation(s) for accessreviews.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - AccessReviews
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-accessreviews-api-openapi.yml
+- aid: lumos:lumos-accounts-api
+  name: Lumos Accounts API
+  description: The Accounts API from Lumos — 3 operation(s) for accounts.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-accounts-api-openapi.yml
+- aid: lumos:lumos-activity-api
+  name: Lumos Activity API
+  description: The Activity API from Lumos — 4 operation(s) for activity.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Activity
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-activity-api-openapi.yml
+- aid: lumos:lumos-apps-api
+  name: Lumos Apps API
+  description: The Apps API from Lumos — 4 operation(s) for apps.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Apps
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-apps-api-openapi.yml
+- aid: lumos:lumos-appstore-api
+  name: Lumos AppStore API
+  description: The AppStore API from Lumos — 4 operation(s) for appstore.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - AppStore
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-appstore-api-openapi.yml
+- aid: lumos:lumos-groups-api
+  name: Lumos Groups API
+  description: The Groups API from Lumos — 3 operation(s) for groups.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-groups-api-openapi.yml
+- aid: lumos:lumos-preapprovalrules-api
+  name: Lumos PreApprovalRules API
+  description: The PreApprovalRules API from Lumos — 2 operation(s) for preapprovalrules.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - PreApprovalRules
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-preapprovalrules-api-openapi.yml
+- aid: lumos:lumos-tasks-api
+  name: Lumos Tasks API
+  description: The Tasks API from Lumos — 8 operation(s) for tasks.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Tasks
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-tasks-api-openapi.yml
+- aid: lumos:lumos-users-api
+  name: Lumos Users API
+  description: The Users API from Lumos — 6 operation(s) for users.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-users-api-openapi.yml
+- aid: lumos:lumos-utility-api
+  name: Lumos Utility API
+  description: The Utility API from Lumos — 1 operation(s) for utility.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Utility
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-utility-api-openapi.yml
+- aid: lumos:lumos-vendors-api
+  name: Lumos Vendors API
+  description: The Vendors API from Lumos — 4 operation(s) for vendors.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Vendors
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-vendors-api-openapi.yml
+- aid: lumos:lumos-webhooks-api
+  name: Lumos Webhooks API
+  description: The Webhooks API from Lumos — 1 operation(s) for webhooks.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-webhooks-api-openapi.yml
 common:
   - type: AgenticAccess
     url: agentic-access/lumos-agentic-access.yml
