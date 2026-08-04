@@ -1,0 +1,40 @@
+{
+  "provider": "lumos",
+  "sources": [
+    "lumos-accesspolicies-api-openapi.yml",
+    "lumos-accessrequests-api-openapi.yml",
+    "lumos-accessreviews-api-openapi.yml",
+    "lumos-accounts-api-openapi.yml",
+    "lumos-activity-api-openapi.yml",
+    "lumos-apps-api-openapi.yml",
+    "lumos-appstore-api-openapi.yml",
+    "lumos-groups-api-openapi.yml",
+    "lumos-preapprovalrules-api-openapi.yml",
+    "lumos-tasks-api-openapi.yml",
+    "lumos-users-api-openapi.yml",
+    "lumos-utility-api-openapi.yml",
+    "lumos-vendors-api-openapi.yml",
+    "lumos-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "lumos-accesspolicies-api-openapi.yml",
+    "lumos-accessrequests-api-openapi.yml",
+    "lumos-accessreviews-api-openapi.yml",
+    "lumos-accounts-api-openapi.yml",
+    "lumos-activity-api-openapi.yml",
+    "lumos-apps-api-openapi.yml",
+    "lumos-appstore-api-openapi.yml",
+    "lumos-groups-api-openapi.yml",
+    "lumos-preapprovalrules-api-openapi.yml",
+    "lumos-tasks-api-openapi.yml",
+    "lumos-users-api-openapi.yml",
+    "lumos-utility-api-openapi.yml",
+    "lumos-vendors-api-openapi.yml",
+    "lumos-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
