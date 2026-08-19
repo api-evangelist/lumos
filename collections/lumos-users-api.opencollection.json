@@ -1,0 +1,146 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST AccessPolicies Users API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List company users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users"
+          },
+          "docs": "List company users"
+        },
+        {
+          "info": {
+            "name": "Get authenticated user info",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/current"
+          },
+          "docs": "Get authenticated user info"
+        },
+        {
+          "info": {
+            "name": "Get specific user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get specific user"
+        },
+        {
+          "info": {
+            "name": "List user accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id/accounts",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List user accounts"
+        },
+        {
+          "info": {
+            "name": "Retrieve user roles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/users/:user_id/roles",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve user roles"
+        },
+        {
+          "info": {
+            "name": "Assign role to user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/users/:user_id/roles/:role_name",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "role_name",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Assign role to user"
+        },
+        {
+          "info": {
+            "name": "Remove role from user",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/users/:user_id/roles/:role_name",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "role_name",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove role from user"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

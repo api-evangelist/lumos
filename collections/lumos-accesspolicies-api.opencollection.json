@@ -1,0 +1,108 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST AccessPolicies API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "AccessPolicies",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List access policies",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_policies"
+          },
+          "docs": "List access policies"
+        },
+        {
+          "info": {
+            "name": "Create access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/access_policies",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create access policy"
+        },
+        {
+          "info": {
+            "name": "Get access policy details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get access policy details"
+        },
+        {
+          "info": {
+            "name": "Update access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update access policy"
+        },
+        {
+          "info": {
+            "name": "Delete access policy",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/access_policies/:access_policy_id",
+            "params": [
+              {
+                "name": "access_policy_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete access policy"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

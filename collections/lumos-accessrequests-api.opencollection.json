@@ -1,0 +1,86 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST AccessPolicies AccessRequests API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "AccessRequests",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create access request",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/access_request",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create access request"
+        },
+        {
+          "info": {
+            "name": "List access requests",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/access_requests"
+          },
+          "docs": "List access requests"
+        },
+        {
+          "info": {
+            "name": "Get access request details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/access_requests/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get access request details"
+        },
+        {
+          "info": {
+            "name": "Cancel access request",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/access_requests/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel access request"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

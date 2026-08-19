@@ -1,0 +1,90 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST AccessPolicies PreApprovalRules API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "PreApprovalRules",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List pre-approval rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules"
+          },
+          "docs": "List pre-approval rules"
+        },
+        {
+          "info": {
+            "name": "Create pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create pre-approval rule"
+        },
+        {
+          "info": {
+            "name": "Update pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules/:pre_approval_rule_id",
+            "params": [
+              {
+                "name": "pre_approval_rule_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update pre-approval rule"
+        },
+        {
+          "info": {
+            "name": "Delete pre-approval rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/pre_approval_rules/:pre_approval_rule_id",
+            "params": [
+              {
+                "name": "pre_approval_rule_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete pre-approval rule"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

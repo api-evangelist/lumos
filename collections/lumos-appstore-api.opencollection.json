@@ -1,0 +1,152 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Lumos REST AccessPolicies AppStore API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "AppStore",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List AppStore apps",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/apps"
+          },
+          "docs": "List AppStore apps"
+        },
+        {
+          "info": {
+            "name": "Add app to AppStore",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/apps",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add app to AppStore"
+        },
+        {
+          "info": {
+            "name": "Get AppStore app details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get AppStore app details"
+        },
+        {
+          "info": {
+            "name": "Remove app from AppStore",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/apps/:app_id",
+            "params": [
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove app from AppStore"
+        },
+        {
+          "info": {
+            "name": "List requestable permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.lumos.com/appstore/requestable_permissions"
+          },
+          "docs": "List requestable permissions"
+        },
+        {
+          "info": {
+            "name": "Create requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.lumos.com/appstore/requestable_permissions",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create requestable permission"
+        },
+        {
+          "info": {
+            "name": "Update requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.lumos.com/appstore/requestable_permissions/:permission_id",
+            "params": [
+              {
+                "name": "permission_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update requestable permission"
+        },
+        {
+          "info": {
+            "name": "Delete requestable permission",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.lumos.com/appstore/requestable_permissions/:permission_id",
+            "params": [
+              {
+                "name": "permission_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete requestable permission"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
