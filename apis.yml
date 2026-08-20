@@ -65,6 +65,10 @@ apis:
   humanURL: https://developers.lumos.com/docs/connector-sdk
   tags:
   - Connectors
+  - Integration
+  - SDK
+  tags_raw:
+  - Connectors
   - Integrations
   - SDK
   properties:
@@ -77,6 +81,8 @@ apis:
   description: The AccessPolicies API from Lumos — 2 operation(s) for accesspolicies.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Access Policies
+  tags_raw:
   - AccessPolicies
   properties:
   - type: OpenAPI
@@ -95,6 +101,8 @@ apis:
   description: The AccessReviews API from Lumos — 5 operation(s) for accessreviews.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Access Reviews
+  tags_raw:
   - AccessReviews
   properties:
   - type: OpenAPI
@@ -104,6 +112,8 @@ apis:
   description: The Accounts API from Lumos — 3 operation(s) for accounts.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
@@ -122,6 +132,8 @@ apis:
   description: The Apps API from Lumos — 4 operation(s) for apps.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Application
+  tags_raw:
   - Apps
   properties:
   - type: OpenAPI
@@ -131,6 +143,8 @@ apis:
   description: The AppStore API from Lumos — 4 operation(s) for appstore.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - App Store
+  tags_raw:
   - AppStore
   properties:
   - type: OpenAPI
@@ -140,6 +154,8 @@ apis:
   description: The Groups API from Lumos — 3 operation(s) for groups.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Group
+  tags_raw:
   - Groups
   properties:
   - type: OpenAPI
@@ -158,6 +174,8 @@ apis:
   description: The Tasks API from Lumos — 8 operation(s) for tasks.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Task
+  tags_raw:
   - Tasks
   properties:
   - type: OpenAPI
@@ -167,6 +185,8 @@ apis:
   description: The Users API from Lumos — 6 operation(s) for users.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -194,6 +214,8 @@ apis:
   description: The Webhooks API from Lumos — 1 operation(s) for webhooks.
   humanURL: https://developers.lumos.com/docs/rest-api
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
