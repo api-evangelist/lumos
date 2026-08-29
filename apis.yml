@@ -7,6 +7,18 @@ description: >-
   least privilege, speeds up user access reviews, and eliminates extra SaaS app
   spending through 80+ connectors and an API.
 type: Index
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: self-serve
