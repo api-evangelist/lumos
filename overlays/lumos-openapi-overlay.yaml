@@ -1,0 +1,117 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for the Lumos REST API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-08-29'
+  method: generated
+  source: openapi/lumos-openapi.json (harvested verbatim from https://api.lumos.com/openapi.json)
+  extends: openapi/lumos-openapi.json
+  note: >-
+    Non-destructive. Every action below adds metadata the published contract omits, drawn from Lumos's
+    own developer portal, its OAuth authorization-server metadata, and live response headers. Nothing
+    here invents behaviour. The original spec is never mutated.
+actions:
+- target: $.info
+  description: Add the contact, licence and documentation links the published contract omits.
+  update:
+    contact:
+      name: Lumos Developers
+      url: https://developers.lumos.com/
+    x-documentation: https://developers.lumos.com/reference/lumos-api
+    x-llms-txt: https://developers.lumos.com/llms.txt
+    x-status-page: https://status.lumos.com/
+    x-roadmap: https://developers.lumos.com/page/public-roadmap
+    x-trust-center: https://trust.lumos.com/
+- target: $.info
+  description: >-
+    Flag that info.version 0.1.0 is the FastAPI default and does not track the API, so consumers do
+    not treat it as a release identifier.
+  update:
+    x-version-is-tracked: false
+    x-version-note: >-
+      info.version is a framework default. Lumos publishes no API version scheme; only
+      /v1/knowledge/context carries a version segment.
+- target: $.servers[0]
+  description: Name the production host.
+  update:
+    description: Lumos production API
+- target: $.components.securitySchemes.HTTPBearer
+  description: State the credential format the docs publish but the scheme omits.
+  update:
+    bearerFormat: Lumos API key (lsk_ prefix)
+    description: >-
+      Static API key issued in the Lumos admin UI, sent as `Authorization: Bearer lsk_...`. This
+      credential does NOT authenticate the hosted MCP servers, which require OAuth.
+- target: $.components.securitySchemes
+  description: >-
+    Add the OAuth scheme that governs the two hosted MCP endpoints, discovered from RFC 8414
+    authorization-server metadata at https://api.lumos.com/.well-known/oauth-authorization-server.
+  update:
+    LumosOAuth:
+      type: oauth2
+      description: >-
+        Browser OAuth for https://api.lumos.com/mcp/user and https://api.lumos.com/mcp/admin.
+        Public clients may register dynamically (RFC 7591).
+      flows:
+        authorizationCode:
+          authorizationUrl: https://b.app.lumosidentity.com/b/oauth/authorize
+          tokenUrl: https://b.app.lumosidentity.com/b/oauth/token
+          refreshUrl: https://b.app.lumosidentity.com/b/oauth/token
+          scopes:
+            lumos:user:read: Read the user's own apps, permissions and access requests.
+            lumos:user:write: Submit and cancel access requests for the user.
+            lumos:admin:access-policies:read: Read domain access policies.
+            lumos:admin:access-policies:write: Write domain access policies.
+            lumos:admin:appstore:read: Inspect AppStore apps and approval configuration.
+            lumos:admin:appstore:write: Configure AppStore approval workflows.
+            lumos:admin:knowledge-hub:read: Read Knowledge Hub entries.
+            lumos:admin:knowledge-hub:write: Create, update and archive Knowledge Hub entries.
+            lumos:admin:mcp-governance:read: Read Lumos MCP governance configuration.
+            lumos:admin:mcp-governance:write: Write Lumos MCP governance configuration.
+            lumos:admin:task-center:read: Read approval, provisioning and error tasks.
+            lumos:admin:task-center:write: Act on, reassign, complete and dismiss tasks.
+            lumos:admin:workflows:read: Read workflow configuration.
+            lumos:admin:workflows:write: Write workflow configuration.
+- target: $
+  description: Record the runtime rate-limit headers observed on live responses but absent from the contract.
+  update:
+    x-rate-limit-headers:
+      limit: x-ratelimit-limit
+      remaining: x-ratelimit-remaining
+      reset: x-ratelimit-reset
+      retry_after: retry-after
+      reset_format: unix epoch seconds (float)
+      observed_on: https://api.lumos.com/info
+      observed_at: '2026-08-29'
+- target: $
+  description: Record the three coexisting pagination styles so a client can pick the right loop per path.
+  update:
+    x-pagination-styles:
+    - style: offset
+      params: [page, size]
+      applies_to: most list operations
+    - style: opaque-cursor
+      params: [page_token, page_size]
+      response_field: next_page_token
+      applies_to: /v1/knowledge/context
+    - style: cursor
+      params: [cursor, limit]
+      response_field: next_cursor
+      applies_to: [/identity_events, /activity_logs]
+- target: $
+  description: Record the reversal paths an agent needs before it writes. See conventions/lumos-conventions.yml.
+  update:
+    x-reversibility:
+      createAccessRequest: cancelAccessRequest (while pending)
+      createUserOffboarding: cancelUserOffboarding (while scheduled or in progress)
+      createAccessReview: deleteAccessReview (soft-delete, any status except COMPLETED)
+      addAppsToAccessReview: deleteAccessReviewApp (soft-delete, any status except COMPLETED)
+      createApp: disconnectApp
+      addAppToAppStore: removeAppFromAppStore
+- target: $.paths['/apps'].get
+  description: Note the app_class_id / instance_id distinction that causes most 404s on this contract.
+  update:
+    x-id-note: >-
+      `app_class_id` identifies the integration TYPE from the catalogue; `instance_id` identifies this
+      domain's connected instance. Passing one where the other is expected returns 404.

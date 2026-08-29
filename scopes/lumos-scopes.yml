@@ -1,0 +1,81 @@
+generated: '2026-08-29'
+method: probed
+source: >-
+  https://api.lumos.com/.well-known/oauth-authorization-server (302 -> b.app.lumosidentity.com),
+  https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user,
+  https://api.lumos.com/.well-known/oauth-protected-resource/mcp/admin
+docs: https://developers.lumos.com/docs/lumos-admin-mcp
+description: >-
+  Lumos publishes its OAuth scope vocabulary in RFC 8414 authorization-server metadata rather than in
+  the OpenAPI, which declares only HTTPBearer. These 14 scopes govern the two hosted MCP servers; the
+  REST API itself is authenticated with an lsk_ API key and is NOT scope-partitioned.
+issuer: https://b.app.lumosidentity.com
+flows:
+  authorization_code:
+    authorizationUrl: https://b.app.lumosidentity.com/b/oauth/authorize
+    tokenUrl: https://b.app.lumosidentity.com/b/oauth/token
+    revocationUrl: https://b.app.lumosidentity.com/b/oauth/revoke
+    registrationUrl: https://b.app.lumosidentity.com/b/oauth/register
+    pkce: S256
+    refresh_token: true
+scope_count: 14
+scopes:
+- name: lumos:user:read
+  description: Read the signing-in user's own apps, requestable permissions, and access requests.
+  resource: https://api.lumos.com/mcp/user
+- name: lumos:user:write
+  description: Submit and cancel access requests on the signing-in user's behalf.
+  resource: https://api.lumos.com/mcp/user
+- name: lumos:admin:access-policies:read
+  description: Read domain access policies.
+  resource: https://api.lumos.com/mcp/admin
+- name: lumos:admin:access-policies:write
+  description: Create, update, and delete domain access policies.
+  resource: https://api.lumos.com/mcp/admin
+- name: lumos:admin:appstore:read
+  description: Inspect AppStore apps, requestable permissions, and approval configuration.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: appstore
+- name: lumos:admin:appstore:write
+  description: Configure AppStore approval workflows and permission configuration.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: appstore
+- name: lumos:admin:knowledge-hub:read
+  description: List and read Knowledge Hub entries for the domain.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: knowledge-hub
+- name: lumos:admin:knowledge-hub:write
+  description: Create, update, and archive Knowledge Hub entries.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: knowledge-hub
+- name: lumos:admin:mcp-governance:read
+  description: Read Lumos MCP governance configuration.
+  resource: https://api.lumos.com/mcp/admin
+  note: >-
+    Advertised by the authorization server but no matching toolset is documented on the admin MCP
+    page. Recorded as published, not as reachable.
+- name: lumos:admin:mcp-governance:write
+  description: Write Lumos MCP governance configuration.
+  resource: https://api.lumos.com/mcp/admin
+  note: Advertised by the authorization server; no documented toolset yet.
+- name: lumos:admin:task-center:read
+  description: Read manual approval, provisioning, and error tasks.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: task-center
+- name: lumos:admin:task-center:write
+  description: Act on, reassign, complete, and dismiss tasks.
+  resource: https://api.lumos.com/mcp/admin
+  toolset: task-center
+- name: lumos:admin:workflows:read
+  description: Read workflow configuration.
+  resource: https://api.lumos.com/mcp/admin
+- name: lumos:admin:workflows:write
+  description: Write workflow configuration.
+  resource: https://api.lumos.com/mcp/admin
+x-evidence:
+- url: https://api.lumos.com/.well-known/oauth-authorization-server
+  status: 200
+- url: https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user
+  status: 200
+- url: https://api.lumos.com/.well-known/oauth-protected-resource/mcp/admin
+  status: 200

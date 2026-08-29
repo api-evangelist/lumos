@@ -1,13 +1,64 @@
-generated: '2026-07-11'
-method: derived
-source: openapi/lumos-openapi.yml
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://developers.lumos.com/docs/rest-api, https://api.lumos.com/openapi.json,
+  https://api.lumos.com/.well-known/oauth-authorization-server, and the RFC 9728 protected-resource
+  documents for both MCP endpoints
+docs: https://developers.lumos.com/docs/rest-api
+description: >-
+  Lumos runs TWO independent credential systems on one host. The REST API takes a static bearer API
+  key prefixed `lsk_`. The two hosted MCP servers take an OAuth 2.1 access token from
+  b.app.lumosidentity.com and explicitly refuse API keys. An agent that has a working REST key still
+  cannot call the MCP servers, and vice versa.
 summary:
   types:
   - http
+  - oauth2
+  systems: 2
 schemes:
-- name: BearerAuth
+- name: HTTPBearer
   type: http
   scheme: bearer
   bearerFormat: Lumos API key (lsk_ prefix)
+  applies_to: REST API (https://api.lumos.com)
+  in: Authorization header
+  key_prefix: lsk_
+  rotation: not documented
+  expiry: not documented
   sources:
-  - openapi/lumos-openapi.yml
+  - openapi/lumos-openapi.json
+  - https://developers.lumos.com/docs/rest-api
+- name: LumosOAuth
+  type: oauth2
+  applies_to:
+  - https://api.lumos.com/mcp/user
+  - https://api.lumos.com/mcp/admin
+  flows:
+    authorizationCode:
+      authorizationUrl: https://b.app.lumosidentity.com/b/oauth/authorize
+      tokenUrl: https://b.app.lumosidentity.com/b/oauth/token
+      refreshUrl: https://b.app.lumosidentity.com/b/oauth/token
+      pkce: S256
+  issuer: https://b.app.lumosidentity.com
+  dynamic_client_registration: https://b.app.lumosidentity.com/b/oauth/register
+  token_endpoint_auth_methods:
+  - none
+  - client_secret_basic
+  - client_secret_post
+  scopes: scopes/lumos-scopes.yml
+  discovery:
+  - https://api.lumos.com/.well-known/oauth-authorization-server
+  - https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user
+  - https://api.lumos.com/.well-known/oauth-protected-resource/mcp/admin
+  sources:
+  - well-known/lumos-oauth-authorization-server.json
+  - https://developers.lumos.com/docs/mcp
+  note: >-
+    Public-client friendly — `none` is an accepted token endpoint auth method and RFC 7591 dynamic
+    registration is open, which is what lets an arbitrary MCP client onboard without a pre-provisioned
+    client_id.
+challenge_observed:
+  url: https://api.lumos.com/mcp/user
+  http_status: 401
+  www_authenticate: Bearer resource_metadata="https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user"
+  probed: '2026-08-29'

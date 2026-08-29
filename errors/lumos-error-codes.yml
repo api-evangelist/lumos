@@ -1,0 +1,119 @@
+generated: '2026-08-29'
+method: derived
+source: openapi/lumos-openapi.json (harvested from https://api.lumos.com/openapi.json)
+docs: https://developers.lumos.com/reference/lumos-api
+description: >-
+  Lumos publishes a first-class error envelope in its contract — `ApiError`, carrying a categorical
+  `type`, a stable machine-readable `code`, a human `detail`, and per-field `errors[]`. It is NOT
+  RFC 9457 problem+json; every response, success and failure alike, is application/json.
+format: vendor-envelope
+media_type: application/json
+rfc9457: false
+envelope:
+  schema: ApiError
+  fields:
+  - name: detail
+    type: string
+    description: Human-readable summary of the error.
+  - name: type
+    type: string
+    enum_ref: ErrorType
+    description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
+  - name: code
+    type: string
+    description: Stable machine-readable error code. The contract says explicitly to branch on this, not on `detail`.
+  - name: errors
+    type: array
+    items: ApiErrorField
+    description: Per-field errors.
+  field_error:
+    schema: ApiErrorField
+    fields:
+    - field   # e.g. 'steps[2].inputs.group_id'
+    - code
+    - message
+categories:
+- id: validation
+  description: Input failed validation.
+- id: authentication
+  description: Missing or invalid credentials.
+- id: permission
+  description: Authenticated but not authorised.
+- id: not_found
+  description: Target does not exist in this domain.
+- id: conflict
+  description: State conflict with the current resource.
+- id: rate_limited
+  description: Throttled.
+- id: runtime
+  description: Server-side failure.
+secondary_envelope:
+  schema: HTTPValidationError
+  note: >-
+    FastAPI's default 422 shape (`detail[]` of `{loc, msg, type}`) is still the declared body for the
+    422 response on all 84 operations that have one. Two different validation shapes therefore exist:
+    ApiError for the newer product areas, HTTPValidationError for the FastAPI default. An agent must
+    handle both.
+status_codes:
+- code: '400'
+  count: 15
+  title: Bad request
+  meaning: >-
+    Request could not be processed. Common causes are missing or malformed credentials, an unknown
+    `app_class_id`, or an invalid configuration value.
+  remediation: Read `detail` for the specific reason; do not retry unchanged.
+- code: '401'
+  count: 5
+  title: Unauthorized
+  meaning: Missing or invalid bearer credential.
+  remediation: Re-issue the lsk_ key, or complete the OAuth flow for MCP surfaces.
+- code: '403'
+  count: 20
+  title: Forbidden
+  meaning: The caller lacks permission to manage this object on this domain.
+  remediation: Not retryable. Escalate to a domain admin.
+- code: '404'
+  count: 20
+  title: Not found
+  meaning: No such object is available to your domain.
+  remediation: Not retryable.
+- code: '409'
+  count: 11
+  title: Conflict
+  meaning: >-
+    State conflict — an instance already exists, or the target is already in the requested status.
+  remediation: >-
+    On the task endpoints the contract states a 409 "is safe to treat as idempotent", which makes it
+    the recovery path for a double-fired complete/dismiss.
+- code: '422'
+  count: 84
+  title: Validation Error
+  meaning: Request body or query parameters failed validation.
+  remediation: Fix the offending field named in `detail[].loc` or `errors[].field`.
+- code: '429'
+  count: 6
+  title: Too many requests
+  meaning: A sync is already in flight for this app, or the caller exceeded the request rate.
+  remediation: Honour the `Retry-After` header (seconds) and retry after it elapses.
+  headers:
+  - Retry-After
+- code: '500'
+  count: 5
+  title: Internal Server Error
+  meaning: Unhandled server failure.
+  remediation: Retryable with backoff.
+- code: '501'
+  count: 4
+  title: Not implemented
+  meaning: This app does not support the requested operation.
+  remediation: Not retryable — capability gap in the connector, not a transient error.
+- code: '502'
+  count: 3
+  title: Bad gateway
+  meaning: The third-party service rejected the credentials, or the post-connect sync failed.
+  remediation: Re-validate the app credentials; retry after fixing upstream.
+notes:
+- >-
+  The 501 and 502 classes are unusual and worth reading as domain semantics rather than infrastructure
+  noise: Lumos is a broker in front of ~80 third-party connectors, so "this app cannot do that" (501)
+  and "the third party rejected us" (502) are ordinary business outcomes of a connect/sync call.

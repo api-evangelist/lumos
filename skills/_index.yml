@@ -1,0 +1,36 @@
+generated: '2026-08-29'
+method: generated
+source: openapi/lumos-openapi.json (https://api.lumos.com/openapi.json)
+provider: Lumos
+description: >-
+  Packaged Agent Skills for the four marquee Lumos flows. Every operationId referenced below was
+  grepped out of the harvested contract; none is invented. Each skill states the reversal path and the
+  fact that Lumos ships no idempotency key, because both matter before an agent writes.
+skills:
+- name: lumos-request-access
+  file: lumos-request-access.md
+  description: Request an AppStore permission for a user, track it, and cancel it while pending.
+  operations: 6
+  consequence: write
+  reversible: true
+- name: lumos-run-access-review
+  file: lumos-run-access-review.md
+  description: Create and scope an access review campaign, and soft-delete the campaign or an app in it.
+  operations: 8
+  consequence: write
+  reversible: true
+- name: lumos-offboard-user
+  file: lumos-offboard-user.md
+  description: Trigger, track and cancel a user offboarding.
+  operations: 6
+  consequence: write
+  reversible: true
+  human_in_the_loop: recommended
+- name: lumos-clear-task-queue
+  file: lumos-clear-task-queue.md
+  description: Work the Task Center — complete, dismiss, reassign or comment on tasks.
+  operations: 8
+  consequence: write
+  reversible: false
+  human_in_the_loop: recommended
+provider_published_skills: none found

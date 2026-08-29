@@ -1,0 +1,149 @@
+generated: '2026-08-29'
+method: probed
+source: >-
+  https://developers.lumos.com/docs/mcp, https://developers.lumos.com/docs/lumos-admin-mcp,
+  and live POST tools/list probes of https://api.lumos.com/mcp/user and https://api.lumos.com/mcp/admin
+  plus their RFC 9728 protected-resource metadata.
+name: Lumos MCP
+description: >-
+  Lumos ships TWO first-party remote MCP servers on its own API host: an end-user server for
+  self-service access requests, and an admin server whose tools are selected per-connection through a
+  `toolsets` query parameter. Both are OAuth-gated — there is no anonymous tools/list — and both
+  advertise RFC 9728 protected-resource metadata pointing at the Lumos authorization server.
+deployment:
+  mode: remote
+  endpoint: https://api.lumos.com/mcp/user
+  auth: oauth
+  verified: probed
+  note: >-
+    Two remote endpoints exist; `endpoint` names the user server because it is the one an ordinary
+    agent connects to. The admin server is https://api.lumos.com/mcp/admin and is listed in servers[]
+    below. No stdio package is published — there is no npx/uvx install anywhere in the docs, on npm,
+    or in the teamlumos GitHub org, so mode is remote rather than both.
+servers:
+- name: Lumos MCP (user)
+  endpoint: https://api.lumos.com/mcp/user
+  transport: streamable-http
+  auth: oauth
+  status: live
+  x-evidence:
+    probed: '2026-08-29'
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    http_status: 401
+    www_authenticate: Bearer resource_metadata="https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user"
+    resource_metadata_status: 200
+  scopes:
+  - lumos:user:read
+  - lumos:user:write
+  authorization_servers:
+  - https://b.app.lumosidentity.com
+  tools:
+  - name: search_apps
+    source: docs
+  - name: search_requestable_permissions
+    source: docs
+  - name: list_requestable_permissions
+    source: docs
+  - name: submit_access_request
+    source: docs
+  - name: list_access_requests
+    source: docs
+  tools_note: >-
+    Tool NAMES come from https://developers.lumos.com/docs/mcp. Input schemas require authenticated
+    introspection — the live tools/list returns 401 with an OAuth challenge, so no inputSchema is
+    recorded here rather than guessed.
+- name: Lumos Admin MCP
+  endpoint: https://api.lumos.com/mcp/admin
+  transport: streamable-http
+  auth: oauth
+  status: live
+  x-evidence:
+    probed: '2026-08-29'
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    http_status: 401
+    www_authenticate: Bearer resource_metadata="https://api.lumos.com/.well-known/oauth-protected-resource/mcp/admin"
+    resource_metadata_status: 200
+  toolsets_parameter: '?toolsets=<core|task-center|knowledge-hub|appstore|all>'
+  toolsets:
+  - name: core
+    default: true
+    description: Read-only look around the Task Center and Knowledge Hub, no write access.
+  - name: task-center
+    description: Manage manual approval, provisioning, and error tasks.
+    scopes:
+    - lumos:admin:task-center:read
+    - lumos:admin:task-center:write
+  - name: knowledge-hub
+    description: List, create, update, and archive knowledge entries.
+    scopes:
+    - lumos:admin:knowledge-hub:read
+    - lumos:admin:knowledge-hub:write
+  - name: appstore
+    description: Inspect and configure approval workflows for apps.
+    scopes:
+    - lumos:admin:appstore:read
+    - lumos:admin:appstore:write
+  scopes:
+  - lumos:admin:access-policies:read
+  - lumos:admin:access-policies:write
+  - lumos:admin:appstore:read
+  - lumos:admin:appstore:write
+  - lumos:admin:knowledge-hub:read
+  - lumos:admin:knowledge-hub:write
+  - lumos:admin:mcp-governance:read
+  - lumos:admin:mcp-governance:write
+  - lumos:admin:task-center:read
+  - lumos:admin:task-center:write
+  - lumos:admin:workflows:read
+  - lumos:admin:workflows:write
+  authorization_servers:
+  - https://b.app.lumosidentity.com
+  tools:
+  - name: list_task_center_tasks
+    toolset: task-center
+    source: docs
+  - name: get_task_center_task
+    toolset: task-center
+    source: docs
+  - name: act_on_task_center_task
+    toolset: task-center
+    source: docs
+  - name: create_knowledge
+    toolset: knowledge-hub
+    source: docs
+  - name: update_knowledge
+    toolset: knowledge-hub
+    source: docs
+  - name: delete_knowledge
+    toolset: knowledge-hub
+    source: docs
+  - name: update_approval_config
+    toolset: appstore
+    source: docs
+  - name: update_permission_config
+    toolset: appstore
+    source: docs
+  tools_note: >-
+    Partial — the admin docs page enumerates these by name; the full per-toolset tool list and every
+    inputSchema require an authenticated tools/list. Not fabricated beyond what the docs state.
+authorization:
+  flow: authorization_code
+  pkce: S256
+  dynamic_client_registration: https://b.app.lumosidentity.com/b/oauth/register
+  authorization_endpoint: https://b.app.lumosidentity.com/b/oauth/authorize
+  token_endpoint: https://b.app.lumosidentity.com/b/oauth/token
+  revocation_endpoint: https://b.app.lumosidentity.com/b/oauth/revoke
+  metadata: well-known/lumos-oauth-authorization-server.json
+  note: >-
+    Browser OAuth only — the Lumos MCP docs state "you never paste an API key or token into the
+    client". The REST API's lsk_ bearer key is a different credential and does not authenticate MCP.
+related:
+  example_client: https://github.com/teamlumos/lumos-mcp-slack-bot
+  governance_scopes:
+  - lumos:admin:mcp-governance:read
+  - lumos:admin:mcp-governance:write
+  governance_note: >-
+    Lumos also sells governance OF other MCP servers — the `mcp-governance` scope pair is advertised by
+    the authorization server even though no mcp-governance toolset is documented on the admin page yet.

@@ -1,0 +1,54 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://status.lumos.com/api/v2/summary.json, https://developers.lumos.com/page/public-roadmap,
+  https://developers.lumos.com/llms.txt, openapi/lumos-openapi.json
+description: Versioning, deprecation, status and roadmap posture for the Lumos API surface.
+status_page:
+  url: https://status.lumos.com/
+  provider: Atlassian Statuspage
+  machine_readable: https://status.lumos.com/api/v2/summary.json
+  page_id: 1sjqgxtvbz7c
+  history: https://status.lumos.com/history
+  verified:
+    url: https://status.lumos.com/api/v2/summary.json
+    http_status: 200
+    probed: '2026-08-29'
+roadmap:
+  url: https://developers.lumos.com/page/public-roadmap
+  public: true
+  verified:
+    http_status: 200
+    probed: '2026-08-29'
+versioning:
+  scheme: mixed-path
+  current_version: unversioned (with a /v1 prefix on the newest area only)
+  detail: >-
+    64 of 64 paths are served from https://api.lumos.com. Only /v1/knowledge/context carries a version
+    segment; every other path is unversioned. info.version in the published contract is 0.1.0, the
+    FastAPI default, and does not track the API. There is no version header, no media-type versioning
+    and no documented version-negotiation.
+  breaking_change_policy: not published
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No deprecation or sunset policy exists on developers.lumos.com, and no operation in the contract
+    carries `deprecated: true`. Deprecation is signalled inline in prose at the FIELD level instead.
+  deprecated_fields:
+  - object: AccessRequest input
+    field: note
+    replacement: business_justification
+    evidence: '"[Deprecated - use business_justification] Why the user needs access."'
+    source: openapi/lumos-openapi.json
+  deprecated_operations: []
+sla:
+  published: false
+  note: No SLA or uptime commitment is published on the public site or the developer portal.
+changelogs:
+  api_changelog: false
+  note: >-
+    There is no API changelog. Lumos publishes eleven CONNECTOR and agent changelogs instead — see
+    changelog/lumos-changelog.yml.

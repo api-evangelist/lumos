@@ -1,0 +1,152 @@
+generated: '2026-08-29'
+method: derived
+source: mcp/lumos-mcp.yml + openapi/lumos-openapi.json
+description: >-
+  Binds every documented Lumos MCP tool to the REST operationId(s) that back it. The live MCP
+  tools/list is OAuth-gated (401), so bindings are made by name and documented semantics against the
+  harvested api.lumos.com contract — confidence is set honestly per row and no inputSchema is asserted.
+surfaces:
+  openapi: openapi/lumos-openapi.json
+  openapi_source: https://api.lumos.com/openapi.json
+  graphql: null
+  mcp:
+  - url: https://api.lumos.com/mcp/user
+    gated: true
+  - url: https://api.lumos.com/mcp/admin
+    gated: true
+coverage:
+  mcp_tools_documented: 13
+  crosswalked: 11
+  mcp_only: 2
+  rest_operations_total: 89
+  rest_only: 78
+crosswalk:
+- tool: search_apps
+  server: user
+  category: discovery
+  rest:
+  - getAppStoreApps
+  - listApps
+  binding: name+semantics
+  confidence: medium
+  note: >-
+    AppStore app search. `getAppStoreApps` (GET /appstore/apps) accepts `name_search` and
+    `exact_match`; `listApps` (GET /apps) is the broader Core equivalent. Which one the tool calls
+    cannot be confirmed without an authenticated tools/list.
+- tool: search_requestable_permissions
+  server: user
+  category: discovery
+  rest:
+  - get_appstore_permissions_appstore_requestable_permissions_get
+  binding: name+semantics
+  confidence: medium
+- tool: list_requestable_permissions
+  server: user
+  category: discovery
+  rest:
+  - get_appstore_permissions_for_app_appstore_apps__app_id__requestable_permissions_get
+  - get_appstore_permissions_appstore_requestable_permissions_get
+  binding: name+semantics
+  confidence: medium
+- tool: submit_access_request
+  server: user
+  category: write
+  rest:
+  - createAccessRequest
+  binding: name+semantics
+  confidence: high
+  note: POST /appstore/access_request — the single documented create path. Reversible via cancelAccessRequest.
+- tool: list_access_requests
+  server: user
+  category: read
+  rest:
+  - getAccessRequests
+  binding: name+semantics
+  confidence: high
+- tool: list_task_center_tasks
+  server: admin
+  toolset: task-center
+  category: read
+  rest:
+  - list_tasks_tasks_get
+  binding: name+semantics
+  confidence: high
+- tool: get_task_center_task
+  server: admin
+  toolset: task-center
+  category: read
+  rest:
+  - get_task_tasks__task_id__get
+  binding: name+semantics
+  confidence: high
+- tool: act_on_task_center_task
+  server: admin
+  toolset: task-center
+  category: write
+  rest:
+  - perform_task_action_tasks__task_id__perform_action_post
+  - complete_task_tasks__task_id__complete_post
+  - dismiss_task_tasks__task_id__dismiss_post
+  binding: semantics
+  confidence: medium
+  note: >-
+    One tool fronting three REST verbs. The spec is explicit that `complete` resolves the unique
+    COMPLETED-transition action and `perform-action` is the escape hatch for tasks with several.
+- tool: create_knowledge
+  server: admin
+  toolset: knowledge-hub
+  category: write
+  rest:
+  - createKnowledgeContext
+  binding: name+semantics
+  confidence: high
+- tool: update_knowledge
+  server: admin
+  toolset: knowledge-hub
+  category: write
+  rest:
+  - updateKnowledgeContext
+  binding: name+semantics
+  confidence: high
+- tool: delete_knowledge
+  server: admin
+  toolset: knowledge-hub
+  category: write
+  rest:
+  - deleteKnowledgeContext
+  binding: name+semantics
+  confidence: high
+  note: >-
+    The admin docs describe this toolset as "list, create, update, and archive"; the REST verb is
+    DELETE /v1/knowledge/context/{id}. Whether the delete is soft (archive) is not stated in the spec.
+mcp_only:
+- tool: update_approval_config
+  server: admin
+  toolset: appstore
+  reason: >-
+    No public REST operation writes an AppStore approval configuration by that name. The nearest
+    surface is updateAppStoreAppSettings (PATCH /appstore/apps/{app_id}/settings), but the mapping is
+    not stated anywhere and is not asserted here.
+- tool: update_permission_config
+  server: admin
+  toolset: appstore
+  reason: >-
+    Likely fronts update_appstore_permission_appstore_requestable_permissions__permission_id__patch,
+    but the docs do not say so and the schema is gated. Left unmapped rather than guessed.
+rest_only_summary:
+  count: 78
+  note: >-
+    The REST contract is far wider than either MCP surface. Whole product areas have no tool at all —
+    Access Reviews (8 operations), Lifecycle Management offboarding (3), Vendor Management (4),
+    Access Policies (5), Activity/Identity events (2), Integrations (3), account and activity bulk
+    upload (4), user roles (3), and the two inbound Integration Webhook receivers. An agent that can
+    only speak MCP cannot run an access review or offboard a user on Lumos today.
+  areas_without_tools:
+  - Access Reviews
+  - Lifecycle Management
+  - Vendor Management
+  - Access Policies (Core)
+  - Activity Logs / Identity Events
+  - Integrations catalogue
+  - Groups
+  - Users and user roles

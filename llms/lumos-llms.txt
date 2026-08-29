@@ -2,6 +2,8 @@
 
 > Lumos is the first Autonomous Identity Platform that automatically discovers and manages access across all your apps. It goes beyond traditional IGA by delivering: Complete Visibility: Uncover every app, identity and permission to see your entire access landscape. Actionable Insights: Lumos pinpoints the biggest security risks and costs inefficiencies, giving teams clear direction to reduce access sprawl effectively. Full Automation: Automate the whole identity lifecycle from joiner-mover-leaver workflows to JIT access to access reviews. Adaptive Systems: Keep RBAC policies up-to-date with AI as your organization evolves.
 
+Append .md to any documentation page URL to get its markdown version.
+
 ## Guides
 - [🏁 Getting Started](https://developers.lumos.com/docs/getting-started.md): Empower secure access in minutes—explore, integrate, and automate with the Lumos Autonomous Identity Platform.
 - [🚀 Quick Start](https://developers.lumos.com/docs/quick-start.md): Launch your first Lumos integration in minutes—authenticate, create, and manage accounts

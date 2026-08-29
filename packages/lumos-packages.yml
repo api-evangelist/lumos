@@ -1,0 +1,102 @@
+generated: '2026-08-29'
+method: searched
+source: https://pypi.org/pypi/connector-py/json, https://pypi.org/pypi/lumos-identity-cli/json,
+  https://registry.terraform.io/v2/providers?filter[name]=lumos, https://proxy.golang.org/github.com/teamlumos/lumos-go-sdk/@latest,
+  https://github.com/teamlumos
+summary:
+  total: 5
+  official: 5
+  registries:
+  - pypi
+  - terraform-registry
+  - go-proxy
+  - homebrew
+  note: >-
+    Every package below is published from the teamlumos GitHub organisation
+    (https://github.com/teamlumos) or carries a lumos.com contact address in its registry
+    metadata, so all five are first-party. Note the apis.yml GitHub pointer previously named
+    github.com/Lumos-Labs, which is an empty personal account with 0 public repositories —
+    the real code org is teamlumos.
+packages:
+- name: connector-py
+  registry: pypi
+  url: https://pypi.org/project/connector-py/
+  official: true
+  language: python
+  version: 4.260.0
+  published: '2026-08-26'
+  description: Lumos Connector SDK — build custom connectors that plug third-party apps back into Lumos.
+  docs: https://developers.lumos.com/reference/the-lumos-connector-api
+  install: pip install connector-py
+  evidence:
+    contact: security@lumos.com (PyPI author_email)
+    project_urls_documentation: https://developers.lumos.com/reference/the-lumos-connector-api
+  note: >-
+    The most actively released Lumos package — 4.260.0 shipped three days before this probe.
+    This is the surface behind the "Lumos Connector SDK" API entry in apis.yml.
+- name: lumos-identity-cli
+  registry: pypi
+  url: https://pypi.org/project/lumos-identity-cli/
+  official: true
+  language: python
+  version: 2.4.2
+  published: '2026-05-20'
+  description: Lumos command line interface — AppStore access requests, listing, and auth.
+  install: pip install lumos-identity-cli
+  repository: https://github.com/teamlumos/lumos-cli
+  binary: lumos
+- name: lumos
+  registry: homebrew
+  url: https://github.com/teamlumos/homebrew-tap
+  official: true
+  language: python
+  version: 2.4.2
+  published: '2026-05-20'
+  description: Homebrew tap distribution of the Lumos CLI (macOS arm64, Linux amd64/arm64 binaries).
+  install: brew install teamlumos/tap/lumos
+  formula: https://raw.githubusercontent.com/teamlumos/homebrew-tap/main/Formula/lumos.rb
+  note: >-
+    Version read from the tap formula itself (`version "2.4.2"`), which pins release tarballs by
+    sha256 — a tap has no registry metadata endpoint, so `published` mirrors the matching PyPI release.
+- name: teamlumos/lumos
+  registry: terraform-registry
+  url: https://registry.terraform.io/providers/teamlumos/lumos/latest
+  official: true
+  language: go
+  version: 0.10.4
+  published: '2026-06-22'
+  description: Lumos Terraform provider — manage Lumos AppStore and access configuration as code.
+  repository: https://github.com/teamlumos/terraform-provider-lumos
+  downloads: 49237
+  tier: community
+- name: github.com/teamlumos/lumos-go-sdk
+  registry: go-proxy
+  url: https://pkg.go.dev/github.com/teamlumos/lumos-go-sdk
+  official: true
+  language: go
+  version: v0.0.0-20240521184604-eaa84bbdda58
+  published: '2024-05-21'
+  description: Lumos Go SDK.
+  repository: https://github.com/teamlumos/lumos-go-sdk
+  note: >-
+    ABANDONMENT SIGNAL — untagged and unreleased since 2024-05-21, more than two years behind the
+    live api.lumos.com contract it wraps (89 operations, 189 schemas). No semver tag has ever been
+    published; the go proxy only resolves a pseudo-version from the last commit.
+absent:
+  - registry: npm
+    checked:
+    - '@lumos/mcp'
+    - '@lumos-labs/connector-sdk'
+    result: not published
+    note: >-
+      `lumos-cli` DOES exist on npm but is an unrelated scaffolding tool for the "lumosjs" framework
+      (github.com/lumosjs) — NOT this company. Rejected on ownership.
+  - registry: pypi
+    checked:
+    - lumos-cli
+    result: name taken by an unrelated project
+    note: PyPI `lumos-cli` 0.1.1.post1 (2022) is "a cell painting plateviewer" — not this company.
+  - registry: maven-central
+    result: not checked against a named artifact; no Java SDK is referenced anywhere in the docs
+  - registry: nuget
+    result: no .NET SDK referenced in the docs

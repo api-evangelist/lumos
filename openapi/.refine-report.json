@@ -35,6 +35,22 @@
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
+  "notes": [
+    "lumos-accesspolicies-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-accessrequests-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-accessreviews-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-accounts-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-activity-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-apps-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-appstore-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-groups-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-preapprovalrules-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-tasks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-users-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-utility-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-vendors-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-webhooks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
   "skipped": []
 }

@@ -1,0 +1,35 @@
+generated: '2026-08-29'
+method: searched
+source: https://trust.lumos.com/
+description: >-
+  Lumos runs a public trust centre at trust.lumos.com, hosted on Vanta. www.lumos.com/security
+  redirects there, so it is the company's canonical security posture page.
+trust_center:
+  url: https://trust.lumos.com/
+  platform: Vanta Trust Center
+  verified:
+    http_status: 200
+    probed: '2026-08-29'
+  redirect_from: https://www.lumos.com/security
+certifications: []
+certifications_note: >-
+  NO certification is asserted here. The Vanta trust centre is a client-rendered single-page app — the
+  served HTML is 7,466 bytes of bootstrap with no certification names in it, and the Vanta backend
+  proxy is not reachable anonymously. Certifications may well be listed to a human with a browser;
+  they are not machine-readable, so nothing was recorded. This is an `unreadable` surface, not an
+  absent one.
+evidence:
+- url: https://trust.lumos.com/
+  status: 200
+  note: 7,466-byte Vanta SPA shell; zero occurrences of SOC, ISO, HIPAA, GDPR, PCI or FedRAMP in the body.
+- url: https://www.lumos.com/security
+  status: 200
+  note: Redirects to https://trust.lumos.com/.
+security_contact:
+  email: security@lumos.com
+  source: PyPI package metadata for connector-py (author_email "teamlumos <security@lumos.com>")
+  note: >-
+    Recorded as an observed contact address, NOT as a published vulnerability disclosure policy —
+    Lumos serves no /.well-known/security.txt on any host and publishes no disclosure or bug-bounty
+    page that could be found. No VulnerabilityDisclosure artifact was written and no `Security`
+    pointer was emitted.

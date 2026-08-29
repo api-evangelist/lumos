@@ -1,0 +1,127 @@
+generated: '2026-08-29'
+method: probed
+source: direct HTTPS GET of /.well-known/* on every apis.yml host and every OpenAPI servers[] host
+summary:
+  hosts_probed: 4
+  documents_served: 3
+  note: >-
+    api.lumos.com serves RFC 8414 authorization-server metadata and TWO RFC 9728 protected-resource
+    documents, one per hosted MCP endpoint. No security.txt, no api-catalog, and no agent card on any
+    host. app.lumosidentity.com answers 200 with the same 1,297-byte React shell for EVERY
+    /.well-known/* path, including paths that cannot exist — that is an SPA catch-all, not a document,
+    and is recorded below as a miss.
+hosts:
+- host: api.lumos.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: lumos-oauth-authorization-server.json
+    content_type: application/json
+    note: >-
+      302-redirects to https://b.app.lumosidentity.com/.well-known/oauth-authorization-server and
+      returns real RFC 8414 metadata — 14 scopes, PKCE S256, dynamic client registration (RFC 7591).
+  - path: /.well-known/oauth-protected-resource/mcp/user
+    status: 200
+    file: lumos-oauth-protected-resource-mcp-user.json
+    content_type: application/json
+    note: RFC 9728 resource metadata for the hosted user MCP server.
+  - path: /.well-known/oauth-protected-resource/mcp/admin
+    status: 200
+    file: lumos-oauth-protected-resource-mcp-admin.json
+    content_type: application/json
+    note: RFC 9728 resource metadata for the hosted admin MCP server.
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    note: The bare path 404s; only the per-resource sub-paths above are served.
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: www.lumos.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: developers.lumos.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: app.lumosidentity.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — 1,297-byte single-page-app shell returned for every path. Treated as a miss.
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — same SPA shell.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — same SPA shell.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — same SPA shell.
+  - path: /.well-known/api-catalog
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — same SPA shell.
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT A DOCUMENT — same SPA shell.
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: null
+    content_type: text/html
+    note: >-
+      NOT AN AGENT CARD — 200 with HTML, fails every AgentCard shape check. No a2a/ artifact was
+      written and no AgentCard pointer was emitted.
+  - path: /.well-known/agent.json
+    status: 200
+    file: null
+    content_type: text/html
+    note: NOT AN AGENT CARD — same SPA shell.

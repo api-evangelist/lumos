@@ -1,0 +1,211 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  openapi/lumos-openapi.json (https://api.lumos.com/openapi.json), https://developers.lumos.com/docs/rest-api,
+  https://developers.lumos.com/llms.txt, and live response-header probes of https://api.lumos.com/info
+description: Cross-cutting runtime semantics for the Lumos REST API and its two hosted MCP servers.
+auth:
+  style: bearer-api-key
+  header: 'Authorization: Bearer lsk_...'
+  mcp: oauth2 authorization_code + PKCE (separate credential — see authentication/lumos-authentication.yml)
+  see: authentication/lumos-authentication.yml
+idempotency:
+  supported: false
+  key_header: null
+  mechanism: none
+  note: >-
+    NO idempotency-key mechanism exists. The string "Idempotency-Key" appears nowhere in the contract,
+    the docs, or any observed response header. What Lumos does document is NATURAL idempotency on two
+    surfaces: PUT /access_policies/{id} and PUT /apps/{app_id} are full replacements, and the task
+    endpoints return 409 when the task is already in the requested status, which the contract says is
+    "safe to treat as idempotent". That is a recovery convention, not a replay guarantee — a retried
+    POST /appstore/access_request WILL create a second request. No `Idempotency` pointer was emitted
+    in apis.yml because emitting one would assert a mechanism the provider does not ship.
+  natural_idempotent_operations:
+  - updateAccessPolicy
+  - reconnectApp
+  - complete_task_tasks__task_id__complete_post
+  - dismiss_task_tasks__task_id__dismiss_post
+pagination:
+  styles: 3
+  note: >-
+    Three different pagination styles coexist in one contract. An agent cannot use one loop for all of
+    Lumos.
+  variants:
+  - style: offset
+    params:
+    - page
+    - size
+    operations: 16
+    note: The dominant style. `size` is capped by the server; listAccessReviews documents the cap.
+  - style: opaque-cursor
+    params:
+    - page_token
+    - page_size
+    response_field: next_page_token
+    operations: 5
+    scope: /v1/knowledge/context
+    note: >-
+      Contract instructs "Treat as opaque: do not decode, construct, or interpret it." Terminates when
+      next_page_token is null.
+  - style: cursor
+    params:
+    - cursor
+    - limit
+    response_field: next_cursor
+    scope: /identity_events, /activity_logs
+    note: Response also carries total_count.
+expansion:
+  param: expand
+  operations: 12
+  note: Sparse-to-rich expansion of related objects on 12 read operations.
+filtering:
+  common_params:
+  - search_term
+  - name_search
+  - exact_match
+  - status
+  - app_id
+  - include_inherited_configs
+  - in_app_store
+  - connection_source
+  - disconnected
+  - discovered_before
+metadata:
+  custom_attributes: true
+  note: >-
+    Vendor agreements carry customer-defined custom attributes written one label at a time via
+    PUT /vendor_agreements/{id}/custom_attributes/{label}. The Custom Attribute Definitions tag in the
+    contract governs their schema.
+request_id_tracing:
+  supported: false
+  note: No request-id or trace header is declared in the contract or observed on live responses.
+versioning:
+  style: mixed-path
+  note: >-
+    Most paths are unversioned (/apps, /users, /tasks). Only the newest product area is versioned —
+    /v1/knowledge/context. info.version in the contract reads 0.1.0, which is a FastAPI default and
+    does not track the API. There is no version header and no documented version-negotiation.
+  see: lifecycle/lumos-lifecycle.yml
+errors:
+  envelope: ApiError
+  rfc9457: false
+  see: errors/lumos-error-codes.yml
+rate_limit_signaling:
+  headers:
+  - x-ratelimit-limit
+  - x-ratelimit-remaining
+  - x-ratelimit-reset
+  - retry-after
+  status: 429
+  observed: true
+  see: rate-limits/lumos-rate-limits.yml
+dry_run_mode:
+  supported: false
+  note: No preview/dry-run/validate-only parameter exists on any write operation.
+reversibility:
+  grade: verified
+  summary: >-
+    Lumos is an access-granting platform, so almost every write has a stated inverse — that is the
+    product. Three reversals carry an explicit window or state precondition in the contract; the rest
+    are documented paths with no stated window.
+  surfaces:
+  - write_operation: createAccessRequest
+    write_path: POST /appstore/access_request
+    reversal: cancelAccessRequest
+    reversal_path: DELETE /appstore/access_requests/{id}
+    window: >-
+      While the request is still pending. The CLI exposes the same reversal as `lumos request cancel`,
+      documented as "revoke a pending access request".
+    window_stated: true
+    docs: https://developers.lumos.com/reference/cancelaccessrequest-1
+    grade: verified
+  - write_operation: createUserOffboarding
+    write_path: POST /lifecycle-management/user-offboardings
+    reversal: cancelUserOffboarding
+    reversal_path: POST /lifecycle-management/user-offboardings/{user_offboarding_id}/cancel
+    window: >-
+      While the offboarding is scheduled or in progress — the reference states "Cancel a scheduled or
+      in-progress user offboarding." Returns 409 once it is past that state.
+    window_stated: true
+    docs: https://developers.lumos.com/reference/canceluseroffboarding
+    grade: verified
+  - write_operation: createAccessReview
+    write_path: POST /access_reviews
+    reversal: deleteAccessReview
+    reversal_path: DELETE /access_reviews/{access_review_id}
+    window: >-
+      Soft-delete, allowed on any review that is not COMPLETED; fails with 400 while a review
+      duplication is in progress.
+    window_stated: true
+    docs: https://developers.lumos.com/reference/deleteaccessreview
+    grade: verified
+  - write_operation: addAppsToAccessReview
+    write_path: POST /access_reviews/{access_review_id}/apps
+    reversal: deleteAccessReviewApp
+    reversal_path: DELETE /access_reviews/{access_review_id}/apps/{arda_id}
+    window: Soft-delete, allowed on any review that is not already COMPLETED.
+    window_stated: true
+    grade: verified
+  - write_operation: createApp
+    write_path: POST /apps
+    reversal: disconnectApp
+    reversal_path: DELETE /apps/{app_id}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: addAppToAppStore
+    write_path: POST /appstore/apps
+    reversal: removeAppFromAppStore
+    reversal_path: DELETE /appstore/apps/{app_id}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: createAccessPolicy
+    write_path: POST /access_policies
+    reversal: deleteAccessPolicy
+    reversal_path: DELETE /access_policies/{access_policy_id}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: createKnowledgeContext
+    write_path: POST /v1/knowledge/context
+    reversal: deleteKnowledgeContext
+    reversal_path: DELETE /v1/knowledge/context/{knowledge_context_id}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: add_role_to_user_users__user_id__roles__role_name__post
+    write_path: POST /users/{user_id}/roles/{role_name}
+    reversal: remove_role_from_user_users__user_id__roles__role_name__delete
+    reversal_path: DELETE /users/{user_id}/roles/{role_name}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: create_appstore_requestable_permission_appstore_requestable_permissions_post
+    write_path: POST /appstore/requestable_permissions
+    reversal: delete_appstore_permission_appstore_requestable_permissions__permission_id__delete
+    reversal_path: DELETE /appstore/requestable_permissions/{permission_id}
+    window: null
+    window_stated: false
+    grade: documented
+  - write_operation: create_pre_approval_rule_appstore_pre_approval_rules_post
+    write_path: POST /appstore/pre_approval_rules
+    reversal: delete_pre_approval_rule_appstore_pre_approval_rules__pre_approval_rule_id__delete
+    reversal_path: DELETE /appstore/pre_approval_rules/{pre_approval_rule_id}
+    window: null
+    window_stated: false
+    grade: documented
+  irreversible:
+  - operation: complete_task_tasks__task_id__complete_post
+    note: >-
+      No un-complete. A completed approval task has already applied its access grant. The only inverse
+      is a new, opposite write (revoke the permission), not a reversal of this call.
+  - operation: perform_task_action_tasks__task_id__perform_action_post
+    note: Custom workflow actions have no declared inverse.
+  - operation: triggerAppSync
+    note: A sync is not undoable; it is idempotent-ish in effect but returns 429 while one is in flight.
+  - operation: postAccounts
+    note: Bulk account upload — no documented rollback of an upload job.
+  - operation: activityRecords
+    note: Activity records are append-only.

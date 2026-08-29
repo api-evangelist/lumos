@@ -1,0 +1,261 @@
+generated: '2026-08-29'
+method: derived
+source: openapi/lumos-openapi.json (189 component schemas, 89 operations)
+docs: https://developers.lumos.com/docs/object-model
+description: >-
+  The Lumos entity graph, derived from component schemas that carry an `id` and from the *_id
+  reference fields that link them. The spine is App -> Account -> User: Lumos discovers apps, pulls
+  accounts out of them, and reconciles those accounts to identities. Everything else — AppStore
+  requestable permissions, access requests, pre-approval rules, access policies, access reviews,
+  tasks — hangs off that spine.
+entity_count: 20
+core_entities:
+- name: App
+  schemas:
+  - App
+  - BaseApp
+  - AppWithCustomAttributes
+  - AppStoreApp
+  id: id
+  keys:
+  - app_class_id   # the integration TYPE (e.g. the GitHub connector)
+  - instance_id    # the tenant's specific instance of it
+  description: A third-party application connected to the Lumos domain.
+  operations:
+  - listApps
+  - getApp
+  - createApp
+  - updateApp
+  - reconnectApp
+  - disconnectApp
+  - triggerAppSync
+- name: Account
+  schemas:
+  - Account
+  id: id
+  description: A login inside a connected app, before or after it is matched to a Lumos user.
+  operations:
+  - getAccounts
+  - getUserAccounts
+  - postAccounts
+- name: User
+  schemas:
+  - User
+  - BaseUser
+  - UserWithCustomAttributes
+  id: id
+  description: An identity in the Lumos domain.
+  operations:
+  - listUsers
+  - getUser
+  - currentUser
+  - getUserAccounts
+- name: Group
+  schemas:
+  - Group
+  - BaseGroup
+  id: id
+  description: A directory or app-specific group.
+  operations:
+  - getGroups
+  - getGroup
+  - getGroupMembership
+- name: RequestablePermission
+  schemas:
+  - RequestablePermissionOutput
+  - RequestablePermissionBase
+  id: id
+  description: A permission inside an app that a user may request through the AppStore.
+- name: AccessRequest
+  schemas:
+  - AccessRequest
+  id: id
+  description: A request for one or more requestable permissions.
+- name: PreApprovalRule
+  schemas:
+  - PreApprovalRuleOutput
+  id: id
+  description: A rule that auto-approves matching access requests.
+- name: AccessPolicy
+  schemas:
+  - AccessPolicyOutput
+  id: id
+  description: A policy binding apps and permissions to eligibility rules.
+- name: AccessReview
+  schemas:
+  - AccessReviewOutput
+  id: id
+  description: A periodic certification campaign over apps and their entitlements.
+- name: AccessReviewDomainApp
+  schemas:
+  - AccessReviewDomainAppOutput
+  id: id
+  alias: arda
+  description: The join between an access review and one app in scope for it.
+- name: Task
+  schemas:
+  - Task
+  id: id
+  description: A unit of human work — approval, manual provisioning, or an error to clear.
+- name: KnowledgeContext
+  schemas:
+  - KnowledgeContextOutput
+  id: id
+  description: A Knowledge Hub entry, the newest and only /v1-versioned area.
+- name: VendorAgreement
+  schemas:
+  - VendorAgreement
+  id: id
+  description: A vendor contract tracked for spend and renewal.
+- name: UserOffboarding
+  schemas:
+  - UserOffboardingOutput
+  id: id
+  description: A scheduled or in-flight offboarding of one identity.
+- name: IdentityEvent
+  schemas:
+  - IdentityEvent
+  id: id
+  description: An identity lifecycle event, cursor-paginated.
+- name: ActivityRecord
+  schemas:
+  - ActivityRecord
+  description: Append-only usage/activity telemetry uploaded into Lumos.
+- name: InlineWebhook
+  schemas:
+  - InlineWebhook
+  - BaseInlineWebhook
+  id: id
+  description: A customer-authored hook executed before/during/after an access request.
+- name: Integration
+  schemas:
+  - IntegrationCatalogOutput
+  - IntegrationConnectionSchemaOutput
+  id: app_class_id
+  description: A connector TYPE in the Lumos catalogue, before any instance exists.
+- name: Job
+  schemas:
+  - JobStateOutput
+  - SyncTaskOutput
+  id: job_id
+  description: An async upload or sync job.
+- name: ApplicationTag
+  schemas:
+  - ApplicationTagOutput
+  id: id
+relationships:
+- from: Account
+  to: App
+  type: belongs_to
+  via: app_id
+- from: Account
+  to: User
+  type: belongs_to
+  via: user_id
+- from: User
+  to: Account
+  type: has_many
+  via: getUserAccounts
+- from: App
+  to: Integration
+  type: belongs_to
+  via: app_class_id
+- from: App
+  to: Account
+  type: has_many
+  via: app_id
+- from: Group
+  to: App
+  type: belongs_to
+  via: app_id
+- from: Group
+  to: App
+  type: belongs_to
+  via: source_app_id
+- from: RequestablePermission
+  to: App
+  type: belongs_to
+  via: app_id
+- from: RequestablePermission
+  to: Integration
+  type: belongs_to
+  via: app_class_id
+- from: AccessRequest
+  to: App
+  type: belongs_to
+  via: app_id
+- from: AccessRequest
+  to: RequestablePermission
+  type: has_many
+  via: requestable_permission_ids
+- from: AccessRequest
+  to: User
+  type: belongs_to
+  via: requester_user_id
+- from: AccessRequest
+  to: User
+  type: belongs_to
+  via: target_user_id
+- from: PreApprovalRule
+  to: App
+  type: belongs_to
+  via: app_id
+- from: AccessReview
+  to: User
+  type: belongs_to
+  via: owner_id
+- from: AccessReview
+  to: User
+  type: belongs_to
+  via: created_by_id
+- from: AccessReview
+  to: AccessReviewDomainApp
+  type: has_many
+  via: addAppsToAccessReview
+- from: AccessReviewDomainApp
+  to: App
+  type: belongs_to
+  via: domain_app_id
+- from: Task
+  to: AccessRequest
+  type: belongs_to
+  via: access_request_id
+- from: Task
+  to: RequestablePermission
+  type: belongs_to
+  via: requestable_permission_id
+- from: Task
+  to: User
+  type: has_many
+  via: user_ids (TaskAssignee / ReassignTaskInput)
+- from: Task
+  to: Group
+  type: has_many
+  via: group_ids (ReassignTaskInput)
+- from: UserOffboarding
+  to: User
+  type: belongs_to
+  via: user_id
+- from: IdentityEvent
+  to: User
+  type: belongs_to
+  via: user_id
+- from: ActivityRecord
+  to: App
+  type: belongs_to
+  via: source_app_id
+- from: VendorAgreement
+  to: App
+  type: belongs_to
+  via: source_app_id (via FoundDocumentsUpload / OrderInput)
+id_conventions:
+  format: uuid
+  note: >-
+    Lumos uses opaque UUIDs, not prefixed ids. The one convention worth knowing is the app_class_id /
+    instance_id pair: app_class_id identifies the INTEGRATION TYPE from the catalogue, instance_id the
+    tenant's connected instance. Passing one where the other is expected is the most common 404 in
+    this contract, and the 404 description says so ("no integration with this `app_class_id` is
+    available to your domain").
+  external_id: >-
+    ActivityRecordAccountInput carries `external_id` and BaseGroup carries `integration_specific_id` —
+    both are the third-party system's identifier, not a Lumos one.

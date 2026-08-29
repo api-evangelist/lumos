@@ -46,7 +46,7 @@ tags:
 url: >-
   https://raw.githubusercontent.com/api-evangelist/lumos/refs/heads/main/apis.yml
 created: '2026-03-16'
-modified: '2026-03-27'
+modified: '2026-08-29'
 specificationVersion: '0.23'
 apis:
 - aid: lumos:rest-api
@@ -56,12 +56,15 @@ apis:
     such as managing users, apps, access requests, and governance workflows. All requests require a bearer
     token (prefixed lsk_) in the Authorization header.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Access Management
   - Automation
   - Governance
   - Identity
   properties:
+  - url: openapi/lumos-openapi.json
+    type: OpenAPI
   - url: https://developers.lumos.com/reference/lumos-api
     type: Documentation
   - url: https://developers.lumos.com/docs/quick-start
@@ -75,6 +78,7 @@ apis:
     with the Lumos platform, enabling automated provisioning, deprovisioning, and access management for
     apps not yet supported natively.
   humanURL: https://developers.lumos.com/docs/connector-sdk
+  baseURL: https://api.lumos.com
   tags:
   - Connectors
   - Integration
@@ -92,6 +96,7 @@ apis:
   name: Lumos AccessPolicies API
   description: The AccessPolicies API from Lumos — 2 operation(s) for accesspolicies.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Access Policies
   tags_raw:
@@ -103,6 +108,7 @@ apis:
   name: Lumos AccessRequests API
   description: The AccessRequests API from Lumos — 3 operation(s) for accessrequests.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - AccessRequests
   properties:
@@ -112,6 +118,7 @@ apis:
   name: Lumos AccessReviews API
   description: The AccessReviews API from Lumos — 5 operation(s) for accessreviews.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Access Reviews
   tags_raw:
@@ -123,6 +130,7 @@ apis:
   name: Lumos Accounts API
   description: The Accounts API from Lumos — 3 operation(s) for accounts.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Account
   tags_raw:
@@ -134,6 +142,7 @@ apis:
   name: Lumos Activity API
   description: The Activity API from Lumos — 4 operation(s) for activity.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Activity
   properties:
@@ -143,6 +152,7 @@ apis:
   name: Lumos Apps API
   description: The Apps API from Lumos — 4 operation(s) for apps.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Application
   tags_raw:
@@ -154,6 +164,7 @@ apis:
   name: Lumos AppStore API
   description: The AppStore API from Lumos — 4 operation(s) for appstore.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - App Store
   tags_raw:
@@ -165,6 +176,7 @@ apis:
   name: Lumos Groups API
   description: The Groups API from Lumos — 3 operation(s) for groups.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Group
   tags_raw:
@@ -176,6 +188,7 @@ apis:
   name: Lumos PreApprovalRules API
   description: The PreApprovalRules API from Lumos — 2 operation(s) for preapprovalrules.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - PreApprovalRules
   properties:
@@ -185,6 +198,7 @@ apis:
   name: Lumos Tasks API
   description: The Tasks API from Lumos — 8 operation(s) for tasks.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Task
   tags_raw:
@@ -196,6 +210,7 @@ apis:
   name: Lumos Users API
   description: The Users API from Lumos — 6 operation(s) for users.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - User
   tags_raw:
@@ -207,6 +222,7 @@ apis:
   name: Lumos Utility API
   description: The Utility API from Lumos — 1 operation(s) for utility.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Utility
   properties:
@@ -216,6 +232,7 @@ apis:
   name: Lumos Vendors API
   description: The Vendors API from Lumos — 4 operation(s) for vendors.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Vendors
   properties:
@@ -225,6 +242,7 @@ apis:
   name: Lumos Webhooks API
   description: The Webhooks API from Lumos — 1 operation(s) for webhooks.
   humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
   tags:
   - Webhook
   tags_raw:
@@ -253,20 +271,77 @@ common:
     url: https://app.lumosidentity.com/
   - type: Signup
     url: https://www.lumos.com/demo
-  - type: GitHub
-    url: https://github.com/Lumos-Labs
+  - type: GitHubOrganization
+    url: https://github.com/teamlumos
   - type: LinkedIn
     url: https://www.linkedin.com/company/lumosidentity
   - type: CLI
     url: https://developers.lumos.com/docs/cli
-  - type: ProductDocumentation
-    url: https://docs.lumos.com/
   - type: Integrations
     url: https://www.lumos.com/integrations
   - type: LlmsText
     url: https://developers.lumos.com/llms.txt
+  - type: DeveloperPortal
+    url: https://developers.lumos.com/
+  - type: APIReference
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: Roadmap
+    url: https://developers.lumos.com/page/public-roadmap
+  - type: Pricing
+    url: https://www.lumos.com/pricing
+  - type: PrivacyPolicy
+    url: https://www.lumos.com/privacy
+  - type: StatusPage
+    url: https://status.lumos.com/
+  - type: TrustCenter
+    url: https://trust.lumos.com/
+  - type: MCPServer
+    url: mcp/lumos-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/lumos-tool-crosswalk.yml
+  - type: OAuthScopes
+    url: scopes/lumos-scopes.yml
+  - type: WellKnown
+    url: well-known/lumos-well-known.yml
+  - type: Packages
+    url: packages/lumos-packages.yml
+  - type: SDKs
+    url: packages/lumos-packages.yml
+  - type: CLI
+    url: cli/lumos-cli.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: Conventions
+    url: conventions/lumos-conventions.yml
+  - type: ErrorCatalog
+    url: errors/lumos-error-codes.yml
+  - type: DataModel
+    url: data-model/lumos-data-model.yml
+  - type: Lifecycle
+    url: lifecycle/lumos-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/lumos-changelog.yml
+  - type: Conformance
+    url: conformance/lumos-conformance.yml
+  - type: Webhooks
+    url: asyncapi/lumos-webhooks.yml
+  - type: Overlay
+    url: overlays/lumos-openapi-overlay.yaml
+  - type: LLMsTxt
+    url: llms/lumos-llms.txt
+  - type: RateLimits
+    url: rate-limits/lumos-rate-limits.yml
+  - type: Plans
+    url: plans/lumos-plans-pricing.yml
+  - type: FinOps
+    url: finops/lumos-finops.yml
 integrations:
   - name: websights
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-29'
+  status: enriched
+  artifacts_added: 24
+  pass: local-v1

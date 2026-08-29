@@ -1,0 +1,84 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://developers.lumos.com/docs/webhooks, https://developers.lumos.com/reference/access-request-webhooks,
+  openapi/lumos-openapi.json
+description: >-
+  Lumos publishes NO AsyncAPI document. Its event surface is unusual and worth stating precisely,
+  because it runs in the opposite direction from most webhook programmes: Lumos does not primarily
+  emit events to you. Its "Inline Webhooks" are SYNCHRONOUS callbacks Lumos makes INTO your code in
+  the middle of an access-request workflow, and its /webhooks/* endpoints are INBOUND receivers where
+  named partners post to Lumos.
+asyncapi_published: false
+webhooks_advertised: true
+surfaces:
+- kind: inline-webhook
+  direction: lumos-calls-you
+  name: Inline Webhooks
+  docs:
+  - https://developers.lumos.com/docs/webhooks
+  - https://developers.lumos.com/reference/access-request-webhooks
+  description: >-
+    Customer-authored scripts executed before, during, or after an access request, used to customise
+    provisioning and deprovisioning for AppStore apps and permissions. Lumos documents hosting them on
+    an iPaaS (Okta Workflows) or a serverless function (AWS Lambda).
+  timing:
+  - before
+  - during
+  - after
+  discovery_operation:
+    operationId: get_inline_webhooks_inline_webhooks_get
+    path: GET /inline_webhooks
+    description: Lists the inline webhooks available in the domain.
+    schema: InlineWebhook
+  event_names_published: false
+  payload_schema_published: false
+  signing: not documented
+  retries: not documented
+  timeout: not documented
+  note: >-
+    The reference page names no event identifiers, no payload schema, no signature verification method
+    and no retry/timeout policy. Those are the four things an integrator needs and none of them are
+    public, so nothing is asserted here. This is the single largest documentation gap on the Lumos
+    event surface.
+- kind: inbound-receiver
+  direction: partner-calls-lumos
+  name: Integration Webhooks
+  description: >-
+    Two named partner receivers declared in the contract under the "Integration Webhooks" tag. These
+    are endpoints Lumos exposes for a specific SaaS partner to post to, scoped by domain app UUID.
+  endpoints:
+  - operationId: processAirbaseMilestoneEvent
+    path: POST /webhooks/airbase/purchase_request_approved/{domain_app_uuid}
+    partner: Airbase
+    event: purchase_request_approved
+    schema: AirbasePurchaseRequestEvent
+    responses:
+    - '200'
+    - '422'
+  - operationId: process_vendr_request_completed_webhooks_vendr_request_completed__domain_app_uuid__post
+    path: POST /webhooks/vendr/request_completed/{domain_app_uuid}
+    partner: Vendr
+    event: request_completed
+    responses:
+    - '200'
+    - '422'
+  note: >-
+    Both are partner-specific and bilateral. They are not a general subscription surface — there is no
+    subscribe/unsubscribe operation and no event catalogue for the wider platform.
+- kind: polling-alternative
+  direction: you-poll-lumos
+  name: Identity Events
+  description: >-
+    The nearest thing Lumos offers to an outbound event stream is a cursor-paginated read of identity
+    lifecycle events. An agent that needs to react to joiner/mover/leaver activity polls this.
+  operations:
+  - operationId: getIdentityEvents
+    path: GET /identity_events
+    pagination: cursor + limit, with next_cursor and total_count
+  - operationId: getActivityLogs
+    path: GET /activity_logs
+gaps:
+- No AsyncAPI or event-catalogue document is published on any host.
+- No outbound event subscription API exists — you cannot register a URL to receive Lumos events.
+- Inline webhook payloads, signatures and retry semantics are undocumented.

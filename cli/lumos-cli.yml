@@ -1,0 +1,78 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://developers.lumos.com/docs/cli-reference, https://developers.lumos.com/reference/lumos-cli-commands,
+  https://github.com/teamlumos/lumos-cli, https://pypi.org/project/lumos-identity-cli/,
+  https://raw.githubusercontent.com/teamlumos/homebrew-tap/main/Formula/lumos.rb
+name: Lumos CLI
+binary: lumos
+version: 2.4.2
+released: '2026-05-20'
+license: MIT
+repository: https://github.com/teamlumos/lumos-cli
+docs:
+- https://developers.lumos.com/docs/cli
+- https://developers.lumos.com/reference/lumos-cli
+- https://developers.lumos.com/reference/lumos-cli-commands
+- https://teamlumos.github.io/lumos-cli/
+description: >-
+  A first-party command line interface for the Lumos AppStore — authenticate over OAuth, list apps,
+  users, permissions and groups, and file and track access requests without touching the UI. It is the
+  same self-service surface as the user MCP server, exposed to a human at a terminal.
+install:
+- method: homebrew
+  command: brew install teamlumos/tap/lumos
+  platforms:
+  - macos-arm64
+  - linux-amd64
+  - linux-arm64
+- method: pypi
+  command: pip install lumos-identity-cli
+  package: lumos-identity-cli
+- method: binary
+  source: https://github.com/teamlumos/lumos-cli/releases
+  note: Release tarballs are pinned by sha256 in the Homebrew formula.
+authentication:
+  commands:
+  - name: setup
+    description: Configure CLI authentication methods.
+  - name: login
+    description: Authenticate via OAuth.
+  - name: logout
+    description: Clear stored credentials and sign out.
+  - name: whoami
+    description: Display information about the current logged-in user.
+command_groups:
+- group: list
+  description: Read the AppStore and directory.
+  commands:
+  - name: list apps
+    description: Display available applications in the AppStore.
+    example: lumos list apps --like github
+  - name: list users
+    description: Display users within Lumos.
+  - name: list permissions
+    description: Display permissions for a specified application.
+  - name: list groups
+    description: Display domain or application-specific groups.
+  - name: list requests
+    description: Display access requests.
+- group: request
+  description: File and track access requests.
+  commands:
+  - name: request
+    description: File an access request.
+  - name: request status
+    description: Check access request status by ID, or retrieve the most recent request.
+  - name: request poll
+    description: Monitor a request for up to 5 minutes awaiting completion.
+  - name: request cancel
+    description: Revoke a pending access request.
+key_flows:
+- name: Request access from a terminal
+  steps:
+  - lumos setup
+  - lumos whoami
+  - lumos list apps --like github
+  - lumos request
+  - lumos request poll

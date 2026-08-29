@@ -1,0 +1,69 @@
+generated: '2026-08-29'
+method: searched
+source: https://developers.lumos.com/docs/on-prem-agent-changelog, https://developers.lumos.com/llms.txt
+description: >-
+  Lumos publishes eleven dated changelogs, but NONE of them covers the REST API. Every one tracks a
+  connector or the On-Premise Agent. The most actively maintained is the On-Prem Agent changelog,
+  captured below; the API contract itself changes without a public record.
+scheme: semver-per-component
+api_changelog_present: false
+components:
+- name: On-Prem Agent
+  url: https://developers.lumos.com/docs/on-prem-agent-changelog
+  current_version: 0.2.10
+  scheme: semver
+  entries:
+  - version: 0.2.10
+    date: '2026-08-27'
+    breaking: false
+    highlights:
+    - Active Directory connector updated 1.305.0 -> 1.313.0, plus several other connectors.
+    - Added SAP ECC connector at 0.7.0.
+  - version: 0.2.9
+    date: '2026-08-17'
+    breaking: false
+    highlights:
+    - Added Generic REST connector at 0.21.0.
+  - version: 0.2.8
+    date: '2026-08-17'
+    breaking: false
+    highlights:
+    - Connector updates across Active Directory, Delinea Secret Server and GitLab Self-Managed.
+    - JDBC connector revision.
+  - version: 0.2.7
+    date: '2026-08-12'
+    breaking: false
+    highlights:
+    - Connector updates across Active Directory, Delinea and GitLab.
+    - A connector bundle that fails to register no longer crashes the agent.
+    - Deterministic entrypoint selection fixes.
+  - version: 0.2.6
+    date: '2026-07-28'
+    breaking: false
+    highlights:
+    - Incremental updates to Active Directory, LDAP and Tableau connectors.
+  - version: 0.2.5
+    date: '2026-07-27'
+    breaking: false
+    highlights:
+    - Connector version increments across the primary integrations.
+- name: Active Directory connector
+  url: https://developers.lumos.com/docs/activedirectory-changelog
+- name: LDAP connector
+  url: https://developers.lumos.com/docs/ldap-changelog
+- name: Retool connector
+  url: https://developers.lumos.com/docs/retool-changelog
+- name: Tableau connector
+  url: https://developers.lumos.com/docs/tableau-changelog
+- name: JDBC connector
+  url: https://developers.lumos.com/docs/jdbc-changelog
+- name: 1Password Groups connector
+  url: https://developers.lumos.com/docs/one-password-changelog
+- name: 1Password Admin connector
+  url: https://developers.lumos.com/docs/one-password-roles-changelog
+- name: Delinea Secret Server connector
+  url: https://developers.lumos.com/docs/delinea-secretserver-changelog
+- name: SCIM connector
+  url: https://developers.lumos.com/docs/scim-changelog
+- name: Flatfile connector (On Prem)
+  url: https://developers.lumos.com/docs/on-prem-flatfile-changelog

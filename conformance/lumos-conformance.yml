@@ -1,0 +1,141 @@
+generated: '2026-08-29'
+method: probed
+source: >-
+  https://api.lumos.com/.well-known/oauth-authorization-server, the two RFC 9728 protected-resource
+  documents, openapi/lumos-openapi.json, and https://developers.lumos.com/docs/scim-1
+description: >-
+  Cross-cutting standards Lumos declares or demonstrably implements. Every entry cites where the claim
+  can be checked; entries that could only be verified from prose rather than from a machine-readable
+  surface are marked `evidence_level: docs`.
+standards:
+- id: oauth2
+  name: OAuth 2.0 / 2.1 authorization code with PKCE
+  conforms: true
+  evidence_level: probed
+  evidence:
+    url: https://api.lumos.com/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: >-
+      grant_types_supported [authorization_code, refresh_token], response_types_supported [code],
+      code_challenge_methods_supported [S256].
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence_level: probed
+  evidence:
+    url: https://api.lumos.com/.well-known/oauth-authorization-server
+    http_status: 200
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence_level: probed
+  evidence:
+    urls:
+    - https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user
+    - https://api.lumos.com/.well-known/oauth-protected-resource/mcp/admin
+    http_status: 200
+    detail: >-
+      Both MCP endpoints return a 401 carrying
+      `WWW-Authenticate: Bearer resource_metadata="..."`, which is the RFC 9728 discovery handshake
+      done correctly.
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  evidence_level: probed
+  evidence:
+    detail: registration_endpoint https://b.app.lumosidentity.com/b/oauth/register advertised in AS metadata.
+- id: rfc7636
+  name: PKCE
+  conforms: true
+  evidence_level: probed
+  evidence:
+    detail: code_challenge_methods_supported ["S256"].
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence_level: probed
+  evidence:
+    urls:
+    - https://api.lumos.com/mcp/user
+    - https://api.lumos.com/mcp/admin
+    http_status: 401
+    detail: >-
+      Both endpoints answer a JSON-RPC tools/list POST with the MCP-standard OAuth challenge rather
+      than a 404 or a generic error, and both publish RFC 9728 resource metadata. Live tool schemas
+      require an authenticated session.
+- id: oidc
+  name: OpenID Connect
+  conforms: false
+  evidence_level: probed
+  evidence:
+    url: https://api.lumos.com/.well-known/openid-configuration
+    http_status: 404
+    detail: >-
+      No openid-configuration on any host, and the authorization server advertises no `openid` scope
+      and no id_token response type. Lumos authorises; it does not federate identity to you.
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence_level: derived
+  evidence:
+    detail: >-
+      No application/problem+json anywhere in the contract. Lumos ships its own ApiError envelope with
+      a stable `code` and a categorical `type` — see errors/lumos-error-codes.yml.
+- id: pagination
+  name: Consistent pagination
+  conforms: false
+  evidence_level: derived
+  evidence:
+    detail: >-
+      Three coexisting styles — page/size, page_token/page_size, cursor/limit. See
+      conventions/lumos-conventions.yml.
+- id: idempotency
+  name: Idempotency keys
+  conforms: false
+  evidence_level: derived
+  evidence:
+    detail: No Idempotency-Key header in the contract, the docs, or any observed response.
+- id: rfc8594
+  name: Sunset / Deprecation headers
+  conforms: false
+  evidence_level: derived
+  evidence:
+    detail: No Sunset or Deprecation header, and no operation marked deprecated.
+- id: openapi
+  name: OpenAPI 3.1.0
+  conforms: true
+  evidence_level: probed
+  evidence:
+    url: https://api.lumos.com/openapi.json
+    http_status: 200
+    detail: 64 paths, 89 operations, 189 component schemas, securitySchemes declared and applied.
+  note: >-
+    SPEC PROVENANCE — this contract was harvested live on 2026-08-29 and saved to
+    openapi/lumos-openapi.json. It supersedes openapi/_original/lumos-openapi.yml, a hand-authored
+    scaffold carrying 67 operations, zero component schemas and `schema: {type: object}` on every
+    body, from which the fourteen per-tag openapi/lumos-*-api-openapi.yml files (and the fourteen
+    matching apis[] entries) were split. Those refined files are now WEAKER than the real contract and
+    should be re-split from openapi/lumos-openapi.json by refine-openapis on the next pass. Ownership
+    was confirmed before saving: info.title "Lumos", the description points at developers.lumos.com,
+    and servers[] names https://api.lumos.com, the same host the spec was fetched from.
+domain_standards:
+- id: scim2
+  name: SCIM 2.0 (RFC 7643 / 7644)
+  conforms: true
+  evidence_level: docs
+  reward_only: true
+  evidence:
+    url: https://developers.lumos.com/docs/scim-1
+    detail: >-
+      Lumos documents a SCIM connector — "Standards-based identity synchronization framework
+      supporting automated access provisioning across SCIM 2.0-compatible systems" — and maintains a
+      dated SCIM connector changelog. IMPORTANT SCOPE NOTE: this is Lumos acting as a SCIM CLIENT
+      against customer systems. The api.lumos.com contract itself declares NO SCIM schema URNs, no
+      /Users or /Groups SCIM resource paths and no ServiceProviderConfig, so Lumos does not expose a
+      SCIM server surface of its own. Recorded as a documented capability, not as a contract-level
+      declaration.
+  contract_declaration: false
+identity_governance_note: >-
+  Identity governance and administration has no single machine-readable interop standard the way
+  banking has FDX or telecom has CAMARA. SCIM 2.0 covers provisioning only, and Lumos consumes it
+  rather than serving it. No conformance was invented to fill the domain-standard slot.
