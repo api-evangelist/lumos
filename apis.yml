@@ -98,7 +98,7 @@ apis:
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - Access Policies
+  - AccessPolicies
   tags_raw:
   - AccessPolicies
   properties:
@@ -120,7 +120,7 @@ apis:
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - Access Reviews
+  - AccessReviews
   tags_raw:
   - AccessReviews
   properties:
