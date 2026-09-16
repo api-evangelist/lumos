@@ -52,28 +52,6 @@ created: '2026-03-16'
 modified: '2026-08-29'
 specificationVersion: '0.23'
 apis:
-- aid: lumos:rest-api
-  name: Lumos REST API
-  description: >-
-    The Lumos REST API enables programmatic access to the Lumos identity platform for automating tasks
-    such as managing users, apps, access requests, and governance workflows. All requests require a bearer
-    token (prefixed lsk_) in the Authorization header.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Access Management
-  - Automation
-  - Governance
-  - Identity
-  properties:
-  - url: openapi/lumos-openapi.json
-    type: OpenAPI
-  - url: https://developers.lumos.com/reference/lumos-api
-    type: Documentation
-  - url: https://developers.lumos.com/docs/quick-start
-    type: GettingStarted
-  - url: https://developers.lumos.com/docs/rest-api
-    type: Authentication
 - aid: lumos:connector-sdk
   name: Lumos Connector SDK
   description: >-
@@ -95,74 +73,6 @@ apis:
     type: Documentation
   - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
     type: GettingStarted
-- aid: lumos:lumos-accesspolicies-api
-  name: Lumos AccessPolicies API
-  description: The AccessPolicies API from Lumos — 2 operation(s) for accesspolicies.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Access Policies
-  tags_raw:
-  - AccessPolicies
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-accesspolicies-api-openapi.yml
-- aid: lumos:lumos-accessrequests-api
-  name: Lumos AccessRequests API
-  description: The AccessRequests API from Lumos — 3 operation(s) for accessrequests.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - AccessRequests
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-accessrequests-api-openapi.yml
-- aid: lumos:lumos-accessreviews-api
-  name: Lumos AccessReviews API
-  description: The AccessReviews API from Lumos — 5 operation(s) for accessreviews.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Access Reviews
-  tags_raw:
-  - AccessReviews
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-accessreviews-api-openapi.yml
-- aid: lumos:lumos-accounts-api
-  name: Lumos Accounts API
-  description: The Accounts API from Lumos — 3 operation(s) for accounts.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Account
-  tags_raw:
-  - Accounts
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-accounts-api-openapi.yml
-- aid: lumos:lumos-activity-api
-  name: Lumos Activity API
-  description: The Activity API from Lumos — 4 operation(s) for activity.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Activity
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-activity-api-openapi.yml
-- aid: lumos:lumos-apps-api
-  name: Lumos Apps API
-  description: The Apps API from Lumos — 4 operation(s) for apps.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Application
-  tags_raw:
-  - Apps
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-apps-api-openapi.yml
 - aid: lumos:lumos-appstore-api
   name: Lumos AppStore API
   description: The AppStore API from Lumos — 4 operation(s) for appstore.
@@ -175,28 +85,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/lumos-appstore-api-openapi.yml
-- aid: lumos:lumos-groups-api
-  name: Lumos Groups API
-  description: The Groups API from Lumos — 3 operation(s) for groups.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - Group
-  tags_raw:
-  - Groups
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-groups-api-openapi.yml
-- aid: lumos:lumos-preapprovalrules-api
-  name: Lumos PreApprovalRules API
-  description: The PreApprovalRules API from Lumos — 2 operation(s) for preapprovalrules.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - PreApprovalRules
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-preapprovalrules-api-openapi.yml
 - aid: lumos:lumos-tasks-api
   name: Lumos Tasks API
   description: The Tasks API from Lumos — 8 operation(s) for tasks.
@@ -209,50 +97,172 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/lumos-tasks-api-openapi.yml
-- aid: lumos:lumos-users-api
-  name: Lumos Users API
-  description: The Users API from Lumos — 6 operation(s) for users.
+- aid: lumos:lumos-access-reviews-api
+  name: Lumos Access Reviews API
+  description: >-
+    Create and manage access review campaigns — scheduled reviews of who has access to what
+
+    across your connected apps.
+
+
+    **Typical workflow for creating a review:**
+
+
+    1. `GET /apps` — find the domain app UUIDs you want to review.
+
+    2. `GET /access_reviews/scope_options?domain_app_id={id}` — discover available scope
+       filters (employment status, team, last login, etc.). Each returned `items` entry is a
+       ready-to-POST `scope_filters` payload; datetime and custom-attribute groups instead
+       expose a `filter_input_template`.
+    3. `POST /access_reviews` with `apps` (optionally with `scope_filters` per app) —
+       creates the campaign.
+    4. `GET /access_reviews/{id}` — poll until `status` transitions from `IN_PREPARATION`
+       to `IN_PROGRESS`.
+
+    **After creation:**
+
+
+    - `POST /access_reviews/{id}/apps` — add more apps while `status != COMPLETED`.
+
+    - `PATCH /access_reviews/{id}` — update name / deadline / owner, or per-ARDA
+      `scope_filters` and removal action.
+    - `DELETE /access_reviews/{id}` — soft-delete the whole campaign.
+
+    - `DELETE /access_reviews/{id}/apps/{arda_id}` — soft-delete a single app from the
+      campaign.
+
+    All endpoints require an API token with the `access_reviews.create` or
+
+    `access_reviews.view` permission (Access Review Administrator or App Admin role).
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - User
-  tags_raw:
-  - Users
+  - Access Reviews
   properties:
   - type: OpenAPI
-    url: openapi/lumos-users-api-openapi.yml
-- aid: lumos:lumos-utility-api
-  name: Lumos Utility API
-  description: The Utility API from Lumos — 1 operation(s) for utility.
+    url: openapi/lumos-access-reviews-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-core-api
+  name: Lumos Core API
+  description: The Core API from Lumos — 27 operation(s) for core.
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - Utility
+  - Core
   properties:
   - type: OpenAPI
-    url: openapi/lumos-utility-api-openapi.yml
-- aid: lumos:lumos-vendors-api
-  name: Lumos Vendors API
-  description: The Vendors API from Lumos — 4 operation(s) for vendors.
+    url: openapi/lumos-core-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-integration-webhooks-api
+  name: Lumos Integration Webhooks API
+  description: The Integration Webhooks API from Lumos — 2 operation(s) for integration webhooks.
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - Vendors
+  - Integration Webhooks
   properties:
   - type: OpenAPI
-    url: openapi/lumos-vendors-api-openapi.yml
-- aid: lumos:lumos-webhooks-api
-  name: Lumos Webhooks API
-  description: The Webhooks API from Lumos — 1 operation(s) for webhooks.
+    url: openapi/lumos-integration-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-knowledge-api
+  name: Lumos Knowledge API
+  description: >-
+    Knowledge entries are the documents and notes Lumos agents draw on when they answer access
+
+    questions. Each entry carries a title, body, tags, and product scopes, plus an optional file
+
+    attachment.
+
+
+    Because of that attachment, create and update send `multipart/form-data` rather than JSON. On
+
+    update, tag and scope lists replace what was there instead of appending, and `clear_attachment=true`
+
+    removes an existing file without uploading a replacement.
+
+
+    `DELETE` archives rather than destroys. The entry stops appearing in list results and stays
+
+    recoverable.
+
+
+    Pages here are small: `page_size` defaults to 10 and is clamped to 25.
   humanURL: https://developers.lumos.com/docs/rest-api
   baseURL: https://api.lumos.com
   tags:
-  - Webhook
-  tags_raw:
-  - Webhooks
+  - Knowledge
   properties:
   - type: OpenAPI
-    url: openapi/lumos-webhooks-api-openapi.yml
+    url: openapi/lumos-knowledge-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-lifecycle-management-api
+  name: Lumos Lifecycle Management API
+  description: The Lifecycle Management API from Lumos — 3 operation(s) for lifecycle management.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
+  tags:
+  - Lifecycle Management
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-lifecycle-management-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-meta-api
+  name: Lumos Meta API
+  description: The Meta API from Lumos — 2 operation(s) for meta.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
+  tags:
+  - Meta
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-meta-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-vendor-management-api
+  name: Lumos Vendor Management API
+  description: The Vendor Management API from Lumos — 4 operation(s) for vendor management.
+  humanURL: https://developers.lumos.com/docs/rest-api
+  baseURL: https://api.lumos.com
+  tags:
+  - Vendor Management
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-vendor-management-api-openapi.yml
+  - type: Documentation
+    url: https://developers.lumos.com/reference/lumos-api
+  - type: GettingStarted
+    url: https://developers.lumos.com/docs/quick-start
+  - type: Authentication
+    url: https://developers.lumos.com/docs/rest-api
 common:
   - type: AgenticAccess
     url: agentic-access/lumos-agentic-access.yml
