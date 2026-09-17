@@ -73,18 +73,6 @@ apis:
     type: Documentation
   - url: https://developers.lumos.com/docs/building-a-lumos-connector-step-by-step-tutorial
     type: GettingStarted
-- aid: lumos:lumos-appstore-api
-  name: Lumos AppStore API
-  description: The AppStore API from Lumos — 4 operation(s) for appstore.
-  humanURL: https://developers.lumos.com/docs/rest-api
-  baseURL: https://api.lumos.com
-  tags:
-  - App Store
-  tags_raw:
-  - AppStore
-  properties:
-  - type: OpenAPI
-    url: openapi/lumos-appstore-api-openapi.yml
 - aid: lumos:lumos-tasks-api
   name: Lumos Tasks API
   description: The Tasks API from Lumos — 8 operation(s) for tasks.
@@ -263,6 +251,16 @@ apis:
     url: https://developers.lumos.com/docs/quick-start
   - type: Authentication
     url: https://developers.lumos.com/docs/rest-api
+- aid: lumos:lumos-app-store-api
+  name: Lumos App Store API
+  description: The App Store API from Lumos — 11 operation(s) for app store.
+  humanURL: https://developers.lumos.com/docs/connector-sdk
+  baseURL: https://api.lumos.com
+  tags:
+  - App Store
+  properties:
+  - type: OpenAPI
+    url: openapi/lumos-app-store-api-openapi.yml
 common:
   - type: AgenticAccess
     url: agentic-access/lumos-agentic-access.yml
