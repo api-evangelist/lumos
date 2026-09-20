@@ -2,15 +2,15 @@
 kin_checks:
   slug: lumos
   schema_version: 0.22.0
-  scored_at: '2026-09-18'
-  run_ts: 2026-09-18T231945
+  scored_at: '2026-09-19'
+  run_ts: 2026-09-19T193153
   note: Actionable checks (missed + partial) in `checks`, plus the ids that did not
     apply in `na`. Everything else in rubric/scoring-0.22.0.yml was earned; counts
     below let you verify that.
   counts:
     total: 136
-    earned: 51
-    partial: 19
+    earned: 50
+    partial: 20
     missed: 41
     na: 25
   checks:
@@ -136,6 +136,10 @@ kin_checks:
     earned: 1.5
     detail: pointer liveness 0.5
   - id: getting_started_present
+    status: partial
+    earned: 2.5
+    detail: pointer liveness 0.5
+  - id: authentication_documented
     status: partial
     earned: 2.5
     detail: pointer liveness 0.5
