@@ -1,0 +1,1 @@
+{"resource":"https://api.lumos.com/mcp/user","authorization_servers":["https://b.app.lumosidentity.com"],"scopes_supported":["lumos:user:read","lumos:user:write"],"bearer_methods_supported":["header"]}

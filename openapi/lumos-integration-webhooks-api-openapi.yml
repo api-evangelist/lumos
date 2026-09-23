@@ -1,0 +1,150 @@
+openapi: 3.2.0
+info:
+  title: Lumos Integration Webhooks API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Integration Webhooks
+paths:
+  /webhooks/airbase/purchase_request_approved/{domain_app_uuid}:
+    post:
+      tags:
+      - Integration Webhooks
+      summary: Process Airbase Purchase Request Approved
+      description: Webhook for Airbase to send events as a workflow transitions through milestones
+      operationId: processAirbaseMilestoneEvent
+      parameters:
+      - name: domain_app_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Domain App Uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AirbasePurchaseRequestEvent'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /webhooks/vendr/request_completed/{domain_app_uuid}:
+    post:
+      tags:
+      - Integration Webhooks
+      summary: Process Vendr Request Completed
+      description: Webhook for Vendr to send request completed events to Lumos
+      operationId: process_vendr_request_completed_webhooks_vendr_request_completed__domain_app_uuid__post
+      parameters:
+      - name: domain_app_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Domain App Uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - type: object
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AirbasePurchaseRequestEvent:
+      properties:
+        id:
+          type: string
+          title: Id
+        object:
+          type: string
+          title: Object
+        type:
+          type: string
+          title: Type
+        created_date:
+          type: string
+          title: Created Date
+        data:
+          type: object
+          title: Data
+      type: object
+      required:
+      - id
+      - object
+      - type
+      - created_date
+      - data
+      title: AirbasePurchaseRequestEvent
+      description: 'Model of the input we''ll get from Airbase''s webhook call.
+
+        All events seem to follow this same base structure, it is just `data` that is different
+
+        for each. We are using `dict` here to be permissive to other webhook events (so we can warn if
+
+        the customer misconfigures for a different webhook), and we actually only use 2 fields from it.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

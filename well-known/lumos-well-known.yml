@@ -1,15 +1,14 @@
-generated: '2026-08-29'
+generated: '2026-09-19'
 method: probed
 source: direct HTTPS GET of /.well-known/* on every apis.yml host and every OpenAPI servers[] host
 summary:
   hosts_probed: 4
   documents_served: 3
-  note: >-
-    api.lumos.com serves RFC 8414 authorization-server metadata and TWO RFC 9728 protected-resource
+  note: api.lumos.com serves RFC 8414 authorization-server metadata and TWO RFC 9728 protected-resource
     documents, one per hosted MCP endpoint. No security.txt, no api-catalog, and no agent card on any
-    host. app.lumosidentity.com answers 200 with the same 1,297-byte React shell for EVERY
-    /.well-known/* path, including paths that cannot exist — that is an SPA catch-all, not a document,
-    and is recorded below as a miss.
+    host. app.lumosidentity.com answers 200 with the same 1,297-byte React shell for EVERY /.well-known/*
+    path, including paths that cannot exist — that is an SPA catch-all, not a document, and is recorded
+    below as a miss.
 hosts:
 - host: api.lumos.com
   documents:
@@ -17,8 +16,7 @@ hosts:
     status: 200
     file: lumos-oauth-authorization-server.json
     content_type: application/json
-    note: >-
-      302-redirects to https://b.app.lumosidentity.com/.well-known/oauth-authorization-server and
+    note: 302-redirects to https://b.app.lumosidentity.com/.well-known/oauth-authorization-server and
       returns real RFC 8414 metadata — 14 scopes, PKCE S256, dynamic client registration (RFC 7591).
   - path: /.well-known/oauth-protected-resource/mcp/user
     status: 200
@@ -45,6 +43,11 @@ hosts:
     status: 404
   - path: /.well-known/agent.json
     status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: lumos-api-oauth-protected-resource.json
+    bytes: 201
+  path_echo_control: passed
 - host: www.lumos.com
   documents:
   - path: /.well-known/security.txt
@@ -117,11 +120,33 @@ hosts:
     status: 200
     file: null
     content_type: text/html
-    note: >-
-      NOT AN AGENT CARD — 200 with HTML, fails every AgentCard shape check. No a2a/ artifact was
-      written and no AgentCard pointer was emitted.
+    note: NOT AN AGENT CARD — 200 with HTML, fails every AgentCard shape check. No a2a/ artifact was written
+      and no AgentCard pointer was emitted.
   - path: /.well-known/agent.json
     status: 200
     file: null
     content_type: text/html
     note: NOT AN AGENT CARD — same SPA shell.
+- host: https://b.app.lumosidentity.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: lumos-b-oauth-authorization-server.json
+    bytes: 1178
+  path_echo_control: passed
+x-mcp-probe:
+  probed: '2026-09-19'
+  issue: roadmap#321, roadmap#337
+  documents:
+  - host: https://api.lumos.com
+    path: /.well-known/oauth-protected-resource
+    file: lumos-api-oauth-protected-resource.json
+  - host: https://b.app.lumosidentity.com
+    path: /.well-known/oauth-authorization-server
+    file: lumos-b-oauth-authorization-server.json
+  validated_on: resource (RFC 9728) / issuer (RFC 8414, OIDC)
+  negative_control: one per host; a 2xx JSON object at an impossible path discards the host
+note: 'MCP-host OAuth discovery added 2026-09-19 (roadmap#321/#337): the harvest visits a provider''s
+  primary hosts, and RFC 9728 protected-resource metadata lives on the MCP host, so these documents existed
+  and were invisible to the scorer. Fetched live and validated on `resource`/`issuer`; one negative control
+  per host.'

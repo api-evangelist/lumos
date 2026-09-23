@@ -1,0 +1,236 @@
+openapi: 3.2.0
+info:
+  title: Lumos Lifecycle Management API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Lifecycle Management
+paths:
+  /lifecycle-management/user-offboardings:
+    post:
+      tags:
+      - Lifecycle Management
+      summary: Create User Offboarding
+      description: Trigger or schedule an offboarding for an identity using the domain's configured offboarding workflow. Omit `scheduled_at` to run immediately, or provide a future datetime to schedule it.
+      operationId: createUserOffboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserOffboardingInput'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOffboardingOutput'
+        '400':
+          description: The target identity is not a source-of-truth identity, or `scheduled_at` is in the past.
+        '403':
+          description: The caller lacks permission for this operation.
+        '404':
+          description: No identity exists with the given `user_id` in the caller's domain.
+        '409':
+          description: An offboarding is already scheduled or in progress for this identity.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /lifecycle-management/user-offboardings/{user_offboarding_id}:
+    get:
+      tags:
+      - Lifecycle Management
+      summary: Get User Offboarding
+      description: Get a user offboarding by ID.
+      operationId: getUserOffboarding
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_offboarding_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The UUID of the user offboarding.
+          title: User Offboarding Id
+        description: The UUID of the user offboarding.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOffboardingOutput'
+        '403':
+          description: The caller lacks permission for this operation.
+        '404':
+          description: No user offboarding exists with the given ID in the caller's domain.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /lifecycle-management/user-offboardings/{user_offboarding_id}/cancel:
+    post:
+      tags:
+      - Lifecycle Management
+      summary: Cancel User Offboarding
+      description: Cancel a scheduled or in-progress user offboarding.
+      operationId: cancelUserOffboarding
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_offboarding_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The UUID of the user offboarding.
+          title: User Offboarding Id
+        description: The UUID of the user offboarding.
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: The caller lacks permission for this operation.
+        '404':
+          description: No user offboarding exists with the given ID in the caller's domain.
+        '409':
+          description: The offboarding is not in a cancellable state (it has already completed or been cancelled).
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    UserOffboardingOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The unique UUID of the user offboarding.
+        user_id:
+          type: string
+          title: User Id
+          description: The UUID of the offboarded identity.
+        status:
+          $ref: '#/components/schemas/FlowsV2NormalizedDisplayStatus'
+          description: The status of the offboarding.
+        scheduled_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Scheduled At
+          description: When the offboarding is scheduled to run, if scheduled.
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+          description: When the offboarding was created.
+        cancelled_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Cancelled At
+          description: When the offboarding was cancelled, if it was cancelled.
+        completed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Completed At
+          description: When the offboarding completed, if it has completed.
+      type: object
+      required:
+      - id
+      - user_id
+      - status
+      - scheduled_at
+      - created_at
+      - cancelled_at
+      - completed_at
+      title: UserOffboardingOutput
+    FlowsV2NormalizedDisplayStatus:
+      type: string
+      enum:
+      - SCHEDULED
+      - IN_PROGRESS
+      - DIVERTED
+      - CANCELLED
+      - FAILED
+      - EXPIRED
+      - COMPLETED
+      title: FlowsV2NormalizedDisplayStatus
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    UserOffboardingInput:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+          description: The UUID of the identity to offboard.
+        scheduled_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Scheduled At
+          description: When to run the offboarding, as an ISO 8601 datetime. Omit to trigger the offboarding immediately; provide a future datetime to schedule it.
+      additionalProperties: false
+      type: object
+      required:
+      - user_id
+      title: UserOffboardingInput
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

@@ -1,56 +1,47 @@
 {
   "provider": "lumos",
   "sources": [
-    "lumos-accesspolicies-api-openapi.yml",
-    "lumos-accessrequests-api-openapi.yml",
-    "lumos-accessreviews-api-openapi.yml",
-    "lumos-accounts-api-openapi.yml",
-    "lumos-activity-api-openapi.yml",
-    "lumos-apps-api-openapi.yml",
-    "lumos-appstore-api-openapi.yml",
-    "lumos-groups-api-openapi.yml",
-    "lumos-preapprovalrules-api-openapi.yml",
-    "lumos-tasks-api-openapi.yml",
-    "lumos-users-api-openapi.yml",
-    "lumos-utility-api-openapi.yml",
-    "lumos-vendors-api-openapi.yml",
-    "lumos-webhooks-api-openapi.yml"
+    "_original/lumos-openapi.json"
   ],
   "outputs": [
-    "lumos-accesspolicies-api-openapi.yml",
-    "lumos-accessrequests-api-openapi.yml",
-    "lumos-accessreviews-api-openapi.yml",
-    "lumos-accounts-api-openapi.yml",
-    "lumos-activity-api-openapi.yml",
-    "lumos-apps-api-openapi.yml",
+    "lumos-access-reviews-api-openapi.yml",
     "lumos-appstore-api-openapi.yml",
-    "lumos-groups-api-openapi.yml",
-    "lumos-preapprovalrules-api-openapi.yml",
+    "lumos-core-api-openapi.yml",
+    "lumos-integration-webhooks-api-openapi.yml",
+    "lumos-knowledge-api-openapi.yml",
+    "lumos-lifecycle-management-api-openapi.yml",
+    "lumos-meta-api-openapi.yml",
     "lumos-tasks-api-openapi.yml",
-    "lumos-users-api-openapi.yml",
-    "lumos-utility-api-openapi.yml",
-    "lumos-vendors-api-openapi.yml",
-    "lumos-webhooks-api-openapi.yml"
+    "lumos-vendor-management-api-openapi.yml"
   ],
-  "archived": [],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
   "errors": [],
   "warnings": [],
   "notes": [
-    "lumos-accesspolicies-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-accessrequests-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-accessreviews-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-accounts-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-activity-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-apps-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-appstore-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-groups-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-preapprovalrules-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-tasks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-users-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-utility-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-vendors-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "lumos-webhooks-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "apis.yml register: already-registered"
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "lumos-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "lumos-openapi.json: declared missing tag: AppStore",
+    "lumos-openapi.json: declared missing tag: Core",
+    "lumos-openapi.json: declared missing tag: Integration Webhooks",
+    "lumos-openapi.json: declared missing tag: Lifecycle Management",
+    "lumos-openapi.json: declared missing tag: Meta",
+    "lumos-openapi.json: declared missing tag: Vendor Management",
+    "superseded outputs removed: lumos-app-store-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 10 total)"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/lumos-openapi.yml: archived document superseded by a larger archived document",
+    "lumos-access-reviews-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-app-store-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-core-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-integration-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-knowledge-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-lifecycle-management-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-meta-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-tasks-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lumos-vendor-management-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

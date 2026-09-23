@@ -1,0 +1,3079 @@
+openapi: 3.2.0
+info:
+  title: Lumos App Store API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: App Store
+paths:
+  /appstore/apps/{app_id}/requestable_permissions:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Permissions For App
+      description: Get AppStore permissions for an application.
+      operationId: get_appstore_permissions_for_app_appstore_apps__app_id__requestable_permissions_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Filters requestable permissions by the ID of the app to which they belong.
+          title: App Id
+        description: Filters requestable permissions by the ID of the app to which they belong.
+      - name: search_term
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: "\n    Searches permissions by the permission's group name,\n    request configuration name, or specific integration ID.\n"
+          title: Search Term
+        description: "\n    Searches permissions by the permission's group name,\n    request configuration name, or specific integration ID.\n"
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Search filter should be an exact match.
+          default: false
+          title: Exact Match
+        description: Search filter should be an exact match.
+      - name: in_app_store
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          description: "\n    Filters permissions by visibility in the AppStore.\n"
+          title: In App Store
+        description: "\n    Filters permissions by visibility in the AppStore.\n"
+      - name: include_inherited_configs
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include inherited configurations from parent app.
+          default: true
+          title: Include Inherited Configs
+        description: Include inherited configurations from parent app.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_RequestablePermissionOutput_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/requestable_permissions:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Permissions
+      description: Get AppStore permissions for an application.
+      operationId: get_appstore_permissions_appstore_requestable_permissions_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Filters requestable permissions by the ID of the app to which they belong.
+          title: App Id
+        description: Filters requestable permissions by the ID of the app to which they belong.
+      - name: search_term
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: "\n    Searches permissions by the permission's group name,\n    request configuration name, or specific integration ID.\n"
+          title: Search Term
+        description: "\n    Searches permissions by the permission's group name,\n    request configuration name, or specific integration ID.\n"
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Search filter should be an exact match.
+          default: false
+          title: Exact Match
+        description: Search filter should be an exact match.
+      - name: in_app_store
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          description: "\n    Filters permissions by visibility in the AppStore.\n"
+          title: In App Store
+        description: "\n    Filters permissions by visibility in the AppStore.\n"
+      - name: include_inherited_configs
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include inherited configurations from parent app.
+          default: true
+          title: Include Inherited Configs
+        description: Include inherited configurations from parent app.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_RequestablePermissionOutput_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - App Store
+      summary: Create Appstore Requestable Permission
+      description: '**Create a permission attached to an App in the AppStore.**
+
+
+        *Required fields:*
+
+        - app-identifier. The App should be identified either by app_id or app_class_id + app_instance_id.
+
+        - label
+
+
+        *Defaults:*
+
+        - request_config:
+
+        - appstore_visibility: HIDDEN
+
+        - allowed_groups:
+
+        - type: ALL_GROUPS
+
+        - groups: []
+
+        - request_approval_config
+
+        - manager_approval: NONE
+
+        - request_approval_stages: []
+
+        - request_fulfillment_config
+
+        - manual_steps_needed: false
+
+        - All other fields will have null values by default.'
+      operationId: create_appstore_requestable_permission_appstore_requestable_permissions_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: include_inherited_configs
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include inherited configurations from parent app.
+          default: true
+          title: Include Inherited Configs
+        description: Include inherited configurations from parent app.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestablePermissionInput'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestablePermissionOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/requestable_permissions/{permission_id}:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Permission
+      description: Get an AppStore permission.
+      operationId: get_appstore_permission_appstore_requestable_permissions__permission_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: permission_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Permission Id
+      - name: include_inherited_configs
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include inherited configurations from parent app.
+          default: true
+          title: Include Inherited Configs
+        description: Include inherited configurations from parent app.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestablePermissionOutput'
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - App Store
+      summary: Update Appstore Permission
+      description: '**Update an AppStore permission.**
+
+
+        All fields present in the payload will override the permission''s data.
+
+        Any missing fields will be disregarded.
+
+
+        Non-updatable fields for now:
+
+        request_config -> request_fulfillment_config -> provisioning_group'
+      operationId: update_appstore_permission_appstore_requestable_permissions__permission_id__patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: permission_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Permission Id
+      - name: include_inherited_configs
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Include inherited configurations from parent app.
+          default: true
+          title: Include Inherited Configs
+        description: Include inherited configurations from parent app.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestablePermissionInputUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestablePermissionOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - App Store
+      summary: Delete Appstore Permission
+      description: 'Delete a requestable permission by ID.
+
+
+        Only permissions of type ''NATIVE'' can be deleted.'
+      operationId: delete_appstore_permission_appstore_requestable_permissions__permission_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: permission_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Permission Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/pre_approval_rules:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Pre Approval Rules For App
+      description: Get AppStore pre-approval rules for an app.
+      operationId: get_appstore_pre_approval_rules_for_app_appstore_pre_approval_rules_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Filters preapproval rules by the ID of the app to which they belong.
+          title: App Id
+        description: Filters preapproval rules by the ID of the app to which they belong.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_PreApprovalRuleOutput_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - App Store
+      summary: Create Pre Approval Rule
+      description: Create a pre-approval rule attached to an App in the AppStore.
+      operationId: create_pre_approval_rule_appstore_pre_approval_rules_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreApprovalRuleInput'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreApprovalRuleOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/pre_approval_rules/{pre_approval_rule_id}:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Pre Approval Rule
+      description: Get an AppStore pre-approval rule.
+      operationId: get_appstore_pre_approval_rule_appstore_pre_approval_rules__pre_approval_rule_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: pre_approval_rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Pre Approval Rule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreApprovalRuleOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - App Store
+      summary: Update Pre Approval Rule
+      description: '**Update a pre-approval rule attached to an App in the AppStore.**
+
+
+        All fields present in the payload will override the pre-approval rule''s data.
+
+        Any missing fields will be disregarded.'
+      operationId: update_pre_approval_rule_appstore_pre_approval_rules__pre_approval_rule_id__patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: pre_approval_rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Pre Approval Rule Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreApprovalRuleUpdateInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreApprovalRuleOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - App Store
+      summary: Delete Pre Approval Rule
+      description: Delete a pre-approval rule by ID.
+      operationId: delete_pre_approval_rule_appstore_pre_approval_rules__pre_approval_rule_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: pre_approval_rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Pre Approval Rule Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/apps/{app_id}/settings:
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore App Settings
+      description: Get AppStore app settings.
+      operationId: getAppStoreAppSettings
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppStoreAppSettingsOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - App Store
+      summary: Update Appstore App Settings
+      description: Update AppStore app settings.
+      operationId: updateAppStoreAppSettings
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppStoreAppSettingsInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppStoreAppSettingsOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/apps:
+    post:
+      tags:
+      - App Store
+      summary: Add App To Appstore
+      description: Add app to AppStore with given settings.
+      operationId: addAppToAppStore
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAppToAppStoreInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppStoreAppSettingsOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore Apps
+      description: List all AppStore apps.
+      operationId: getAppStoreApps
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters apps by the ID of the app.
+          title: App Id
+        description: Filters apps by the ID of the app.
+      - name: name_search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search against name, app instance identifier, and app class ID.
+          title: Name Search
+        description: Search against name, app instance identifier, and app class ID.
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Search filter should be an exact match.
+          default: false
+          title: Exact Match
+        description: Search filter should be an exact match.
+      - name: all_visibilities
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Get all apps in the AppStore regardless of visibility. Only available to admins.
+          default: false
+          title: All Visibilities
+        description: Get all apps in the AppStore regardless of visibility. Only available to admins.
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_AppStoreApp_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/apps/{app_id}:
+    delete:
+      tags:
+      - App Store
+      summary: Remove App From Appstore
+      description: Remove app from AppStore.
+      operationId: removeAppFromAppStore
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - App Store
+      summary: Get Appstore App
+      description: Get AppStore app.
+      operationId: getAppStoreApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppStoreApp'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/access_requests/{id}:
+    delete:
+      tags:
+      - App Store
+      summary: Cancel Access Request
+      description: Cancel an access request.
+      operationId: cancelAccessRequest
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: reason
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Reason for cancellation.
+          title: Reason
+        description: Reason for cancellation.
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - App Store
+      summary: Get Access Request
+      description: Get access request by ID.
+      operationId: getAccessRequest
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported values: tasks, custom_fields.'
+          title: Expand
+        description: 'Fields to expand. Supported values: tasks, custom_fields.'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequest'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /appstore/access_request:
+    post:
+      tags:
+      - App Store
+      summary: Create Access Request
+      description: Create a request to access a specific permission in the appstore.
+      operationId: createAccessRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccessRequestInput'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AccessRequest'
+                type: array
+                title: Response Createaccessrequest
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /appstore/access_requests:
+    get:
+      tags:
+      - App Store
+      summary: Get Access Requests
+      description: Get all access requests for the current organization.
+      operationId: getAccessRequests
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: target_user_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters requests by the ID of the target user.
+          title: Target User Id
+        description: Filters requests by the ID of the target user.
+      - name: requester_user_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters requests by the ID of the requesting user.
+          title: Requester User Id
+        description: Filters requests by the ID of the requesting user.
+      - name: user_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters requests by the ID of the user.
+          title: User Id
+        description: Filters requests by the ID of the user.
+      - name: statuses
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/SupportRequestStatus'
+          - type: 'null'
+          description: 'Filters requests by their status. Possible values: ''PENDING'', ''PENDING_MANAGER_APPROVAL'', ''MANAGER_APPROVED'', ''MANAGER_DENIED'', ''PENDING_APPROVAL'', ''APPROVED'', ''DENIED'', ''EXPIRED'', ''CANCELLED'', ''PENDING_PROVISIONING'', ''PENDING_MANUAL_PROVISIONING'', ''DENIED_PROVISIONING'', ''PROVISIONED'', ''PENDING_DEPROVISIONING'', ''PENDING_MANUAL_DEPROVISIONING'', ''TIME_BASED_EXPIRED'', ''COMPLETED'', ''REVERTING'', ''REVERTED'', ''TIME_BASED_EXPIRED_FAILED'', ''TIME_BASED_EXPIRED_CANCELLED'''
+          title: Statuses
+        description: 'Filters requests by their status. Possible values: ''PENDING'', ''PENDING_MANAGER_APPROVAL'', ''MANAGER_APPROVED'', ''MANAGER_DENIED'', ''PENDING_APPROVAL'', ''APPROVED'', ''DENIED'', ''EXPIRED'', ''CANCELLED'', ''PENDING_PROVISIONING'', ''PENDING_MANUAL_PROVISIONING'', ''DENIED_PROVISIONING'', ''PROVISIONED'', ''PENDING_DEPROVISIONING'', ''PENDING_MANUAL_DEPROVISIONING'', ''TIME_BASED_EXPIRED'', ''COMPLETED'', ''REVERTING'', ''REVERTED'', ''TIME_BASED_EXPIRED_FAILED'', ''TIME_BASED_EXPIRED_CANCELLED'''
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          description: Sort access requests ascending (ASC) or descending (DESC) by created date.
+          default: ASC
+          title: Sort
+        description: Sort access requests ascending (ASC) or descending (DESC) by created date.
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported values: tasks, custom_fields.'
+          title: Expand
+        description: 'Fields to expand. Supported values: tasks, custom_fields.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_AccessRequest_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    RequestFulfillmentConfigOutput:
+      properties:
+        manual_steps_needed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Manual Steps Needed
+          description: Whether manual steps are needed.
+        manual_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Manual Instructions
+          description: The manual instructions that go along.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        time_based_access_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Time Based Access Override
+          description: Indicates if time based access is overriden.
+        provisioning_group:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+          description: The provisioning group optionally assocated with this config.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+      type: object
+      title: RequestFulfillmentConfigOutput
+    AppStoreAppSettingsRequestFlowOutput:
+      properties:
+        discoverability:
+          $ref: '#/components/schemas/AppStoreVisibility'
+          description: AppStore App visibility.
+        custom_approval_message:
+          type: string
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Markdown for links and text formatting is supported.
+        require_manager_approval:
+          type: boolean
+          title: Require Manager Approval
+          description: When a user makes an access request, require that their manager approves the request before moving on to additional approvals.
+        require_additional_approval:
+          type: boolean
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigOutput'
+          - type: 'null'
+          description: The allowed groups config associated with this config.
+          default:
+            type: ALL_GROUPS
+            groups: []
+        approvers:
+          $ref: '#/components/schemas/AppApproversOutput'
+          description: AppStore App approvers assigned.
+          default:
+            groups: []
+            users: []
+        approvers_stage_2:
+          $ref: '#/components/schemas/AppApproversOutput'
+          description: AppStore App stage 2 approvers assigned.
+          default:
+            groups: []
+            users: []
+        response_describes_entire_approval_workflow:
+          type: boolean
+          title: Response Describes Entire Approval Workflow
+          description: Indicates whether the approval configuration is fully represented by the existing API. If False, the approval configuration may contain additional stages or conditional approval chains not reflected in the v1 API.
+          default: false
+        admins:
+          $ref: '#/components/schemas/AppAdminsOutput'
+          description: AppStore App admins assigned.
+          default: []
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+      type: object
+      title: AppStoreAppSettingsRequestFlowOutput
+    BaseInlineWebhook:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this inline webhook.
+      type: object
+      required:
+      - id
+      title: BaseInlineWebhook
+    TaskComment:
+      properties:
+        body:
+          type: string
+          title: Body
+          description: The text content of the comment.
+        created_by:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who created the comment.
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: When the comment was created.
+      type: object
+      required:
+      - body
+      - created_at
+      title: TaskComment
+    Page_PreApprovalRuleOutput_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PreApprovalRuleOutput'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[PreApprovalRuleOutput]
+    GroupProvisioningOption:
+      type: string
+      enum:
+      - DIRECT_TO_USER
+      - GROUPS_AND_HIDDEN
+      - GROUPS_AND_VISIBLE
+      title: GroupProvisioningOption
+    ManagerApprovalOption:
+      type: string
+      enum:
+      - NONE
+      - INITIAL_APPROVAL
+      title: ManagerApprovalOption
+    AppStoreAppSettingsProvisioningInput:
+      properties:
+        groups_provisioning:
+          $ref: '#/components/schemas/GroupProvisioningOption'
+          description: Controls how access is provisioned when a request is fulfilled. DIRECT_TO_USER provisions access at the app level and marks all permissions as not visible in the App Store. GROUPS_AND_HIDDEN provisions access at the permission level, but users cannot select which permission they want (requires at least one visible permission). GROUPS_AND_VISIBLE provisions access at the permission level and allows users to select the permission when requesting (requires at least one visible permission).
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Whether the app is configured to allow users to request multiple permissions in a single request
+        manual_steps_needed:
+          type: boolean
+          title: Manual Steps Needed
+          description: If enabled, Lumos will notify the App Admin after initial access is granted to perform additional manual steps. Note that if this option is enabled, this action must be confirmed by the App Admin in order to resolve the request.
+        custom_provisioning_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Provisioning Instructions
+          description: Only Available if manual steps is active. During the provisioning step, Lumos will send a custom message to app admins explaining how to provision a user to the app. Markdown for links and text formatting is supported.
+        default_time_based_access_option:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Time Based Access Option
+          description: The label of the default time-based access duration pre-selected when a user requests access. Must be one of the values in time_based_access. Null when there is no default.
+        default_permission:
+          anyOf:
+          - $ref: '#/components/schemas/RequestablePermissionBase'
+          - type: 'null'
+          description: The default permission pre-selected when a user requests access to this app. Provide the permission's id (UUID). Null when there is no default. The permission must belong to this app.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this app.
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this app.
+      type: object
+      title: AppStoreAppSettingsProvisioningInput
+    RequestApprovalStageInput:
+      properties:
+        approvers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ApproverInput'
+            type: array
+          - type: 'null'
+          title: Approvers
+          description: The approvers of this stage.
+      type: object
+      title: RequestApprovalStageInput
+    AppStoreAppSettingsOutput:
+      properties:
+        custom_request_instructions:
+          type: string
+          title: Custom Request Instructions
+          description: AppStore App instructions that are shown to the requester.
+        redirect_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+          - type: 'null'
+          title: Redirect Url
+          description: If set, requesting this app redirects the user to this URL instead of going through the normal access-request flow. Send null to clear an existing redirect; omit the field to leave it unchanged. Max 2048 characters.
+        request_flow:
+          $ref: '#/components/schemas/AppStoreAppSettingsRequestFlowOutput'
+          description: Request flow configuration to request access to app.
+        provisioning:
+          $ref: '#/components/schemas/AppStoreAppSettingsProvisioningOutput'
+          description: Provisioning flow configuration to request access to app.
+      type: object
+      title: AppStoreAppSettingsOutput
+    User:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+      type: object
+      required:
+      - id
+      title: User
+    BaseUser:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+      type: object
+      required:
+      - id
+      title: BaseUser
+    Group:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          description: The ID of this group.
+        app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+          description: The ID of the app that sources this group.
+        integration_specific_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Specific Id
+          description: The ID of this group, specific to the integration.
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The name of this group.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The description of this group.
+        group_lifecycle:
+          anyOf:
+          - $ref: '#/components/schemas/Lifecycle'
+          - type: 'null'
+          description: The lifecycle of this group.
+          default: SYNCED
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: The ID of the app that sources this group.
+      type: object
+      title: Group
+    DiscoverySource:
+      type: string
+      enum:
+      - GSUITE_QUICK_INBOX
+      - GSUITE_DEEP_INBOX
+      - MICROSOFT_DEEP_INBOX
+      - MICROSOFT_OAUTH
+      - MICROSOFT_GCC
+      - GSUITE_OAUTH
+      - OKTA
+      - MANUAL
+      - ONELOGIN
+      - ATLASSIAN
+      - GOOGLE_CLOUD
+      - LUMOS_INTEGRATION
+      - JUMPCLOUD
+      - CUSTOM
+      - MCP
+      title: DiscoverySource
+    AllowedGroupsConfigOutput:
+      properties:
+        type:
+          $ref: '#/components/schemas/AllowedGroupsConfigType'
+          description: The type of this allowed groups config, can be all groups or specific.
+          default: ALL_GROUPS
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: The groups allowed to request this permission.
+          default: []
+      type: object
+      title: AllowedGroupsConfigOutput
+    RequestConfigOutput:
+      properties:
+        appstore_visibility:
+          anyOf:
+          - $ref: '#/components/schemas/AppStoreVisibilityOption'
+          - type: 'null'
+          description: The appstore visibility of this request config.
+          default: HIDDEN
+        allowed_groups_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Allowed Groups Override
+          description: Indicates if allowed groups is overriden from the app-level settings.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigOutput'
+          - type: 'null'
+          description: The allowed groups config associated with this config.
+          default:
+            type: ALL_GROUPS
+            groups: []
+        request_approval_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestApprovalConfigOutput'
+          - type: 'null'
+          description: A request approval config can be optionally associated with this config
+          default:
+            manager_approval: NONE
+            request_approval_stages:
+            - {}
+        request_fulfillment_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestFulfillmentConfigOutput'
+          - type: 'null'
+          description: A request fulfillment config can be optionally associated with this config
+          default: {}
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+      type: object
+      title: RequestConfigOutput
+    CustomAttributeType:
+      type: string
+      enum:
+      - TEXT
+      - USER
+      - SINGLE_SELECT
+      title: CustomAttributeType
+    BaseGroup:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          description: The ID of this group.
+        app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+          description: The ID of the app that sources this group.
+        integration_specific_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Specific Id
+          description: The ID of this group, specific to the integration.
+      type: object
+      title: BaseGroup
+    CreateAccessRequestInput:
+      properties:
+        app_id:
+          type: string
+          title: App Id
+        requester_user_id:
+          type: string
+          title: Requester User Id
+          description: Override the user who made the request. If omitted, use the current user. Only available to organization admins.
+        target_user_id:
+          type: string
+          title: Target User Id
+          description: User to request access for. If omitted, request for the current user.
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+          description: '[Deprecated - use business_justification] Why the user needs access.'
+        business_justification:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Business Justification
+          description: Why the user needs access.
+        expiration_in_seconds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expiration In Seconds
+          description: Once granted, how long the access should last. Omit for permanent access.
+        access_length:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Length
+          description: Once granted, how long the access should last. Omit for permanent access. All possible values are '2 hours', '4 hours', '8 hours', '12 hours', '1 day', '2 days', '3 days', '7 days', '14 days', '30 days', '90 days', 'Unlimited', but the exact options depend on the settings of the app and permissions.
+        requestable_permission_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Requestable Permission Ids
+          description: The IDs of the requestable permissions the user is requesting access to. Omit this to just request access to the app.
+      type: object
+      required:
+      - app_id
+      title: CreateAccessRequestInput
+    TaskProductArea:
+      type: string
+      enum:
+      - ACCESS_REVIEWS
+      - APPSTORE
+      - MOVER
+      - ATTRIBUTE_SYNC
+      - OFFBOARDING
+      - ONBOARDING
+      - PLATFORM
+      - SAVINGS
+      title: TaskProductArea
+    Lifecycle:
+      type: string
+      enum:
+      - SYNCED
+      - NATIVE
+      title: Lifecycle
+    RequestConfigInputCreate:
+      properties:
+        appstore_visibility:
+          anyOf:
+          - $ref: '#/components/schemas/AppStoreVisibilityOption'
+          - type: 'null'
+          description: The appstore visibility of this request config.
+          default: HIDDEN
+        allowed_groups_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Allowed Groups Override
+          description: Indicates if allowed groups is overriden from the app-level settings.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigInput'
+          - type: 'null'
+          description: Refers to which group(s) can make requests to this permission.
+        request_approval_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestApprovalConfigInput'
+          - type: 'null'
+          description: A request approval config can be optionally associated with this config
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+        request_fulfillment_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestFulfillmentConfigInput'
+          - type: 'null'
+          description: A request fulfillment config can be optionally associated with this config
+      type: object
+      title: RequestConfigInputCreate
+    DomainAppStatus:
+      type: string
+      enum:
+      - DISCOVERED
+      - IN_REVIEW
+      - NEEDS_REVIEW
+      - APPROVED
+      - BLOCKLISTED
+      - DEPRECATED
+      title: DomainAppStatus
+    AppStoreApp:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website, or other identifier.
+        instance_id:
+          type: string
+          title: Instance Id
+          description: The non-unique ID of the instance associated with this app. This will be the Okta app id if it’s an Okta app, or will be marked as custom_app_import if manually uploaded into Lumos.
+        user_friendly_label:
+          type: string
+          title: User Friendly Label
+          description: The user-friendly label of this app.
+        status:
+          $ref: '#/components/schemas/DomainAppStatus'
+          description: 'The status of this app. Possible values: ''DISCOVERED'', ''IN_REVIEW'', ''NEEDS_REVIEW'', ''APPROVED'', ''BLOCKLISTED'', ''DEPRECATED'''
+        sources:
+          items:
+            $ref: '#/components/schemas/DiscoverySource'
+          type: array
+          title: Sources
+          description: The sources of this app.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Determines whether users can request multiple permissions at once.This field will be removed in subsequent API versions.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The URL of the logo of this app.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The URL of the website of this app.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Request Instructions
+          description: The request instructions.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The user-facing description of the app
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: The category of the app, as shown in the AppStore
+        disconnected:
+          type: boolean
+          title: Disconnected
+          description: Whether this app has been disconnected (its stored credentials removed via `DELETE /apps/{app_id}`). A disconnected app is excluded from `GET /apps?disconnected=false`; reconnect it with `PUT /apps/{app_id}`.
+        links:
+          $ref: '#/components/schemas/AppLinks'
+          description: A collection of URLs related to this application
+        sync_status:
+          anyOf:
+          - $ref: '#/components/schemas/SyncStatus'
+          - type: 'null'
+          description: 'The state of this app''s most recent sync: `SYNCING` while one is running, `SUCCESS` or `FAILED` once it finished. Poll this after `POST /apps/{app_id}/sync` to follow that sync. `null` when no sync result is recorded — the app has never synced, or was disconnected.'
+        custom_attributes:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/CustomAttribute'
+            type: object
+          - type: 'null'
+          title: Custom Attributes
+          description: Custom attributes configured on the app
+      type: object
+      required:
+      - id
+      - app_class_id
+      - instance_id
+      - user_friendly_label
+      - status
+      - sources
+      - allow_multiple_permission_selection
+      - disconnected
+      - links
+      title: AppStoreApp
+    AppApproversInput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: Groups assigned as support request approvers.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/BaseUser'
+          type: array
+          title: Users
+          description: Users assigned as support request approvers.
+          default: []
+      type: object
+      title: AppApproversInput
+    AllowedGroupsConfigType:
+      type: string
+      enum:
+      - ALL_GROUPS
+      - SPECIFIED_GROUPS
+      title: AllowedGroupsConfigType
+    RequestConfigInputUpdate:
+      properties:
+        appstore_visibility:
+          anyOf:
+          - $ref: '#/components/schemas/AppStoreVisibilityOption'
+          - type: 'null'
+          description: The appstore visibility of this request config.
+          default: HIDDEN
+        allowed_groups_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Allowed Groups Override
+          description: Indicates if allowed groups is overriden from the app-level settings.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigInput'
+          - type: 'null'
+          description: Refers to which group(s) can make requests to this permission.
+        request_approval_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestApprovalConfigInput'
+          - type: 'null'
+          description: A request approval config can be optionally associated with this config
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+        request_fulfillment_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestFulfillmentConfigInputUpdate'
+          - type: 'null'
+          description: A request fulfillment config can be optionally associated with this config
+      type: object
+      title: RequestConfigInputUpdate
+    PermissionType:
+      type: string
+      enum:
+      - SYNCED
+      - NATIVE
+      title: PermissionType
+    AppStoreAppSettingsRequestFlowInput:
+      properties:
+        discoverability:
+          $ref: '#/components/schemas/AppStoreVisibility'
+          description: AppStore App visibility.
+        custom_approval_message:
+          type: string
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Markdown for links and text formatting is supported.
+        require_manager_approval:
+          type: boolean
+          title: Require Manager Approval
+          description: When a user makes an access request, require that their manager approves the request before moving on to additional approvals.
+        require_additional_approval:
+          type: boolean
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigInput'
+          - type: 'null'
+          description: The allowed groups associated with this config.
+        approvers:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App approvers assigned.
+        approvers_stage_2:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App stage 2 approvers assigned.
+        admins:
+          $ref: '#/components/schemas/AppAdminsInput'
+          description: AppStore App admins assigned.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this app.
+      type: object
+      title: AppStoreAppSettingsRequestFlowInput
+    AddAppToAppStoreInput:
+      properties:
+        custom_request_instructions:
+          type: string
+          title: Custom Request Instructions
+          description: AppStore App instructions that are shown to the requester.
+        redirect_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+          - type: 'null'
+          title: Redirect Url
+          description: If set, requesting this app redirects the user to this URL instead of going through the normal access-request flow. Send null to clear an existing redirect; omit the field to leave it unchanged. Max 2048 characters.
+        request_flow:
+          $ref: '#/components/schemas/AppStoreAppSettingsRequestFlowInput'
+          description: Request flow configuration to request access to app.
+        provisioning:
+          $ref: '#/components/schemas/AppStoreAppSettingsProvisioningInput'
+          description: Provisioning flow configuration to request access to app.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app to add to the app store.
+      type: object
+      required:
+      - app_id
+      title: AddAppToAppStoreInput
+    UserLifecycleStatus:
+      type: string
+      enum:
+      - STAGED
+      - ACTIVE
+      - SUSPENDED
+      - INACTIVE
+      title: UserLifecycleStatus
+    CustomAttribute:
+      properties:
+        type:
+          $ref: '#/components/schemas/CustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: string
+            format: date-time
+          - type: integer
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: CustomAttribute
+    InlineWebhookType:
+      type: string
+      enum:
+      - PRE_APPROVAL
+      - PROVISION
+      - DEPROVISION
+      - REQUEST_VALIDATION
+      - SIEM
+      title: InlineWebhookType
+    AppAdminsOutput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: Groups assigned as app admins.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Users
+          description: Users assigned as app admins.
+          default: []
+      type: object
+      title: AppAdminsOutput
+    RequestablePermissionBaseOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+        type:
+          anyOf:
+          - $ref: '#/components/schemas/PermissionType'
+          - type: 'null'
+          description: The type of this requestable permission.
+        label:
+          type: string
+          title: Label
+          description: The label of this requestable permission.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this requestable permission.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website,  or other identifier.
+        app_instance_id:
+          type: string
+          title: App Instance Id
+          description: The ID of the instance associated with this requestable permission. This may be an empty string.
+      type: object
+      required:
+      - label
+      - app_id
+      - app_class_id
+      - app_instance_id
+      title: RequestablePermissionBaseOutput
+    RequestablePermissionBase:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+      type: object
+      title: RequestablePermissionBase
+    AttributeEqualityRule:
+      properties:
+        attribute:
+          type: string
+          title: Attribute
+          description: The label for the attribute that will be matched against
+        value:
+          type: string
+          title: Value
+          description: A value to check for strict equality against
+      type: object
+      required:
+      - attribute
+      - value
+      title: AttributeEqualityRule
+    RequestFulfillmentConfigInput:
+      properties:
+        manual_steps_needed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Manual Steps Needed
+          description: Whether manual steps are needed.
+        manual_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Manual Instructions
+          description: The manual instructions that go along.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        time_based_access_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Time Based Access Override
+          description: Indicates if time based access is overriden.
+        provisioning_group:
+          anyOf:
+          - $ref: '#/components/schemas/BaseGroup'
+          - type: 'null'
+          description: The provisioning group optionally associated with this config.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+      type: object
+      title: RequestFulfillmentConfigInput
+    RequestApprovalStageOutput:
+      properties:
+        approvers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ApproverOutput'
+            type: array
+          - type: 'null'
+          title: Approvers
+          description: The approvers of this stage.
+      type: object
+      title: RequestApprovalStageOutput
+    Page_RequestablePermissionOutput_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/RequestablePermissionOutput'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[RequestablePermissionOutput]
+    AppApproversOutput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: Groups assigned as support request approvers.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Users
+          description: Users assigned as support request approvers.
+          default: []
+      type: object
+      title: AppApproversOutput
+    AllowedGroupsConfigInput:
+      properties:
+        type:
+          $ref: '#/components/schemas/AllowedGroupsConfigType'
+          description: The type of this allowed groups config, can be all groups or specific.
+          default: ALL_GROUPS
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: The groups allowed to request this permission. At most 100 groups when type is SPECIFIED_GROUPS.
+      type: object
+      title: AllowedGroupsConfigInput
+    AppStoreAppSettingsProvisioningOutput:
+      properties:
+        groups_provisioning:
+          $ref: '#/components/schemas/GroupProvisioningOption'
+          description: Controls how access is provisioned when a request is fulfilled. DIRECT_TO_USER provisions access at the app level and marks all permissions as not visible in the App Store. GROUPS_AND_HIDDEN provisions access at the permission level, but users cannot select which permission they want (requires at least one visible permission). GROUPS_AND_VISIBLE provisions access at the permission level and allows users to select the permission when requesting (requires at least one visible permission).
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Whether the app is configured to allow users to request multiple permissions in a single request
+        manual_steps_needed:
+          type: boolean
+          title: Manual Steps Needed
+          description: If enabled, Lumos will notify the App Admin after initial access is granted to perform additional manual steps. Note that if this option is enabled, this action must be confirmed by the App Admin in order to resolve the request.
+        custom_provisioning_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Provisioning Instructions
+          description: Only Available if manual steps is active. During the provisioning step, Lumos will send a custom message to app admins explaining how to provision a user to the app. Markdown for links and text formatting is supported.
+        default_time_based_access_option:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Time Based Access Option
+          description: The label of the default time-based access duration pre-selected when a user requests access. Must be one of the values in time_based_access. Null when there is no default.
+        default_permission:
+          anyOf:
+          - $ref: '#/components/schemas/RequestablePermissionOutput'
+          - type: 'null'
+          description: The default permission pre-selected when a user requests access to this app. Null if no default is configured.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+      type: object
+      title: AppStoreAppSettingsProvisioningOutput
+    PreApprovalRuleUpdateInput:
+      properties:
+        justification:
+          type: string
+          maxLength: 500
+          title: Justification
+          description: The justification of this preapproval rule.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: Preapproval rule time access length,
+        preapproved_groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Preapproved Groups
+          description: The preapproved groups of this preapproval rule.
+          default: []
+        preapproved_permissions:
+          items:
+            $ref: '#/components/schemas/RequestablePermissionBase'
+          type: array
+          title: Preapproved Permissions
+          description: The preapproved permissions of this preapproval rule.
+          default: []
+        preapproved_users_by_attribute:
+          items:
+            $ref: '#/components/schemas/AttributeEqualityRule'
+          type: array
+          title: Preapproved Users By Attribute
+          description: The set of users this pre-approval rule applies to, defined by attributes that must be true about the user
+          default: []
+        preapproval_webhooks:
+          items:
+            $ref: '#/components/schemas/BaseInlineWebhook'
+          type: array
+          title: Preapproval Webhooks
+          description: The preapproval webhooks of this preapproval rule.
+          default: []
+      type: object
+      required:
+      - justification
+      title: PreApprovalRuleUpdateInput
+    TaskAssigneeType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      title: TaskAssigneeType
+    TaskAssignee:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of the assignee.
+        type:
+          $ref: '#/components/schemas/TaskAssigneeType'
+          description: Whether this assignee is a user or group.
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The display name of the assignee.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of the assignee. Only set for users.
+      type: object
+      required:
+      - id
+      - type
+      title: TaskAssignee
+    AccessRequest:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of the access request.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app the request is for.
+        app_name:
+          type: string
+          title: App Name
+          description: The name of the app the request is for.
+        requester_user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who requested access. It's possible for one user to request access on another's behalf. None for system-initiated requests, such as automated onboarding policies, that have no human requester.
+        target_user:
+          $ref: '#/components/schemas/User'
+          description: The user the request is for.
+        supporter_user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user supporting this request, if any. None if no supporter has been assigned.
+        status:
+          $ref: '#/components/schemas/SupportRequestStatus'
+          description: The current status of the request.
+        notes:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: 'null'
+          type: object
+          title: Notes
+          description: The reason the user wrote for putting the access request into the given state.
+          default: {}
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        expiration_in_seconds:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Expiration In Seconds
+          description: For time-based access requests, the number of seconds after provisioning at which access should be removed. None for permanent requests.
+        requestable_permissions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RequestablePermissionOutput'
+            type: array
+          - type: 'null'
+          title: Requestable Permissions
+        requested_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Requested At
+        tasks:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Task'
+            type: array
+          - type: 'null'
+          title: Tasks
+        custom_fields:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/CustomIntakeFieldResponseOutput'
+            type: array
+          - type: 'null'
+          title: Custom Fields
+      type: object
+      required:
+      - id
+      - app_id
+      - app_name
+      - target_user
+      - status
+      title: AccessRequest
+      description: API version of DomainAppSupportRequest.
+    TaskCategory:
+      type: string
+      enum:
+      - MANAGER_APPROVAL
+      - APPROVAL
+      - PROVISIONING
+      - DEPROVISIONING
+      - ERROR
+      - GENERIC
+      title: TaskCategory
+    AppStoreAppSettingsInput:
+      properties:
+        custom_request_instructions:
+          type: string
+          title: Custom Request Instructions
+          description: AppStore App instructions that are shown to the requester.
+        redirect_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+          - type: 'null'
+          title: Redirect Url
+          description: If set, requesting this app redirects the user to this URL instead of going through the normal access-request flow. Send null to clear an existing redirect; omit the field to leave it unchanged. Max 2048 characters.
+        request_flow:
+          $ref: '#/components/schemas/AppStoreAppSettingsRequestFlowInput'
+          description: Request flow configuration to request access to app.
+        provisioning:
+          $ref: '#/components/schemas/AppStoreAppSettingsProvisioningInput'
+          description: Provisioning flow configuration to request access to app.
+      type: object
+      title: AppStoreAppSettingsInput
+    ApproverInput:
+      properties:
+        type:
+          $ref: '#/components/schemas/ApproverType'
+          description: The type of this approver.
+        user:
+          anyOf:
+          - $ref: '#/components/schemas/BaseUser'
+          - type: 'null'
+          description: Optionally, the approver can be a user.
+        group:
+          anyOf:
+          - $ref: '#/components/schemas/BaseGroup'
+          - type: 'null'
+          description: Optionally, the approver can be a group.
+      type: object
+      title: ApproverInput
+    TaskActionTransition:
+      properties:
+        transition_to:
+          anyOf:
+          - $ref: '#/components/schemas/TaskStatus'
+          - type: 'null'
+          description: The status the task will transition to when this action is taken.
+      type: object
+      title: TaskActionTransition
+    ApproverType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      title: ApproverType
+    Task:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this task.
+        task_type:
+          type: string
+          title: Task Type
+          description: The type of this task.
+        task_category:
+          $ref: '#/components/schemas/TaskCategory'
+          description: The category of this task.
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+          description: The current status of this task.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: A description of this task.
+        instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Instructions
+          description: Instructions for completing this task.
+        product_area:
+          anyOf:
+          - $ref: '#/components/schemas/TaskProductArea'
+          - type: 'null'
+          description: The product area this task is related to.
+        app:
+          anyOf:
+          - $ref: '#/components/schemas/BaseApp'
+          - type: 'null'
+          description: The app this task is related to.
+        target_user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user this task is about.
+        resolved_by:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who resolved this task.
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: When this task was created.
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: When this task was last updated.
+        assignees:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskAssignee'
+            type: array
+          - type: 'null'
+          title: Assignees
+          description: The assignees of this task. Requires expand=assignees.
+        actions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskAction'
+            type: array
+          - type: 'null'
+          title: Actions
+          description: Available actions for this task. Requires expand=actions.
+        comments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskComment'
+            type: array
+          - type: 'null'
+          title: Comments
+          description: Comments on this task. Requires expand=comments.
+        access_request_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Request Id
+          description: The access request this task is associated with, if applicable.
+        requestable_permission_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requestable Permission Id
+          description: The requestable permission this task is associated with, if applicable.
+      type: object
+      required:
+      - id
+      - task_type
+      - task_category
+      - status
+      - created_at
+      - updated_at
+      title: Task
+    PreApprovalRuleOutput:
+      properties:
+        justification:
+          type: string
+          maxLength: 500
+          title: Justification
+          description: The justification of this preapproval rule.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: Preapproval rule time access length,
+        id:
+          type: string
+          title: Id
+          description: The ID of this preapproval rule.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this pre-approval rule.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The ID of the service associated with this pre-approval rule.
+        app_instance_id:
+          type: string
+          title: App Instance Id
+          description: Optionally, an app has an identifer associated with it's particular instance.
+        preapproved_groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Preapproved Groups
+          description: The preapproved groups of this preapproval rule.
+          default: []
+        preapproved_users_by_attribute:
+          items:
+            $ref: '#/components/schemas/AttributeEqualityRule'
+          type: array
+          title: Preapproved Users By Attribute
+          description: The set of users this pre-approval rule applies to, defined by attributes that must be true about the user
+          default: []
+        preapproved_permissions:
+          items:
+            $ref: '#/components/schemas/RequestablePermissionBaseOutput'
+          type: array
+          title: Preapproved Permissions
+          description: The preapproved permissions of this preapproval rule.
+          default: []
+        preapproval_webhooks:
+          items:
+            $ref: '#/components/schemas/InlineWebhook'
+          type: array
+          title: Preapproval Webhooks
+          description: The preapproval webhooks of this preapproval rule.
+          default: []
+      type: object
+      required:
+      - justification
+      - app_id
+      - app_class_id
+      - app_instance_id
+      title: PreApprovalRuleOutput
+    CustomIntakeFieldResponseOutput:
+      properties:
+        prompt:
+          type: string
+          title: Prompt
+          description: The custom intake field prompt shown to the requester.
+        response:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Response
+          description: The requester's response to the custom intake field.
+      type: object
+      required:
+      - prompt
+      title: CustomIntakeFieldResponseOutput
+      description: API version of a CustomIntakeFieldResponse on an access request.
+    AppLinks:
+      properties:
+        self:
+          type: string
+          title: Self
+          description: The canonical API URL for retrieving this specific application
+        admin_url:
+          type: string
+          title: Admin Url
+          description: A URL to access this application within the Lumos web UI
+      type: object
+      required:
+      - self
+      - admin_url
+      title: AppLinks
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    BaseApp:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+      type: object
+      required:
+      - id
+      title: BaseApp
+    Page_AccessRequest_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AccessRequest'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[AccessRequest]
+    InlineWebhook:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this inline webhook.
+        hook_type:
+          $ref: '#/components/schemas/InlineWebhookType'
+          description: The type of this inline webhook.
+        name:
+          type: string
+          title: Name
+          description: The name of this inline webhook.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The description of this inline webhook.
+      type: object
+      required:
+      - id
+      - hook_type
+      - name
+      title: InlineWebhook
+    Page_AppStoreApp_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AppStoreApp'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[AppStoreApp]
+    AppStoreVisibility:
+      type: string
+      enum:
+      - FULL
+      - LIMITED
+      - NONE
+      title: AppStoreVisibility
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    RequestApprovalConfigOutput:
+      properties:
+        request_approval_config_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Request Approval Config Override
+          description: Indicates if approval flow is overridden.
+        manager_approval:
+          anyOf:
+          - $ref: '#/components/schemas/ManagerApprovalOption'
+          - type: 'null'
+          description: Manager approval can be configured as necessary to continue
+          default: NONE
+        require_additional_approval:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        custom_approval_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Note that the permission level approval message will override the App level approval message if custom_approval_message_override is set. Markdown for links and text formatting is supported.
+        custom_approval_message_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Custom Approval Message Override
+          description: Indicates if custom_approval_message is overridden.
+        approvers:
+          anyOf:
+          - $ref: '#/components/schemas/AppApproversOutput'
+          - type: 'null'
+          description: AppStore App approvers assigned.
+        approvers_stage_2:
+          anyOf:
+          - $ref: '#/components/schemas/AppApproversOutput'
+          - type: 'null'
+          description: AppStore App stage 2 approvers assigned.
+        request_approval_stages:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RequestApprovalStageOutput'
+            type: array
+          - type: 'null'
+          title: Request Approval Stages
+          description: The stages of this request approval.
+          default:
+          - {}
+        response_describes_entire_approval_workflow:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Response Describes Entire Approval Workflow
+          description: Indicates whether the approval configuration is fully represented by the existing API. If False, the approval configuration may contain additional stages or conditional approval chains not reflected in the v1 API.
+      type: object
+      title: RequestApprovalConfigOutput
+    TaskStatus:
+      type: string
+      enum:
+      - PENDING
+      - ACCEPTED
+      - COMPLETED
+      - DISMISSED
+      - BLOCKED
+      - STAGED
+      - RETRIED
+      - EXPIRED
+      title: TaskStatus
+    PreApprovalRuleInput:
+      properties:
+        justification:
+          type: string
+          maxLength: 500
+          title: Justification
+          description: The justification of this preapproval rule.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: Preapproval rule time access length,
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this pre-approval rule.
+        preapproved_groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Preapproved Groups
+          description: The preapproved groups of this preapproval rule.
+          default: []
+        preapproved_permissions:
+          items:
+            $ref: '#/components/schemas/RequestablePermissionBase'
+          type: array
+          title: Preapproved Permissions
+          description: The preapproved permissions of this preapproval rule.
+          default: []
+        preapproved_users_by_attribute:
+          items:
+            $ref: '#/components/schemas/AttributeEqualityRule'
+          type: array
+          title: Preapproved Users By Attribute
+          description: The set of users this pre-approval rule applies to, defined by attributes that must be true about the user
+          default: []
+        preapproval_webhooks:
+          items:
+            $ref: '#/components/schemas/BaseInlineWebhook'
+          type: array
+          title: Preapproval Webhooks
+          description: The preapproval webhooks of this preapproval rule.
+          default: []
+      type: object
+      required:
+      - justification
+      - app_id
+      title: PreApprovalRuleInput
+    RequestablePermissionInput:
+      properties:
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this requestable permission.
+        app_class_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Class Id
+          description: The ID of the service associated with this requestable permission.
+        app_instance_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Instance Id
+          description: Optionally, an app has an identifer associated with it's particular instance.
+        label:
+          type: string
+          title: Label
+          description: The label of this requestable permission.
+        request_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestConfigInputCreate'
+          - type: 'null'
+          description: The request config associated with this requestable permission.
+      type: object
+      required:
+      - app_id
+      - label
+      title: RequestablePermissionInput
+    RequestApprovalConfigInput:
+      properties:
+        request_approval_config_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Request Approval Config Override
+          description: Indicates if approval flow is overridden.
+        manager_approval:
+          anyOf:
+          - $ref: '#/components/schemas/ManagerApprovalOption'
+          - type: 'null'
+          description: Manager approval can be configured as necessary to continue
+          default: NONE
+        require_additional_approval:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        custom_approval_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Note that the permission level approval message will override the App level approval message if custom_approval_message_override is set. Markdown for links and text formatting is supported.
+        custom_approval_message_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Custom Approval Message Override
+          description: Indicates if custom_approval_message is overridden.
+        approvers:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App approvers assigned.
+        approvers_stage_2:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App stage 2 approvers assigned.
+        request_approval_stages:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RequestApprovalStageInput'
+            type: array
+          - type: 'null'
+          title: Request Approval Stages
+          description: The stages of this request approval.
+      type: object
+      title: RequestApprovalConfigInput
+    SyncStatus:
+      type: string
+      enum:
+      - SYNCING
+      - SUCCESS
+      - FAILED
+      title: SyncStatus
+    RequestFulfillmentConfigInputUpdate:
+      properties:
+        manual_steps_needed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Manual Steps Needed
+          description: Whether manual steps are needed.
+        manual_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Manual Instructions
+          description: The manual instructions that go along.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        time_based_access_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Time Based Access Override
+          description: Indicates if time based access is overriden.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+      type: object
+      title: RequestFulfillmentConfigInputUpdate
+    ApproverOutput:
+      properties:
+        type:
+          $ref: '#/components/schemas/ApproverType'
+          description: The type of this approver.
+        user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: Optionally, the approver can be a user.
+        group:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+          description: Optionally, the approver can be a group.
+      type: object
+      required:
+      - type
+      title: ApproverOutput
+    AppAdminsInput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: Groups assigned as app admins.
+        users:
+          items:
+            $ref: '#/components/schemas/BaseUser'
+          type: array
+          title: Users
+          description: Users assigned as app admins.
+      type: object
+      title: AppAdminsInput
+    SupportRequestStatus:
+      type: string
+      enum:
+      - PENDING
+      - PENDING_MANAGER_APPROVAL
+      - MANAGER_APPROVED
+      - MANAGER_DENIED
+      - PENDING_APPROVAL
+      - APPROVED
+      - DENIED
+      - EXPIRED
+      - CANCELLED
+      - PENDING_PROVISIONING
+      - PENDING_MANUAL_PROVISIONING
+      - DENIED_PROVISIONING
+      - PROVISIONED
+      - PENDING_DEPROVISIONING
+      - PENDING_MANUAL_DEPROVISIONING
+      - TIME_BASED_EXPIRED
+      - COMPLETED
+      - REVERTING
+      - REVERTED
+      - TIME_BASED_EXPIRED_FAILED
+      - TIME_BASED_EXPIRED_CANCELLED
+      title: SupportRequestStatus
+    TaskAction:
+      properties:
+        action_type:
+          type: string
+          title: Action Type
+          description: The external identifier for this action type.
+        transitions:
+          items:
+            $ref: '#/components/schemas/TaskActionTransition'
+          type: array
+          title: Transitions
+          description: The possible status transitions for this action.
+      type: object
+      required:
+      - action_type
+      - transitions
+      title: TaskAction
+    RequestablePermissionOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+        type:
+          anyOf:
+          - $ref: '#/components/schemas/PermissionType'
+          - type: 'null'
+          description: The type of this requestable permission.
+        label:
+          type: string
+          title: Label
+          description: The label of this requestable permission.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this requestable permission.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website,  or other identifier.
+        app_instance_id:
+          type: string
+          title: App Instance Id
+          description: The ID of the instance associated with this requestable permission. This may be an empty string.
+        request_config:
+          $ref: '#/components/schemas/RequestConfigOutput'
+          description: The request config associated with this requestable permission.
+      type: object
+      required:
+      - label
+      - app_id
+      - app_class_id
+      - app_instance_id
+      title: RequestablePermissionOutput
+    AppStoreVisibilityOption:
+      type: string
+      enum:
+      - HIDDEN
+      - VISIBLE
+      title: AppStoreVisibilityOption
+    RequestablePermissionInputUpdate:
+      properties:
+        app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+          description: The ID of the app associated with this requestable permission.
+        app_class_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Class Id
+          description: The ID of the service associated with this requestable permission.
+        app_instance_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Instance Id
+          description: Optionally, an app has an identifer associated with it's particular instance.
+        label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Label
+          description: The label of this requestable permission.
+        request_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestConfigInputUpdate'
+          - type: 'null'
+          description: The request config associated with this requestable permission.
+      type: object
+      title: RequestablePermissionInputUpdate
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

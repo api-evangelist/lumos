@@ -1,0 +1,1432 @@
+openapi: 3.2.0
+info:
+  title: Lumos Access Reviews API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Access Reviews
+  description: 'Create and manage access review campaigns — scheduled reviews of who has access to what
+
+    across your connected apps.'
+paths:
+  /access_reviews:
+    post:
+      tags:
+      - Access Reviews
+      summary: Create Access Review
+      description: 'Create a new access review campaign.
+
+
+        The review''s initial status depends on whether apps are provided:
+
+
+        - **With apps**: the review starts in `IN_PREPARATION` while account and entitlement snapshots are taken. Status automatically transitions to `IN_PROGRESS` once snapshotting completes.
+
+        - **Without apps**: the review is created directly in `IN_PROGRESS`.
+
+
+        Poll `GET /access_reviews/{id}` to observe the status transition. To add apps after creation, use `POST /access_reviews/{id}/apps` (allowed on any status except `COMPLETED`).'
+      operationId: createAccessReview
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccessReviewInput'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccessReviewOutput'
+        '400':
+          description: Validation error — the request violated a business rule (e.g. duplicate review name, deadline in the past, review not in the required status for this operation).
+        '403':
+          description: Forbidden — the caller lacks permission to create or manage access reviews. Requires the Access Review Administrator or App Admin role on the domain.
+        '404':
+          description: Not found — the referenced review / app does not exist.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Access Reviews
+      summary: List Access Reviews
+      description: List access reviews for your organization. Paginated via standard `page` + `size` query params — `size` is capped at 100; requests over the cap return 422.
+      operationId: listAccessReviews
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_AccessReviewOutput_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_reviews/{access_review_id}/apps:
+    post:
+      tags:
+      - Access Reviews
+      summary: Add Apps To Access Review
+      description: Add apps to an existing access review. Allowed on any review that is not yet `COMPLETED`. Soft-errors on invalid or duplicate domain app UUIDs — per-app failures are returned in the `errors` array rather than raising.
+      operationId: addAppsToAccessReview
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Review Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAppsInput'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAppsOutput'
+        '400':
+          description: Validation error — the request violated a business rule (e.g. duplicate review name, deadline in the past, review not in the required status for this operation).
+        '403':
+          description: Forbidden — the caller lacks permission to create or manage access reviews. Requires the Access Review Administrator or App Admin role on the domain.
+        '404':
+          description: Not found — the referenced review / app does not exist.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_reviews/{access_review_id}:
+    delete:
+      tags:
+      - Access Reviews
+      summary: Delete Access Review
+      description: Soft-delete an access review campaign. Fails with 400 if a review duplication is currently in progress.
+      operationId: deleteAccessReview
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Review Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Validation error — the request violated a business rule (e.g. duplicate review name, deadline in the past, review not in the required status for this operation).
+        '403':
+          description: Forbidden — the caller lacks permission to create or manage access reviews. Requires the Access Review Administrator or App Admin role on the domain.
+        '404':
+          description: Not found — the referenced review / app does not exist.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Access Reviews
+      summary: Get Access Review
+      description: Get an access review by ID.
+      operationId: getAccessReview
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Review Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessReviewOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Access Reviews
+      summary: Update Access Review
+      description: Update an existing access review campaign. Top-level fields are editable on any review that is not yet `COMPLETED`. Per-app (`apps[].scope_filters`) edits are only accepted while the ARDA is still in `IN_PREPARATION` or `ASSIGNING_REVIEWERS` status.
+      operationId: updateAccessReview
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Review Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccessReviewInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessReviewOutput'
+        '400':
+          description: Validation error — the request violated a business rule (e.g. duplicate review name, deadline in the past, review not in the required status for this operation).
+        '403':
+          description: Forbidden — the caller lacks permission to create or manage access reviews. Requires the Access Review Administrator or App Admin role on the domain.
+        '404':
+          description: Not found — the referenced review / app does not exist.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_reviews/{access_review_id}/apps/{arda_id}:
+    delete:
+      tags:
+      - Access Reviews
+      summary: Delete Access Review App
+      description: Soft-delete an app from an access review campaign. Fails with 400 if the review is already `COMPLETED`.
+      operationId: deleteAccessReviewApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_review_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Review Id
+      - name: arda_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Arda Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Validation error — the request violated a business rule (e.g. duplicate review name, deadline in the past, review not in the required status for this operation).
+        '403':
+          description: Forbidden — the caller lacks permission to create or manage access reviews. Requires the Access Review Administrator or App Admin role on the domain.
+        '404':
+          description: Not found — the referenced review / app does not exist.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_reviews/scope_options:
+    get:
+      tags:
+      - Access Reviews
+      summary: Get Scope Options Endpoint
+      description: 'Get available scope filter options for a domain app or ARDA.
+
+
+        To use these in `scope_filters` on a create/edit request, copy an item''s `value` (and `name`) verbatim — `value` is the machine-matchable identifier, while `label` is display-only. Posting a `label` as a `value` (or any value not present here) is rejected.
+
+
+        ACCOUNT_ENTITLEMENT groups are split per `entitlement_type_label` (e.g. ''Roles'', ''Groups''), with each group''s `items` capped at 1000 entitlement labels. Groups whose underlying bucket exceeds the cap set `truncated: true` so callers know some valid labels are not present in the response.'
+      operationId: getScopeOptions
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: domain_app_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain App Id
+      - name: arda_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Arda Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScopeOptionsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    CustomAttributeScopeFilterInput:
+      properties:
+        group:
+          type: string
+          enum:
+          - CUSTOM_ATTRIBUTE
+          const: CUSTOM_ATTRIBUTE
+          title: Group
+          description: Always CUSTOM_ATTRIBUTE.
+        name:
+          type: string
+          maxLength: 255
+          title: Name
+          description: Custom attribute label (e.g. 'Department'). Matches the label from scope_options.
+        label:
+          type: string
+          maxLength: 255
+          title: Label
+          description: Human-readable display label.
+        value:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Value
+          description: Value to filter by for this custom attribute.
+        type:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Type
+          description: Attribute type (STRING, INTEGER, DATETIME, USER, GROUP, SINGLESELECT, MULTISELECT).
+      additionalProperties: false
+      type: object
+      required:
+      - group
+      - name
+      - label
+      title: CustomAttributeScopeFilterInput
+      description: 'Scope filter for ``CUSTOM_ATTRIBUTE`` groups.
+
+
+        Custom attributes are keyed by ``name`` (the attribute label, e.g.
+
+        "Department"). ``type`` declares the attribute''s type (STRING, INTEGER,
+
+        DATETIME, USER, GROUP, SINGLESELECT, MULTISELECT).'
+    ScopeFilterGroupOutput:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: Display name of this filter group.
+        group:
+          $ref: '#/components/schemas/ScopablePropertyGroup'
+          description: ScopablePropertyGroup enum value.
+        type:
+          type: string
+          enum:
+          - STRING
+          - INTEGER
+          - DATETIME
+          - SINGLESELECT
+          - MULTISELECT
+          - USER
+          - GROUP
+          title: Type
+          description: Attribute type for values in this group.
+        items:
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/ScalarScopeFilterInput'
+            - $ref: '#/components/schemas/CustomAttributeScopeFilterInput'
+            - $ref: '#/components/schemas/DatetimeScopeFilterInput'
+            discriminator:
+              propertyName: group
+              mapping:
+                ACCESS_APPROVED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                ACCESS_GRANTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                ACCESS_LENGTH: '#/components/schemas/ScalarScopeFilterInput'
+                ACCESS_PROVISIONED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                ACCESS_REQUESTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                ACCOUNT_DELTA: '#/components/schemas/ScalarScopeFilterInput'
+                ACCOUNT_ENTITLEMENT: '#/components/schemas/ScalarScopeFilterInput'
+                ACCOUNT_SOURCE: '#/components/schemas/ScalarScopeFilterInput'
+                ACCOUNT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                CATEGORIES: '#/components/schemas/ScalarScopeFilterInput'
+                CUSTOM_ATTRIBUTE: '#/components/schemas/CustomAttributeScopeFilterInput'
+                EMAIL_DOMAIN: '#/components/schemas/ScalarScopeFilterInput'
+                EMPLOYMENT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                ENTITLEMENT_TAG: '#/components/schemas/ScalarScopeFilterInput'
+                LAST_ACTIVITY: '#/components/schemas/DatetimeScopeFilterInput'
+                LAST_LOGIN: '#/components/schemas/DatetimeScopeFilterInput'
+                SOD_POLICY: '#/components/schemas/ScalarScopeFilterInput'
+                TEAM: '#/components/schemas/ScalarScopeFilterInput'
+                UNMATCHED_ACCOUNTS: '#/components/schemas/ScalarScopeFilterInput'
+                USER_OR_GROUP: '#/components/schemas/ScalarScopeFilterInput'
+          type: array
+          title: Items
+          description: Available items for this group, each already shaped as a valid scope filter input. Callers can POST an item directly in `scope_filters`.
+        filter_input_template:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Filter Input Template
+          description: Template shape for filter input on this group. Present for datetime groups and CUSTOM_ATTRIBUTE — where values vary per request so no pre-computed items list exists.
+        default_label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Label
+          description: Default display label (e.g. 'No' for delta filter).
+        truncated:
+          type: boolean
+          title: Truncated
+          description: True when `items` was capped below the underlying source's actual cardinality. Today this only applies to ACCOUNT_ENTITLEMENT groups, which are capped at 1000 entitlement labels per type bucket. When set, callers should expect that some valid entitlement labels for this bucket are not present in `items`.
+          default: false
+      type: object
+      required:
+      - name
+      - group
+      - type
+      title: ScopeFilterGroupOutput
+      description: 'Self-describing discovery group.
+
+
+        Each entry in ``items`` is a valid :type:`ScopeFilterInput` payload — the
+
+        caller can POST it back unmodified in a create/edit request. For groups
+
+        whose values vary per-user (CUSTOM_ATTRIBUTE) or are datetime ranges
+
+        (LAST_LOGIN, LAST_ACTIVITY), ``items`` is empty and
+
+        ``filter_input_template`` shows the expected shape instead.'
+    AddAppsInput:
+      properties:
+        apps:
+          items:
+            $ref: '#/components/schemas/AccessReviewDomainAppInput'
+          type: array
+          maxItems: 200
+          title: Apps
+          description: List of domain apps to add to the access review. Capped at 200 entries per the Access Review scale limits (technically-supported tier).
+      additionalProperties: false
+      type: object
+      required:
+      - apps
+      title: AddAppsInput
+      examples:
+      - apps:
+        - id: 00000000-0000-0000-0000-000000000002
+          review_type: ENTITLEMENTS
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ScalarScopeFilterInput:
+      properties:
+        group:
+          type: string
+          enum:
+          - ACCOUNT_ENTITLEMENT
+          - TEAM
+          - EMPLOYMENT_STATUS
+          - EMAIL_DOMAIN
+          - CATEGORIES
+          - ACCOUNT_DELTA
+          - ACCOUNT_STATUS
+          - ACCOUNT_SOURCE
+          - SOD_POLICY
+          - ACCESS_GRANTED_AT
+          - ACCESS_REQUESTED_AT
+          - ACCESS_APPROVED_AT
+          - ACCESS_PROVISIONED_AT
+          - ACCESS_LENGTH
+          - USER_OR_GROUP
+          - UNMATCHED_ACCOUNTS
+          - ENTITLEMENT_TAG
+          title: Group
+          description: Scope filter group. Use DatetimeScopeFilterInput for LAST_LOGIN / LAST_ACTIVITY and CustomAttributeScopeFilterInput for CUSTOM_ATTRIBUTE.
+        name:
+          type: string
+          maxLength: 255
+          title: Name
+          description: Internal identifier for this filter item. For ACCOUNT_ENTITLEMENT this is the entitlement **type label** (e.g. 'Team', 'Role', 'Repo Access') — copy it from the matching item's `name` in GET /access_reviews/scope_options.
+        label:
+          type: string
+          maxLength: 255
+          title: Label
+          description: Human-readable display label.
+        value:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Value
+          description: The value to filter by. This must be the exact `value` of an item returned by GET /access_reviews/scope_options for this app — the machine-matchable identifier, **not** the human-readable `label`. For ACCOUNT_ENTITLEMENT the value is the entitlement's integration_specific_entitlement_id, which may be an opaque id (e.g. a numeric team id) rather than its display name. Posting a `label`, or any value not present in scope_options, is rejected.
+        type:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Type
+          description: Attribute type. Required for USER_OR_GROUP (must be 'USER' or 'GROUP'). Ignored for all other groups.
+      additionalProperties: false
+      type: object
+      required:
+      - group
+      - name
+      - label
+      title: ScalarScopeFilterInput
+      description: 'Scope filter for groups whose value is a simple string/UUID/enum.
+
+
+        Datetime-valued groups (``LAST_LOGIN``, ``LAST_ACTIVITY``) use
+
+        :class:`DatetimeScopeFilterInput`; ``CUSTOM_ATTRIBUTE`` uses
+
+        :class:`CustomAttributeScopeFilterInput`.'
+    AccessReviewDomainAppOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of this access review domain app record.
+        domain_app_id:
+          type: string
+          title: Domain App Id
+          description: UUID of the domain app being reviewed.
+        domain_app_name:
+          type: string
+          title: Domain App Name
+          description: Display name of the domain app.
+        domain_app_sources:
+          items:
+            type: string
+          type: array
+          title: Domain App Sources
+          description: List of sources for the domain app.
+        status:
+          type: string
+          enum:
+          - IN_PREPARATION
+          - ASSIGNING_REVIEWERS
+          - IN_PROGRESS
+          - COMPLETED
+          - WAITING_FOR_MANUAL_ACTION
+          - DELETED
+          title: Status
+          description: Status of this app within the review.
+        review_type:
+          anyOf:
+          - $ref: '#/components/schemas/ReviewType'
+          - type: 'null'
+          description: 'What is being reviewed: ENTITLEMENTS or ACCOUNTS.'
+        app_last_synced_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: App Last Synced At
+          description: When the app data was last synced.
+        last_synced_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Synced At
+          description: When this review's data was last synced.
+        account_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Account Count
+          description: Number of accounts in scope for this app.
+        launched_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Launched At
+          description: When this app's review was launched.
+        completed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Completed At
+          description: When this app's review was completed.
+        scope_filters:
+          anyOf:
+          - items:
+              type: object
+            type: array
+          - type: 'null'
+          title: Scope Filters
+          description: Scope filters applied to this app's review.
+      type: object
+      required:
+      - id
+      - domain_app_id
+      - domain_app_name
+      - domain_app_sources
+      - status
+      title: AccessReviewDomainAppOutput
+    AccessReviewDomainAppErrorOutput:
+      properties:
+        app_id:
+          type: string
+          title: App Id
+          description: UUID of the domain app that could not be added.
+        error:
+          type: string
+          title: Error
+          description: Description of why the app could not be added.
+      type: object
+      required:
+      - app_id
+      - error
+      title: AccessReviewDomainAppErrorOutput
+    ScopablePropertyGroup:
+      type: string
+      enum:
+      - ACCOUNT_ENTITLEMENT
+      - TEAM
+      - EMPLOYMENT_STATUS
+      - EMAIL_DOMAIN
+      - CATEGORIES
+      - ACCOUNT_DELTA
+      - ACCOUNT_STATUS
+      - ACCOUNT_SOURCE
+      - LAST_LOGIN
+      - LAST_ACTIVITY
+      - CUSTOM_ATTRIBUTE
+      - SOD_POLICY
+      - ACCESS_GRANTED_AT
+      - ACCESS_REQUESTED_AT
+      - ACCESS_APPROVED_AT
+      - ACCESS_PROVISIONED_AT
+      - ACCESS_LENGTH
+      - USER_OR_GROUP
+      - UNMATCHED_ACCOUNTS
+      - ENTITLEMENT_TAG
+      title: ScopablePropertyGroup
+    Page_AccessReviewOutput_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AccessReviewOutput'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[AccessReviewOutput]
+    PositionalWeekday:
+      properties:
+        weekday:
+          type: integer
+          maximum: 6.0
+          minimum: 0.0
+          title: Weekday
+          description: 0=Monday, 1=Tuesday, ..., 6=Sunday.
+        n:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: N
+          description: Which occurrence of the weekday within the period (e.g. 1 = first, -1 = last). None means every matching weekday.
+      type: object
+      required:
+      - weekday
+      title: PositionalWeekday
+      description: 'A positional weekday for monthly/yearly recurrences — e.g. "the first Monday of the
+
+        month" is ``{"weekday": 0, "n": 1}``. Mirrors ``dateutil.rrule.weekday``.
+
+
+        A plain integer weekday (0–6) covers the common case; this richer form is only needed
+
+        when an Nth-occurrence qualifier is present, which a bare int cannot express.'
+    AccessReviewDomainAppConfigurableEvidenceUpload:
+      type: string
+      enum:
+      - ALWAYS
+      - DEFAULT
+      title: AccessReviewDomainAppConfigurableEvidenceUpload
+      description: Every operation requires evidence upload for failures and manual actions.
+    RecurrenceConfig:
+      properties:
+        freq:
+          type: integer
+          title: Freq
+          description: 'Recurrence frequency. Use dateutil.rrule constants: YEARLY=0, MONTHLY=1, WEEKLY=2, DAILY=3, HOURLY=4, MINUTELY=5, SECONDLY=6.'
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+          description: Interval between each recurrence. Defaults to 1 (every freq period).
+        count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Count
+          description: Total number of occurrences. Mutually exclusive with until.
+        until:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Until
+          description: End date/time for the recurrence. ISO 8601 datetime string. Mutually exclusive with count.
+        byweekday:
+          anyOf:
+          - items:
+              anyOf:
+              - type: integer
+              - $ref: '#/components/schemas/PositionalWeekday'
+            type: array
+          - type: 'null'
+          title: Byweekday
+          description: 'Days of the week to recur on. 0=Monday, 1=Tuesday, ..., 6=Sunday. For positional weekdays (e.g. the first Monday of the month) use the {"weekday": N, "n": K} form, e.g. {"weekday": 0, "n": 1}.'
+        bymonth:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bymonth
+          description: Months to recur on (1–12).
+        bymonthday:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bymonthday
+          description: Days of the month to recur on (1–31, negative values count from end).
+        byyearday:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byyearday
+          description: Days of the year to recur on.
+        byweekno:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byweekno
+          description: Week numbers of the year to recur on.
+        bysetpos:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bysetpos
+          description: Positions within the recurrence set to include (e.g. -1 for last occurrence, 1 for first).
+        byhour:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byhour
+          description: Hours of the day to recur on (0–23).
+        byminute:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byminute
+          description: Minutes of the hour to recur on (0–59).
+        bysecond:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bysecond
+          description: Seconds of the minute to recur on (0–59).
+        wkst:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Wkst
+          description: Week start day. 0=Monday, 6=Sunday. Defaults to Monday.
+      type: object
+      required:
+      - freq
+      title: RecurrenceConfig
+      description: 'Shape of a recurrence configuration. Fields map directly to dateutil.rrule kwargs.
+
+        See https://dateutil.readthedocs.io/en/stable/rrule.html for full documentation.
+
+        The minimum required field is freq.'
+    ScopeOptionsResponse:
+      properties:
+        scope_options:
+          items:
+            $ref: '#/components/schemas/ScopeFilterGroupOutput'
+          type: array
+          title: Scope Options
+          description: Available scope filter groups.
+      type: object
+      required:
+      - scope_options
+      title: ScopeOptionsResponse
+    UpdateAccessReviewInput:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: Name of the access review campaign.
+        deadline_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deadline At
+          description: Deadline by which reviewers must complete their reviews. ISO 8601 datetime (e.g. '2026-05-01T00:00:00Z').
+        owner_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner Id
+          description: UUID of the user to set as the review owner.
+        target_launch_date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Target Launch Date
+          description: Scheduled launch date override. ISO 8601 datetime.
+        recurrence_config:
+          anyOf:
+          - $ref: '#/components/schemas/RecurrenceConfigInput'
+          - type: 'null'
+          description: Recurrence configuration. Mutually exclusive with recurrence_days_frequency.
+        recurrence_days_frequency:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Recurrence Days Frequency
+          description: Recurrence frequency in days. Mutually exclusive with recurrence_config.
+        apps:
+          items:
+            $ref: '#/components/schemas/UpdateAccessReviewArdaInput'
+          type: array
+          title: Apps
+          description: Per-app (ARDA) fields to update.
+      additionalProperties: false
+      type: object
+      title: UpdateAccessReviewInput
+      examples:
+      - deadline_at: '2026-07-15T23:59:59Z'
+        name: Q2 2026 Quarterly Access Review — extended
+      - apps:
+        - id: 00000000-0000-0000-0000-0000000000ab
+          removal_action: DEPROVISION
+          scope_filters:
+          - after: '2026-01-01T00:00:00Z'
+            group: LAST_LOGIN
+    AccessReviewOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the access review.
+        name:
+          type: string
+          title: Name
+          description: Name of the access review campaign.
+        status:
+          type: string
+          enum:
+          - IN_PREPARATION
+          - IN_PROGRESS
+          - COMPLETED
+          - DUPLICATING
+          - SCHEDULED
+          - SCHEDULED_IN_PREPARATION
+          - DELETED
+          title: Status
+          description: Current status of the access review.
+        creation_path:
+          type: string
+          enum:
+          - UI
+          - RECURRENCE
+          - API
+          - CLI
+          - MCP
+          title: Creation Path
+          description: How this review was created.
+        owner_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner Id
+          description: UUID of the review owner.
+        created_by_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Created By Id
+          description: UUID of the user who created this review.
+        deadline_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Deadline At
+          description: Deadline for completing reviews.
+        started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Started At
+          description: When the review was started.
+        completed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Completed At
+          description: When the review was completed.
+        target_launch_date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Target Launch Date
+          description: Scheduled launch date, if this is a scheduled review.
+        recurrence_config:
+          anyOf:
+          - $ref: '#/components/schemas/RecurrenceConfig'
+          - type: 'null'
+          description: Recurrence configuration, if this is a recurring review.
+        recurrence_days_frequency:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Recurrence Days Frequency
+          description: Recurrence frequency in days, if this is a recurring review.
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+          description: When this record was created.
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+          description: When this record was last updated.
+        apps:
+          items:
+            $ref: '#/components/schemas/AccessReviewDomainAppOutput'
+          type: array
+          title: Apps
+          description: Apps included in this review.
+      type: object
+      required:
+      - id
+      - name
+      - status
+      - creation_path
+      title: AccessReviewOutput
+    ReviewType:
+      type: string
+      enum:
+      - ACCOUNTS
+      - ENTITLEMENTS
+      title: ReviewType
+    RecurrenceConfigInput:
+      properties:
+        freq:
+          type: integer
+          title: Freq
+          description: 'Recurrence frequency. Use dateutil.rrule constants: YEARLY=0, MONTHLY=1, WEEKLY=2, DAILY=3, HOURLY=4, MINUTELY=5, SECONDLY=6.'
+        interval:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Interval
+          description: Interval between each recurrence. Defaults to 1 (every freq period).
+        count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Count
+          description: Total number of occurrences. Mutually exclusive with until.
+        until:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Until
+          description: End date/time for the recurrence. ISO 8601 datetime string. Mutually exclusive with count.
+        byweekday:
+          anyOf:
+          - items:
+              anyOf:
+              - type: integer
+              - $ref: '#/components/schemas/PositionalWeekday'
+            type: array
+          - type: 'null'
+          title: Byweekday
+          description: 'Days of the week to recur on. 0=Monday, 1=Tuesday, ..., 6=Sunday. For positional weekdays (e.g. the first Monday of the month) use the {"weekday": N, "n": K} form, e.g. {"weekday": 0, "n": 1}.'
+        bymonth:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bymonth
+          description: Months to recur on (1–12).
+        bymonthday:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bymonthday
+          description: Days of the month to recur on (1–31, negative values count from end).
+        byyearday:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byyearday
+          description: Days of the year to recur on.
+        byweekno:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byweekno
+          description: Week numbers of the year to recur on.
+        bysetpos:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bysetpos
+          description: Positions within the recurrence set to include (e.g. -1 for last occurrence, 1 for first).
+        byhour:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byhour
+          description: Hours of the day to recur on (0–23).
+        byminute:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Byminute
+          description: Minutes of the hour to recur on (0–59).
+        bysecond:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Bysecond
+          description: Seconds of the minute to recur on (0–59).
+        wkst:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Wkst
+          description: Week start day. 0=Monday, 6=Sunday. Defaults to Monday.
+      type: object
+      required:
+      - freq
+      title: RecurrenceConfigInput
+      description: Extends RecurrenceConfig with rrule semantic validation for use on write paths.
+    CreateAccessReviewInput:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+          description: Name of the access review campaign.
+        deadline_at:
+          type: string
+          format: date-time
+          title: Deadline At
+          description: Deadline by which reviewers must complete their reviews. ISO 8601 datetime (e.g. '2026-05-01T00:00:00Z').
+        owner_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Owner Id
+          description: UUID of the user to set as the review owner. Defaults to the authenticated user if not provided.
+        target_launch_date:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Target Launch Date
+          description: Scheduled launch date for the review. ISO 8601 datetime.
+        recurrence_config:
+          anyOf:
+          - $ref: '#/components/schemas/RecurrenceConfigInput'
+          - type: 'null'
+          description: Recurrence configuration. Mutually exclusive with recurrence_days_frequency.
+        recurrence_days_frequency:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Recurrence Days Frequency
+          description: Recurrence frequency in days. Mutually exclusive with recurrence_config.
+        apps:
+          items:
+            $ref: '#/components/schemas/AccessReviewDomainAppInput'
+          type: array
+          maxItems: 200
+          title: Apps
+          description: List of domain apps to include in this review. Capped at 200 entries per the Access Review scale limits (technically-supported tier).
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - deadline_at
+      title: CreateAccessReviewInput
+      examples:
+      - apps:
+        - id: 00000000-0000-0000-0000-000000000001
+          review_type: ENTITLEMENTS
+        deadline_at: '2026-06-30T23:59:59Z'
+        name: Q2 2026 Quarterly Access Review
+      - apps:
+        - id: 00000000-0000-0000-0000-000000000001
+          review_type: ACCOUNTS
+          scope_filters:
+          - group: EMPLOYMENT_STATUS
+            label: Terminated
+            name: employment_status
+            value: TERMINATED
+        deadline_at: '2026-06-30T23:59:59Z'
+        name: Finance apps — terminated users only
+        owner_id: 00000000-0000-0000-0000-0000000000aa
+    AccessReviewRemovalAction:
+      type: string
+      enum:
+      - DEPROVISION
+      - SUSPEND
+      - DEACTIVATE
+      - MANUAL
+      - WEBHOOK
+      title: AccessReviewRemovalAction
+    UpdateAccessReviewArdaInput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the ARDA to update.
+        scope_filters:
+          anyOf:
+          - items:
+              oneOf:
+              - $ref: '#/components/schemas/ScalarScopeFilterInput'
+              - $ref: '#/components/schemas/CustomAttributeScopeFilterInput'
+              - $ref: '#/components/schemas/DatetimeScopeFilterInput'
+              discriminator:
+                propertyName: group
+                mapping:
+                  ACCESS_APPROVED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_GRANTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_LENGTH: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_PROVISIONED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_REQUESTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_DELTA: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_ENTITLEMENT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_SOURCE: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                  CATEGORIES: '#/components/schemas/ScalarScopeFilterInput'
+                  CUSTOM_ATTRIBUTE: '#/components/schemas/CustomAttributeScopeFilterInput'
+                  EMAIL_DOMAIN: '#/components/schemas/ScalarScopeFilterInput'
+                  EMPLOYMENT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                  ENTITLEMENT_TAG: '#/components/schemas/ScalarScopeFilterInput'
+                  LAST_ACTIVITY: '#/components/schemas/DatetimeScopeFilterInput'
+                  LAST_LOGIN: '#/components/schemas/DatetimeScopeFilterInput'
+                  SOD_POLICY: '#/components/schemas/ScalarScopeFilterInput'
+                  TEAM: '#/components/schemas/ScalarScopeFilterInput'
+                  UNMATCHED_ACCOUNTS: '#/components/schemas/ScalarScopeFilterInput'
+                  USER_OR_GROUP: '#/components/schemas/ScalarScopeFilterInput'
+            type: array
+          - type: 'null'
+          title: Scope Filters
+          description: Scoping filters for this app's review. Replaces existing filters.
+        removal_action:
+          anyOf:
+          - $ref: '#/components/schemas/AccessReviewRemovalAction'
+          - type: 'null'
+          description: Action taken when removing access for accounts in this review.
+        configurable_evidence_upload:
+          anyOf:
+          - $ref: '#/components/schemas/AccessReviewDomainAppConfigurableEvidenceUpload'
+          - type: 'null'
+          description: When reviewers must upload evidence during account removal. ALWAYS = required for every operation; DEFAULT = required only for non-restrictive sign-on modes.
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      title: UpdateAccessReviewArdaInput
+    DatetimeScopeFilterInput:
+      properties:
+        group:
+          type: string
+          enum:
+          - LAST_LOGIN
+          - LAST_ACTIVITY
+          title: Group
+          description: Datetime scope filter group. Must be LAST_LOGIN or LAST_ACTIVITY.
+        after:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: After
+          description: Inclusive lower bound. Records where the datetime field is >= this value match.
+        before:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Before
+          description: Inclusive upper bound. Records where the datetime field is <= this value match.
+      additionalProperties: false
+      type: object
+      required:
+      - group
+      title: DatetimeScopeFilterInput
+      description: "Scope filter for datetime-valued groups (``LAST_LOGIN``, ``LAST_ACTIVITY``).\n\nProvide ``after``, ``before``, or both. Bounds are inclusive. At least one\nmust be set.\n\n- ``after`` alone: matches records where the field is on or after that timestamp.\n- ``before`` alone: matches records where the field is on or before that timestamp.\n- Both: matches records in the closed interval ``[after, before]``. If the\n  two bounds are equal, this matches records at exactly that timestamp."
+    AddAppsOutput:
+      properties:
+        added_apps:
+          items:
+            $ref: '#/components/schemas/AccessReviewDomainAppOutput'
+          type: array
+          title: Added Apps
+          description: Apps that were successfully added to the access review.
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AccessReviewDomainAppErrorOutput'
+            type: array
+          - type: 'null'
+          title: Errors
+          description: Per-app errors for any domain apps that could not be added (invalid, not connected, or already present).
+      type: object
+      required:
+      - added_apps
+      title: AddAppsOutput
+    AccessReviewDomainAppInput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the domain app to include in this review.
+        review_type:
+          $ref: '#/components/schemas/ReviewType'
+          description: What to review for this app.
+          default: ENTITLEMENTS
+        scope_filters:
+          anyOf:
+          - items:
+              oneOf:
+              - $ref: '#/components/schemas/ScalarScopeFilterInput'
+              - $ref: '#/components/schemas/CustomAttributeScopeFilterInput'
+              - $ref: '#/components/schemas/DatetimeScopeFilterInput'
+              discriminator:
+                propertyName: group
+                mapping:
+                  ACCESS_APPROVED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_GRANTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_LENGTH: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_PROVISIONED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCESS_REQUESTED_AT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_DELTA: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_ENTITLEMENT: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_SOURCE: '#/components/schemas/ScalarScopeFilterInput'
+                  ACCOUNT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                  CATEGORIES: '#/components/schemas/ScalarScopeFilterInput'
+                  CUSTOM_ATTRIBUTE: '#/components/schemas/CustomAttributeScopeFilterInput'
+                  EMAIL_DOMAIN: '#/components/schemas/ScalarScopeFilterInput'
+                  EMPLOYMENT_STATUS: '#/components/schemas/ScalarScopeFilterInput'
+                  ENTITLEMENT_TAG: '#/components/schemas/ScalarScopeFilterInput'
+                  LAST_ACTIVITY: '#/components/schemas/DatetimeScopeFilterInput'
+                  LAST_LOGIN: '#/components/schemas/DatetimeScopeFilterInput'
+                  SOD_POLICY: '#/components/schemas/ScalarScopeFilterInput'
+                  TEAM: '#/components/schemas/ScalarScopeFilterInput'
+                  UNMATCHED_ACCOUNTS: '#/components/schemas/ScalarScopeFilterInput'
+                  USER_OR_GROUP: '#/components/schemas/ScalarScopeFilterInput'
+            type: array
+            maxItems: 50
+          - type: 'null'
+          title: Scope Filters
+          description: Scope filters to limit which accounts/entitlements are included in this review. Filters within the same group are OR'd; filters across groups are AND'd. Capped at 50 filters per app.
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      title: AccessReviewDomainAppInput
+    CreateAccessReviewOutput:
+      properties:
+        access_review:
+          $ref: '#/components/schemas/AccessReviewOutput'
+          description: The newly created access review.
+        errors:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AccessReviewDomainAppErrorOutput'
+            type: array
+          - type: 'null'
+          title: Errors
+          description: Per-app errors for any domain apps that could not be added. The review is still created with the valid apps.
+      type: object
+      required:
+      - access_review
+      title: CreateAccessReviewOutput
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

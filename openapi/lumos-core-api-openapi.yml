@@ -1,0 +1,3990 @@
+openapi: 3.2.0
+info:
+  title: Lumos Core API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Core
+paths:
+  /apps:
+    get:
+      tags:
+      - Core
+      summary: Get Apps
+      description: List all of your company's apps.
+      operationId: listApps
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: name_search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search against name, app instance identifier, and app class ID.
+          title: Name Search
+        description: Search against name, app instance identifier, and app class ID.
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Search filter should be an exact match.
+          default: false
+          title: Exact Match
+        description: Search filter should be an exact match.
+      - name: connection_source
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/ConnectionSource'
+          - type: 'null'
+          description: Filter to integration apps connected via this source (`API` or `UI`).
+          title: Connection Source
+        description: Filter to integration apps connected via this source (`API` or `UI`).
+      - name: disconnected
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          description: Filter on whether the app has been disconnected. `false` excludes disconnected apps, `true` returns only disconnected apps whose record Lumos still holds, and omitting it lists every app. Pair `false` with `connection_source=API` to reconcile the integrations you manage from automation such as Terraform.
+          title: Disconnected
+        description: Filter on whether the app has been disconnected. `false` excludes disconnected apps, `true` returns only disconnected apps whose record Lumos still holds, and omitting it lists every app. Pair `false` with `connection_source=API` to reconcile the integrations you manage from automation such as Terraform.
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_AppWithCustomAttributes_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Core
+      summary: Create App
+      description: 'Create a new custom app, or connect an integration app.
+
+
+        With a `name`/`category`/`description` body this creates a custom app. With an `app_class_id` body it connects the integration identified by `app_class_id` using the credentials in `auth` — integrations that validate in-band connect immediately and trigger an initial sync, while integrations that require browser consent are finished in the Lumos UI. Custom apps and integrations created here are both marked `connection_source=API`; list your API-managed apps with `GET /apps?connection_source=API&disconnected=false`.'
+      operationId: createApp
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInputCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          description: 'Bad request — the request could not be processed. Common causes: missing or malformed credentials, an unknown `app_class_id`, or an invalid configuration value. See the `detail` field for the specific reason.'
+        '403':
+          description: Forbidden — the caller lacks permission to manage apps on this domain.
+        '501':
+          description: Not implemented — this app does not support the requested operation.
+        '404':
+          description: Not found — no integration with this `app_class_id` is available to your domain.
+        '409':
+          description: Conflict — an instance for this app already exists in the domain.
+        '502':
+          description: Bad gateway — the third-party service rejected the credentials, or the post-connect sync failed.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /apps/categories:
+    get:
+      tags:
+      - Core
+      summary: Get App Categories
+      description: Get app categories.
+      operationId: getAppCategories
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+                title: Response Getappcategories
+      security:
+      - HTTPBearer: []
+  /apps/{app_id}:
+    get:
+      tags:
+      - Core
+      summary: Get App
+      description: Get an app by id.
+      operationId: getApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppWithCustomAttributes'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Core
+      summary: Update App
+      description: Update domain-specific app metadata overrides. This updates the app instance in your domain, not the shared Lumos app catalog.
+      operationId: updateApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInputUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Core
+      summary: Reconnect App
+      description: 'Update an app in place: apply domain-specific metadata overrides (the same fields as `PATCH /apps/{app_id}`) and/or rotate an integration''s credentials. Providing `auth`/`settings`/`version` (with the matching `app_class_id`) reconnects the app: credentials are always overwritten and re-validated, and a sync is triggered — like connect, the app either connects in-band or awaits browser consent in the Lumos UI, and while a sync is in flight the request is throttled with `429` and a `Retry-After` header. Metadata-only bodies (custom apps, or integrations without credential changes) never touch credentials.'
+      operationId: reconnectApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInputPut'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          description: 'Bad request — the request could not be processed. Common causes: missing or malformed credentials, an unknown `app_class_id`, or an invalid configuration value. See the `detail` field for the specific reason.'
+        '403':
+          description: Forbidden — the caller lacks permission to manage apps on this domain.
+        '501':
+          description: Not implemented — this app does not support the requested operation.
+        '404':
+          description: Not found — no app with this id in your domain.
+        '409':
+          description: Conflict — credentials were provided for an app that is not managed via the API (`connection_source` is not `API`), so it cannot be reconnected here.
+        '429':
+          description: Too many requests — a sync is already in flight for this app. Includes a `Retry-After` header (seconds).
+        '502':
+          description: Bad gateway — the third-party service rejected the credentials, or the post-reconnect sync failed.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Core
+      summary: Disconnect App
+      description: Disconnect an API-managed app. For integrations this removes the stored credentials and returns the app to a connectable state; for custom apps it removes the app. In both cases, when no users remain the underlying record is also deleted where possible (a record still referenced by other Lumos data is kept, disconnected). Reconnect an integration later with `PUT /apps/{app_id}`. Returns 404 if `app_id` is unknown in the caller's organization.
+      operationId: disconnectApp
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisconnectIntegrationOutput'
+        '400':
+          description: 'Bad request — the request could not be processed. Common causes: missing or malformed credentials, an unknown `app_class_id`, or an invalid configuration value. See the `detail` field for the specific reason.'
+        '403':
+          description: Forbidden — the caller lacks permission to manage apps on this domain.
+        '501':
+          description: Not implemented — this app does not support the requested operation.
+        '404':
+          description: Not found — no app with this id in your domain.
+        '409':
+          description: Conflict — the app is not managed via the API (`connection_source` is not `API`), so it cannot be disconnected here.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /apps/{app_id}/settings:
+    get:
+      tags:
+      - Core
+      summary: Get Appstore App Settings
+      description: Get App settings.
+      operationId: getAppSettings
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppSettingOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Core
+      summary: Update Domain App Appstore Settings
+      description: Update app settings.
+      operationId: updateAppSettings
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppSettingInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppSettingOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/current:
+    get:
+      tags:
+      - Core
+      summary: Get Current User
+      description: Get current user
+      operationId: currentUser
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security:
+      - HTTPBearer: []
+  /users:
+    get:
+      tags:
+      - Core
+      summary: Get Users
+      description: List all of your company's users.
+      operationId: listUsers
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: search_term
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search for users by name or email.
+          title: Search Term
+        description: Search for users by name or email.
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: If a search_term is provided, only accept exact matches.
+          default: false
+          title: Exact Match
+        description: If a search_term is provided, only accept exact matches.
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_UserWithCustomAttributes_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/{user_id}:
+    get:
+      tags:
+      - Core
+      summary: Get User
+      description: Get user by id.
+      operationId: getUser
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: custom_attributes.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: custom_attributes.'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithCustomAttributes'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/{user_id}/accounts:
+    get:
+      tags:
+      - Core
+      summary: Get User Accounts
+      description: Get a list of Accounts for this user
+      operationId: getUserAccounts
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: app.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: app.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Account_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /inline_webhooks:
+    get:
+      tags:
+      - Core
+      summary: Get Inline Webhooks
+      description: Get available webhooks
+      operationId: get_inline_webhooks_inline_webhooks_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InlineWebhook'
+                type: array
+                title: Response Get Inline Webhooks Inline Webhooks Get
+      security:
+      - HTTPBearer: []
+  /accounts:
+    get:
+      tags:
+      - Core
+      summary: Get Accounts
+      description: Get all accounts associated with apps at your company.
+      operationId: getAccounts
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+      - name: discovered_before
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered Before
+      - name: discovered_after
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered After
+      - name: sources
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/DiscoverySource'
+          - type: 'null'
+          title: Sources
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/AccountLifecycleStatus'
+          - type: 'null'
+          title: Status
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand. Supported fields: app.'
+          title: Expand
+        description: 'Fields to expand. Supported fields: app.'
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 50
+          title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /groups/{group_id}/users:
+    get:
+      tags:
+      - Core
+      summary: Get Group Membership
+      description: Get user members by group ID.
+      operationId: getGroupMembership
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Group Id
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_User_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /groups/{group_id}:
+    get:
+      tags:
+      - Core
+      summary: Get Group
+      description: Get group by ID.
+      operationId: getGroup
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Group Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /groups:
+    get:
+      tags:
+      - Core
+      summary: Get Groups
+      description: Get groups synced from connected integrations
+      operationId: getGroups
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: integration_specific_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters groups by integration specific ID, e.g. the group's Okta ID.
+          title: Integration Specific Id
+        description: Filters groups by integration specific ID, e.g. the group's Okta ID.
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters groups by name.
+          title: Name
+        description: Filters groups by name.
+      - name: exact_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Search filter should be an exact match.
+          default: false
+          title: Exact Match
+        description: Search filter should be an exact match.
+      - name: app_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filters groups by the ID of the app to which they belong.
+          title: App Id
+        description: Filters groups by the ID of the app to which they belong.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Group_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /accounts/upload/{job_id}:
+    get:
+      tags:
+      - Core
+      summary: Get Upload Job State
+      description: Get state of an account upload job.
+      operationId: getUploadJobState
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStateOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /activity_logs:
+    get:
+      tags:
+      - Core
+      summary: Get Activity Logs
+      description: Get activity logs.
+      operationId: getActivityLogs
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: since
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Since
+      - name: until
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Until
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size limit
+          default: 50
+          title: Limit
+        description: Page size limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          description: Page offset
+          default: 0
+          title: Offset
+        description: Page offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitOffsetPage_ActivityLog_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /identity_events:
+    get:
+      tags:
+      - Core
+      summary: Get Identity Events
+      description: Get user identity events.
+      operationId: getIdentityEvents
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: identity_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: Filter events tied to specific user UUIDs.
+          title: Identity Ids
+        description: Filter events tied to specific user UUIDs.
+      - name: changed_fields
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: Filter events by changed field names, eg - 'title' or 'team'
+          title: Changed Fields
+        description: Filter events by changed field names, eg - 'title' or 'team'
+      - name: start_time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start Time
+      - name: end_time
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End Time
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityEventsResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /apps/{app_id}/sync:
+    post:
+      tags:
+      - Core
+      summary: Trigger App Sync
+      description: 'Trigger a sync for a connected app on demand (e.g. from automation, after Terraform has connected it). The sync runs asynchronously — the call returns `202 Accepted` once the sync is launched; poll `GET /apps/{app_id}` to follow status.
+
+
+        Requires `sync_type` (only `full_sync` is supported today). The app must be connected or in an error state from a prior sync (so callers can retry after failure). Manual/CSV apps are not supported. Only one sync may run at a time: while a sync is in flight the request is rejected with `409` — wait for the running sync to finish, then retry.'
+      operationId: triggerAppSync
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerSyncInput'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerSyncOutput'
+        '400':
+          description: 'Bad request — the request could not be processed. Common causes: missing or malformed credentials, an unknown `app_class_id`, or an invalid configuration value. See the `detail` field for the specific reason.'
+        '403':
+          description: Forbidden — the caller lacks permission to manage apps on this domain.
+        '501':
+          description: Not implemented — this app does not support the requested operation.
+        '404':
+          description: Not found — no app with this id in your domain.
+        '409':
+          description: Conflict — a sync is already running for this app, the app is not in a syncable state, or its first sync is deferred pending admin review (match rules, or a flatfile column mapping) in the Lumos UI.
+        '422':
+          description: Unprocessable — `sync_type` is missing or not a supported value, or the app is a manual/CSV app, which cannot be synced via this endpoint.
+        '502':
+          description: Bad gateway — the downstream sync launch failed.
+  /integrations:
+    get:
+      tags:
+      - Core
+      summary: List Integrations
+      description: List the integrations (apps) available to connect in your domain (paginated). Only connectable integrations are returned — catalog-only apps (e.g. discovered SaaS without a Lumos integration) are excluded. Returns catalog metadata only — name, category, and logo. Integrations you have connected are read via the Apps API (`GET /apps`).
+      operationId: listIntegrations
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Case-insensitive substring filter over the integration's `app_class_id` and name. `google` matches both `workspace.google.com` and `cloud.google.com`.
+          title: Query
+        description: Case-insensitive substring filter over the integration's `app_class_id` and name. `google` matches both `workspace.google.com` and `cloud.google.com`.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_IntegrationCatalogOutput_'
+        '403':
+          description: Forbidden — the caller lacks permission to view integrations in this domain.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /integrations/{app_class_id}:
+    get:
+      tags:
+      - Core
+      summary: Get Integration
+      description: Get a connectable integration (app) by its `app_class_id` (e.g. `okta.com`). Returns catalog metadata only; integrations you have connected are read via the Apps API (`GET /apps`).
+      operationId: getIntegration
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_class_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Class Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationCatalogOutput'
+        '403':
+          description: Forbidden — the caller lacks permission to view integrations in this domain.
+        '404':
+          description: Not found — no integration with this `app_class_id` in your domain.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /integrations/{app_class_id}/connection-schema:
+    get:
+      tags:
+      - Core
+      summary: Get Integration Connection Schema
+      description: Get the connection schema for an integration — the JSON schema of the `auth` and `settings` fields needed to connect it via `POST /apps`. Use it to discover how to connect an integration *before* connecting it (e.g. to populate a Terraform resource). `app_class_id` is the canonical identifier (e.g. `okta.com`, `slack_ics`) — the same value the connect body uses. Integrations whose connection schema Lumos cannot describe yet return 404.
+      operationId: getIntegrationConnectionSchema
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: app_class_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: App Class Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationConnectionSchemaOutput'
+        '403':
+          description: Forbidden — the caller lacks permission to view integrations in this domain.
+        '404':
+          description: Not found — no integration with this `app_class_id` is accessible to your domain, or no connection schema is available for it yet.
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /accounts/upload:
+    post:
+      tags:
+      - Core
+      summary: Create Accounts
+      description: Upload accounts to an app.
+      operationId: postAccounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                accounts:
+                  items:
+                    $ref: '#/components/schemas/AccountInput'
+                  type: array
+                  title: Accounts
+                  description: Accounts to upload.
+                  default: []
+                app_id:
+                  type: string
+                  title: App Id
+                  description: The ID of the app to upload accounts to.
+              type: object
+              required:
+              - app_id
+              title: AccountsUploadInput
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStateOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /activity_records:
+    post:
+      tags:
+      - Core
+      summary: Update Activity Records
+      description: Update the last_login or last_activity for a given account.
+      operationId: activityRecords
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityRecordInput'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityRecordOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /activity_records/job/{job_id}:
+    get:
+      tags:
+      - Core
+      summary: Get Activity Records Job State
+      description: Get the state of an activity records post-processing job.
+      operationId: getActivityRecordsJobState
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncTaskOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/{user_id}/roles:
+    get:
+      tags:
+      - Core
+      summary: Get User Roles
+      description: 'Get the roles assigned to a specific user,
+
+        ensuring the user belongs to the specified domain.'
+      operationId: get_user_roles_users__user_id__roles_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/{user_id}/roles/{role_name}:
+    post:
+      tags:
+      - Core
+      summary: Add Role To User
+      description: Add a role to a specific user, ensuring the user belongs to the specified domain.
+      operationId: add_role_to_user_users__user_id__roles__role_name__post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      - name: role_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Role Name
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Core
+      summary: Remove Role From User
+      description: Remove a specific role from a user, ensuring the user belongs to the specified domain.
+      operationId: remove_role_from_user_users__user_id__roles__role_name__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: User Id
+      - name: role_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Role Name
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_policies:
+    get:
+      tags:
+      - Core
+      summary: Get Access Policies
+      description: Get all access policies. Results are sorted by created time descending by default.
+      operationId: getAccessPolicies
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      - name: name
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by policy name (case insensitive)
+          title: Name
+        description: Filter by policy name (case insensitive)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_AccessPolicyOutput_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Core
+      summary: Create Access Policy
+      description: Create a new access policy.
+      operationId: createAccessPolicy
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicyInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicyOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /access_policies/{access_policy_id}:
+    get:
+      tags:
+      - Core
+      summary: Get Access Policy
+      description: Get an access policy by ID.
+      operationId: getAccessPolicy
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicyOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Core
+      summary: Delete Access Policy
+      description: Delete an access policy by ID.
+      operationId: deleteAccessPolicy
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Policy Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Core
+      summary: Update Access Policy
+      description: Update an access policy by ID.
+      operationId: updateAccessPolicy
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: access_policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Access Policy Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicyInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicyOutput'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Page_AppWithCustomAttributes_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AppWithCustomAttributes'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[AppWithCustomAttributes]
+    RequestFulfillmentConfigOutput:
+      properties:
+        manual_steps_needed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Manual Steps Needed
+          description: Whether manual steps are needed.
+        manual_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Manual Instructions
+          description: The manual instructions that go along.
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        time_based_access_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Time Based Access Override
+          description: Indicates if time based access is overriden.
+        provisioning_group:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+          description: The provisioning group optionally assocated with this config.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+      type: object
+      title: RequestFulfillmentConfigOutput
+    AppStoreAppSettingsRequestFlowOutput:
+      properties:
+        discoverability:
+          $ref: '#/components/schemas/AppStoreVisibility'
+          description: AppStore App visibility.
+        custom_approval_message:
+          type: string
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Markdown for links and text formatting is supported.
+        require_manager_approval:
+          type: boolean
+          title: Require Manager Approval
+          description: When a user makes an access request, require that their manager approves the request before moving on to additional approvals.
+        require_additional_approval:
+          type: boolean
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigOutput'
+          - type: 'null'
+          description: The allowed groups config associated with this config.
+          default:
+            type: ALL_GROUPS
+            groups: []
+        approvers:
+          $ref: '#/components/schemas/AppApproversOutput'
+          description: AppStore App approvers assigned.
+          default:
+            groups: []
+            users: []
+        approvers_stage_2:
+          $ref: '#/components/schemas/AppApproversOutput'
+          description: AppStore App stage 2 approvers assigned.
+          default:
+            groups: []
+            users: []
+        response_describes_entire_approval_workflow:
+          type: boolean
+          title: Response Describes Entire Approval Workflow
+          description: Indicates whether the approval configuration is fully represented by the existing API. If False, the approval configuration may contain additional stages or conditional approval chains not reflected in the v1 API.
+          default: false
+        admins:
+          $ref: '#/components/schemas/AppAdminsOutput'
+          description: AppStore App admins assigned.
+          default: []
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+      type: object
+      title: AppStoreAppSettingsRequestFlowOutput
+    AppSettingInput:
+      properties:
+        custom_request_instructions:
+          type: string
+          title: Custom Request Instructions
+          description: AppStore App instructions that are shown to the requester.
+        redirect_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+          - type: 'null'
+          title: Redirect Url
+          description: If set, requesting this app redirects the user to this URL instead of going through the normal access-request flow. Send null to clear an existing redirect; omit the field to leave it unchanged. Max 2048 characters.
+        request_flow:
+          $ref: '#/components/schemas/AppStoreAppSettingsRequestFlowInput'
+          description: Request flow configuration to request access to app.
+        provisioning:
+          $ref: '#/components/schemas/AppStoreAppSettingsProvisioningInput'
+          description: Provisioning flow configuration to request access to app.
+        in_app_store:
+          type: boolean
+          title: In App Store
+          description: Whether the app is in the app store.
+          default: false
+      type: object
+      title: AppSettingInput
+    BaseInlineWebhook:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this inline webhook.
+      type: object
+      required:
+      - id
+      title: BaseInlineWebhook
+    Page_AccessPolicyOutput_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AccessPolicyOutput'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[AccessPolicyOutput]
+    JobStateOutput:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+          description: The ID of the job.
+        state:
+          $ref: '#/components/schemas/FlowState'
+          description: The state of the job.
+      type: object
+      required:
+      - job_id
+      title: JobStateOutput
+    GroupProvisioningOption:
+      type: string
+      enum:
+      - DIRECT_TO_USER
+      - GROUPS_AND_HIDDEN
+      - GROUPS_AND_VISIBLE
+      title: GroupProvisioningOption
+    ManagerApprovalOption:
+      type: string
+      enum:
+      - NONE
+      - INITIAL_APPROVAL
+      title: ManagerApprovalOption
+    AccountLifecycleStatus:
+      type: string
+      enum:
+      - DISCOVERED
+      - STAGED
+      - ACCESS_CREATED
+      - ACTIVE
+      - ARCHIVED
+      - SUSPENDED
+      - DEPROVISIONED
+      - MANUALLY_REMOVED
+      - ACCESS_REMOVED
+      - NON_CORPORATE_ACCOUNT
+      - WAITING_MANUAL_REMOVAL
+      title: AccountLifecycleStatus
+      description: "NOTE: If you update this, also update UserDomainAppLifecycleStatus\n\nDISCOVERED             - Account discovered through accountfinding. Could be noisy.\n\nSTAGED                 - An account that has been queued for provisioning, but is not\n                         provisioned yet. Relevant for Apps where provisioning is async\n                         (eg. Okta, OneLogin).\n\nACCESS_CREATED         - When an account has been provisioned but not accessed.\n\nACTIVE                 - A live, active, accessible account.\n\nSUSPENDED              - The user can no longer access the account, the license may or may not\n                         be removed. The account can be recovered.\n\nDEPROVISIONED          - The user can no longer access the account, the license was removed,\n                         and the account cannot be recovered.\n\nARCHIVED               - The user can no longer access the account, the license may or may not\n                         be removed. The account can be recovered.\n\nMANUALLY_REMOVED       - The user can no longer access the account, the license is presumably\n                         removed, but all of this was done manually\n\nACCESS_REMOVED         - The user can no longer access the account, but a license may still\n                         exist. This is the case when we remove access through Okta but not a\n                         direct integration\n\nNON_CORPORATE_ACCOUNT  - The account doesn't exist, or is a personal employee account.\n\nWAITING_MANUAL_REMOVAL - Waiting manual removal, someone was requested to remove the user access\n                         from the App, and we are waiting for an answer about it."
+    AppStoreAppSettingsProvisioningInput:
+      properties:
+        groups_provisioning:
+          $ref: '#/components/schemas/GroupProvisioningOption'
+          description: Controls how access is provisioned when a request is fulfilled. DIRECT_TO_USER provisions access at the app level and marks all permissions as not visible in the App Store. GROUPS_AND_HIDDEN provisions access at the permission level, but users cannot select which permission they want (requires at least one visible permission). GROUPS_AND_VISIBLE provisions access at the permission level and allows users to select the permission when requesting (requires at least one visible permission).
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Whether the app is configured to allow users to request multiple permissions in a single request
+        manual_steps_needed:
+          type: boolean
+          title: Manual Steps Needed
+          description: If enabled, Lumos will notify the App Admin after initial access is granted to perform additional manual steps. Note that if this option is enabled, this action must be confirmed by the App Admin in order to resolve the request.
+        custom_provisioning_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Provisioning Instructions
+          description: Only Available if manual steps is active. During the provisioning step, Lumos will send a custom message to app admins explaining how to provision a user to the app. Markdown for links and text formatting is supported.
+        default_time_based_access_option:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Time Based Access Option
+          description: The label of the default time-based access duration pre-selected when a user requests access. Must be one of the values in time_based_access. Null when there is no default.
+        default_permission:
+          anyOf:
+          - $ref: '#/components/schemas/RequestablePermissionBase'
+          - type: 'null'
+          description: The default permission pre-selected when a user requests access to this app. Provide the permission's id (UUID). Null when there is no default. The permission must belong to this app.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this app.
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this app.
+      type: object
+      title: AppStoreAppSettingsProvisioningInput
+    User:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+      type: object
+      required:
+      - id
+      title: User
+    ConnectionSource:
+      type: string
+      enum:
+      - API
+      - UI
+      title: ConnectionSource
+      description: Tracks how a domain app integration was initiated.
+    BaseUser:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+      type: object
+      required:
+      - id
+      title: BaseUser
+    Group:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          description: The ID of this group.
+        app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+          description: The ID of the app that sources this group.
+        integration_specific_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Specific Id
+          description: The ID of this group, specific to the integration.
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The name of this group.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The description of this group.
+        group_lifecycle:
+          anyOf:
+          - $ref: '#/components/schemas/Lifecycle'
+          - type: 'null'
+          description: The lifecycle of this group.
+          default: SYNCED
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: The ID of the app that sources this group.
+      type: object
+      title: Group
+    DiscoverySource:
+      type: string
+      enum:
+      - GSUITE_QUICK_INBOX
+      - GSUITE_DEEP_INBOX
+      - MICROSOFT_DEEP_INBOX
+      - MICROSOFT_OAUTH
+      - MICROSOFT_GCC
+      - GSUITE_OAUTH
+      - OKTA
+      - MANUAL
+      - ONELOGIN
+      - ATLASSIAN
+      - GOOGLE_CLOUD
+      - LUMOS_INTEGRATION
+      - JUMPCLOUD
+      - CUSTOM
+      - MCP
+      title: DiscoverySource
+    AllowedGroupsConfigOutput:
+      properties:
+        type:
+          $ref: '#/components/schemas/AllowedGroupsConfigType'
+          description: The type of this allowed groups config, can be all groups or specific.
+          default: ALL_GROUPS
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: The groups allowed to request this permission.
+          default: []
+      type: object
+      title: AllowedGroupsConfigOutput
+    Links:
+      properties:
+        first:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First
+          examples:
+          - /api/v1/users?limit=1&offset1
+        last:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last
+          examples:
+          - /api/v1/users?limit=1&offset1
+        self:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Self
+          examples:
+          - /api/v1/users?limit=1&offset1
+        next:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next
+          examples:
+          - /api/v1/users?limit=1&offset1
+        prev:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prev
+          examples:
+          - /api/v1/users?limit=1&offset1
+      type: object
+      required:
+      - first
+      - last
+      - self
+      - next
+      - prev
+      title: Links
+    AppInputCreate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The name of the app you're creating. Required when creating a custom app.
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: 'The category of the app you''re creating; required when creating a custom app. Possible values: ''Accounting & Finance'', ''Marketing & Analytics'', ''Content & Social Media'', ''Sales & Support'', ''Design & Creativity'', ''IT & Security'', ''Developers'', ''HR & Learning'', ''Office & Legal'', ''Communication'', ''Collaboration'', ''Commerce & Marketplaces'', ''Other'', ''Internal'''
+        description:
+          anyOf:
+          - type: string
+            maxLength: 8192
+          - type: 'null'
+          title: Description
+          description: The description of the app you're creating. Required when creating a custom app.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The URL of the logo of the app you're creating.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The URL of the website of the app you're creating.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Request Instructions
+          description: The request instructions.
+        app_class_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Class Id
+          description: Canonical identifier of an integration to connect, e.g. `okta.com`. Providing it switches this request from creating a custom app to connecting that integration using `auth`/`settings`. Must be an integration Lumos supports for your domain; an unknown value is rejected with 400.
+        auth:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Auth
+          description: Credentials for the integration being connected, as a JSON object — **all secrets go here**. The accepted keys depend on the integration and are validated server-side. Some integrations connect in-band from these credentials (e.g. an `api_key`, or an OAuth `client_id`/`client_secret`); others require browser consent and are finished in the Lumos UI — for those, send `{}`. Missing or wrong-shaped credentials are rejected with 400; credentials the third party rejects return 502. Only used with `app_class_id`.
+        settings:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Settings
+          description: Non-secret configuration for the integration being connected, as a JSON object — e.g. host, port, region, or tenant / instance URL. The accepted keys vary by integration and some integrations need none. Only used with `app_class_id`.
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+          description: Optional integration version override. Pins the connection to a specific integration implementation/version instead of the current default; leave unset (`null`) unless directed otherwise. Only used with `app_class_id`.
+      type: object
+      title: AppInputCreate
+      description: 'Body of `POST /apps`: create a custom app, or connect an integration.
+
+
+        One flat model serves both operations (a request-body union would generate
+
+        poorly into SDK/Terraform clients). Providing `app_class_id` switches the
+
+        request from "create a custom app" to "connect an integration"; the model
+
+        validator enforces the fields each mode requires.'
+      examples:
+      - category: Engineering
+        description: Hand-rolled deploy dashboard.
+        name: My internal tool
+      - app_class_id: okta.com
+        auth:
+          api_key: 0123456789abcdef0123456789abcdef
+        settings:
+          app_instance_identifier: myorg.okta.com
+    RequestConfigOutput:
+      properties:
+        appstore_visibility:
+          anyOf:
+          - $ref: '#/components/schemas/AppStoreVisibilityOption'
+          - type: 'null'
+          description: The appstore visibility of this request config.
+          default: HIDDEN
+        allowed_groups_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Allowed Groups Override
+          description: Indicates if allowed groups is overriden from the app-level settings.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigOutput'
+          - type: 'null'
+          description: The allowed groups config associated with this config.
+          default:
+            type: ALL_GROUPS
+            groups: []
+        request_approval_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestApprovalConfigOutput'
+          - type: 'null'
+          description: A request approval config can be optionally associated with this config
+          default:
+            manager_approval: NONE
+            request_approval_stages:
+            - {}
+        request_fulfillment_config:
+          anyOf:
+          - $ref: '#/components/schemas/RequestFulfillmentConfigOutput'
+          - type: 'null'
+          description: A request fulfillment config can be optionally associated with this config
+          default: {}
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this config.
+      type: object
+      title: RequestConfigOutput
+    CustomAttributeType:
+      type: string
+      enum:
+      - TEXT
+      - USER
+      - SINGLE_SELECT
+      title: CustomAttributeType
+    BaseGroup:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          description: The ID of this group.
+        app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Id
+          description: The ID of the app that sources this group.
+        integration_specific_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Integration Specific Id
+          description: The ID of this group, specific to the integration.
+      type: object
+      title: BaseGroup
+    AccountInput:
+      properties:
+        unique_identifier:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Unique Identifier
+          description: A unique identifier for this account, such as an account ID or email.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this account.
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+          description: The first name of the user.
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+          description: The last name of the user.
+        last_activity:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Activity
+          description: The datetime of last activity of the user.
+        last_login:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Login
+          description: The datetime of last login of the user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/AccountLifecycleStatus'
+          - type: 'null'
+          description: The status of the account.
+        permissions:
+          items:
+            $ref: '#/components/schemas/PermissionInput'
+          type: array
+          title: Permissions
+          description: The permissions of the account.
+          default: []
+        attributes:
+          items:
+            $ref: '#/components/schemas/AttributeInput'
+          type: array
+          title: Attributes
+          description: The attributes of the account.
+          default: []
+      type: object
+      required:
+      - unique_identifier
+      title: AccountInput
+    IdentityEventsResult:
+      properties:
+        identity_events:
+          items:
+            $ref: '#/components/schemas/IdentityEvent'
+          type: array
+          title: Identity Events
+          description: Identity events returned by the query.
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+          description: Cursor for fetching the next page of results.
+        total_count:
+          type: integer
+          title: Total Count
+          description: Total number of events matching the query.
+      type: object
+      required:
+      - identity_events
+      - total_count
+      title: IdentityEventsResult
+      description: Paginated list of identity events.
+    Lifecycle:
+      type: string
+      enum:
+      - SYNCED
+      - NATIVE
+      title: Lifecycle
+    TriggerSyncOutput:
+      properties:
+        app_id:
+          type: string
+          title: App Id
+          description: UUID of the app (domain app) the sync was triggered for.
+        sync_type:
+          $ref: '#/components/schemas/SyncType'
+          description: The sync kind that was triggered (echoes the request).
+        status:
+          type: string
+          title: Status
+          description: Sync state immediately after the trigger was accepted — typically `SYNCING`. The sync itself runs asynchronously; poll `GET /apps/{app_id}` to follow the app.
+      type: object
+      required:
+      - app_id
+      - sync_type
+      - status
+      title: TriggerSyncOutput
+    ActivityRecordOutput:
+      properties:
+        job:
+          $ref: '#/components/schemas/SyncTaskOutput'
+          description: State of the job to post-process the records.
+      type: object
+      required:
+      - job
+      title: ActivityRecordOutput
+    Page_UserWithCustomAttributes_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserWithCustomAttributes'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserWithCustomAttributes]
+    Page_IntegrationCatalogOutput_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/IntegrationCatalogOutput'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[IntegrationCatalogOutput]
+    DomainAppStatus:
+      type: string
+      enum:
+      - DISCOVERED
+      - IN_REVIEW
+      - NEEDS_REVIEW
+      - APPROVED
+      - BLOCKLISTED
+      - DEPRECATED
+      title: DomainAppStatus
+    AppApproversInput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: Groups assigned as support request approvers.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/BaseUser'
+          type: array
+          title: Users
+          description: Users assigned as support request approvers.
+          default: []
+      type: object
+      title: AppApproversInput
+    AllowedGroupsConfigType:
+      type: string
+      enum:
+      - ALL_GROUPS
+      - SPECIFIED_GROUPS
+      title: AllowedGroupsConfigType
+    ActivityRecordAppInput:
+      properties:
+        instance_identifier:
+          type: string
+          title: Instance Identifier
+          description: The ID of the app as it is identified in the source E.g. the ID that Okta uses to identify the app
+      type: object
+      required:
+      - instance_identifier
+      title: ActivityRecordAppInput
+    AccessPolicyPermissionOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+        label:
+          type: string
+          title: Label
+          description: The human-readable label of this permission.
+      type: object
+      required:
+      - label
+      title: AccessPolicyPermissionOutput
+      description: 'A permission for a given app granted by this access policy.
+
+        Inherits RequestablePermissionBase fields (i.e. id)'
+    IntegrationCatalogOutput:
+      properties:
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: Canonical identifier of the integration (e.g. `okta.com`). Pass it as `app_class_id` when connecting via `POST /apps`.
+        name:
+          type: string
+          title: Name
+          description: Display name of the integration.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: Short description of the integration.
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: Category of the integration (e.g. `IT & Security`).
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: URL of the integration's logo.
+      type: object
+      required:
+      - app_class_id
+      - name
+      title: IntegrationCatalogOutput
+      description: 'A connectable integration from the app catalog (not a connected instance).
+
+
+        Read via `GET /integrations` and `GET /integrations/{app_class_id}`. Carries
+
+        catalog metadata only — no connection status. To read the state of an
+
+        integration you have connected, use the Apps API (`GET /apps`).'
+    ActivityRecordEventType:
+      type: string
+      enum:
+      - LOGIN
+      - ACTIVITY
+      title: ActivityRecordEventType
+    PermissionType:
+      type: string
+      enum:
+      - SYNCED
+      - NATIVE
+      title: PermissionType
+    AppStoreAppSettingsRequestFlowInput:
+      properties:
+        discoverability:
+          $ref: '#/components/schemas/AppStoreVisibility'
+          description: AppStore App visibility.
+        custom_approval_message:
+          type: string
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Markdown for links and text formatting is supported.
+        require_manager_approval:
+          type: boolean
+          title: Require Manager Approval
+          description: When a user makes an access request, require that their manager approves the request before moving on to additional approvals.
+        require_additional_approval:
+          type: boolean
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        allowed_groups:
+          anyOf:
+          - $ref: '#/components/schemas/AllowedGroupsConfigInput'
+          - type: 'null'
+          description: The allowed groups associated with this config.
+        approvers:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App approvers assigned.
+        approvers_stage_2:
+          $ref: '#/components/schemas/AppApproversInput'
+          description: AppStore App stage 2 approvers assigned.
+        admins:
+          $ref: '#/components/schemas/AppAdminsInput'
+          description: AppStore App admins assigned.
+        request_validation_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/BaseInlineWebhook'
+          - type: 'null'
+          description: A request validation webhook can be optionally associated with this app.
+      type: object
+      title: AppStoreAppSettingsRequestFlowInput
+    AccountType:
+      type: string
+      enum:
+      - USER
+      - ROLE
+      - SERVICE
+      title: AccountType
+    AppWithCustomAttributes:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website, or other identifier.
+        instance_id:
+          type: string
+          title: Instance Id
+          description: The non-unique ID of the instance associated with this app. This will be the Okta app id if it’s an Okta app, or will be marked as custom_app_import if manually uploaded into Lumos.
+        user_friendly_label:
+          type: string
+          title: User Friendly Label
+          description: The user-friendly label of this app.
+        status:
+          $ref: '#/components/schemas/DomainAppStatus'
+          description: 'The status of this app. Possible values: ''DISCOVERED'', ''IN_REVIEW'', ''NEEDS_REVIEW'', ''APPROVED'', ''BLOCKLISTED'', ''DEPRECATED'''
+        sources:
+          items:
+            $ref: '#/components/schemas/DiscoverySource'
+          type: array
+          title: Sources
+          description: The sources of this app.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Determines whether users can request multiple permissions at once.This field will be removed in subsequent API versions.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The URL of the logo of this app.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The URL of the website of this app.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Request Instructions
+          description: The request instructions.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The user-facing description of the app
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: The category of the app, as shown in the AppStore
+        disconnected:
+          type: boolean
+          title: Disconnected
+          description: Whether this app has been disconnected (its stored credentials removed via `DELETE /apps/{app_id}`). A disconnected app is excluded from `GET /apps?disconnected=false`; reconnect it with `PUT /apps/{app_id}`.
+        links:
+          $ref: '#/components/schemas/AppLinks'
+          description: A collection of URLs related to this application
+        sync_status:
+          anyOf:
+          - $ref: '#/components/schemas/SyncStatus'
+          - type: 'null'
+          description: 'The state of this app''s most recent sync: `SYNCING` while one is running, `SUCCESS` or `FAILED` once it finished. Poll this after `POST /apps/{app_id}/sync` to follow that sync. `null` when no sync result is recorded — the app has never synced, or was disconnected.'
+        custom_attributes:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/CustomAttribute'
+            type: object
+          - type: 'null'
+          title: Custom Attributes
+          description: Custom attributes configured on the app
+      type: object
+      required:
+      - id
+      - app_class_id
+      - instance_id
+      - user_friendly_label
+      - status
+      - sources
+      - allow_multiple_permission_selection
+      - disconnected
+      - links
+      title: AppWithCustomAttributes
+    UserLifecycleStatus:
+      type: string
+      enum:
+      - STAGED
+      - ACTIVE
+      - SUSPENDED
+      - INACTIVE
+      title: UserLifecycleStatus
+    CustomAttribute:
+      properties:
+        type:
+          $ref: '#/components/schemas/CustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: string
+            format: date-time
+          - type: integer
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: CustomAttribute
+    InlineWebhookType:
+      type: string
+      enum:
+      - PRE_APPROVAL
+      - PROVISION
+      - DEPROVISION
+      - REQUEST_VALIDATION
+      - SIEM
+      title: InlineWebhookType
+    AppAdminsOutput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: Groups assigned as app admins.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Users
+          description: Users assigned as app admins.
+          default: []
+      type: object
+      title: AppAdminsOutput
+    AppInputPut:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The updated domain-specific display name of the app. Set to null to reset to the app's default name.
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: 'The updated domain-specific category of the app. Set to null to reset to the app''s default category. Possible values: ''Accounting & Finance'', ''Marketing & Analytics'', ''Content & Social Media'', ''Sales & Support'', ''Design & Creativity'', ''IT & Security'', ''Developers'', ''HR & Learning'', ''Office & Legal'', ''Communication'', ''Collaboration'', ''Commerce & Marketplaces'', ''Other'', ''Internal'''
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          maxLength: 1000
+          title: Description
+          description: The updated domain-specific description of the app. Set to null to reset to the app's default description.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The updated domain-specific URL of the logo of the app. Set to null to reset to the app's default logo.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The updated URL of the website of the app. Set to null to clear it.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          maxLength: 511
+          title: Request Instructions
+          description: The updated request instructions.
+        app_class_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: App Class Id
+          description: Canonical identifier of the integration this app belongs to, e.g. `okta.com`. Must match the existing app (a mismatch is rejected with 400); required when rotating credentials via `auth`/`settings`/`version`.
+        auth:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Auth
+          description: 'New credentials for the integration, as a JSON object — **all secrets go here**. Providing credentials reconnects the app: they are always overwritten and re-validated, and a sync is triggered. The accepted keys depend on the integration and are validated server-side. Missing or wrong-shaped credentials are rejected with 400; credentials the third party rejects return 502. Requires `app_class_id`.'
+        settings:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Settings
+          description: Non-secret configuration for the integration being reconnected, as a JSON object — e.g. host, port, region, or tenant / instance URL. The accepted keys vary by integration and some integrations need none. Requires `app_class_id`.
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+          description: Optional integration version override for the reconnect. Pins the connection to a specific integration implementation/version instead of the current default; leave unset (`null`) unless directed otherwise. Requires `app_class_id`.
+      additionalProperties: false
+      type: object
+      title: AppInputPut
+      description: 'Body of `PUT /apps/{app_id}`: update metadata overrides and/or reconnect.
+
+
+        One flat model serves both operations (mirroring `AppInputCreate`): the
+
+        metadata fields apply the same domain-specific overrides as
+
+        `PATCH /apps/{app_id}`, and providing credentials (`auth`/`settings`/
+
+        `version`, which require the matching `app_class_id`) additionally
+
+        reconnects the integration with those credentials.'
+      examples:
+      - description: Hand-rolled deploy dashboard.
+        name: My internal tool
+      - app_class_id: okta.com
+        auth:
+          api_key: 0123456789abcdef0123456789abcdef
+        settings:
+          app_instance_identifier: myorg.okta.com
+    ActivityLog:
+      properties:
+        event_hash:
+          type: string
+          title: Event Hash
+        event_type:
+          type: string
+          title: Event Type
+        event_type_user_friendly:
+          type: string
+          title: Event Type User Friendly
+        outcome:
+          type: string
+          title: Outcome
+        targets:
+          items:
+            type: object
+          type: array
+          title: Targets
+        actor:
+          type: object
+          title: Actor
+        event_began_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Event Began At
+        event_metadata:
+          type: object
+          title: Event Metadata
+      type: object
+      required:
+      - event_hash
+      - event_type
+      - event_type_user_friendly
+      - outcome
+      - targets
+      - actor
+      - event_metadata
+      title: ActivityLog
+      description: API version of SIEMEvent
+    RequestablePermissionBase:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+      type: object
+      title: RequestablePermissionBase
+    RequestApprovalStageOutput:
+      properties:
+        approvers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ApproverOutput'
+            type: array
+          - type: 'null'
+          title: Approvers
+          description: The approvers of this stage.
+      type: object
+      title: RequestApprovalStageOutput
+    Page_Account_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Account'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[Account]
+    AppApproversOutput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Groups
+          description: Groups assigned as support request approvers.
+          default: []
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Users
+          description: Users assigned as support request approvers.
+          default: []
+      type: object
+      title: AppApproversOutput
+    AllowedGroupsConfigInput:
+      properties:
+        type:
+          $ref: '#/components/schemas/AllowedGroupsConfigType'
+          description: The type of this allowed groups config, can be all groups or specific.
+          default: ALL_GROUPS
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: The groups allowed to request this permission. At most 100 groups when type is SPECIFIED_GROUPS.
+      type: object
+      title: AllowedGroupsConfigInput
+    AppStoreAppSettingsProvisioningOutput:
+      properties:
+        groups_provisioning:
+          $ref: '#/components/schemas/GroupProvisioningOption'
+          description: Controls how access is provisioned when a request is fulfilled. DIRECT_TO_USER provisions access at the app level and marks all permissions as not visible in the App Store. GROUPS_AND_HIDDEN provisions access at the permission level, but users cannot select which permission they want (requires at least one visible permission). GROUPS_AND_VISIBLE provisions access at the permission level and allows users to select the permission when requesting (requires at least one visible permission).
+        time_based_access:
+          items:
+            type: string
+          type: array
+          title: Time Based Access
+          description: If enabled, users can request an app for a selected duration. After expiry, Lumos will automatically remove user's access.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Whether the app is configured to allow users to request multiple permissions in a single request
+        manual_steps_needed:
+          type: boolean
+          title: Manual Steps Needed
+          description: If enabled, Lumos will notify the App Admin after initial access is granted to perform additional manual steps. Note that if this option is enabled, this action must be confirmed by the App Admin in order to resolve the request.
+        custom_provisioning_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Provisioning Instructions
+          description: Only Available if manual steps is active. During the provisioning step, Lumos will send a custom message to app admins explaining how to provision a user to the app. Markdown for links and text formatting is supported.
+        default_time_based_access_option:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Time Based Access Option
+          description: The label of the default time-based access duration pre-selected when a user requests access. Must be one of the values in time_based_access. Null when there is no default.
+        default_permission:
+          anyOf:
+          - $ref: '#/components/schemas/RequestablePermissionOutput'
+          - type: 'null'
+          description: The default permission pre-selected when a user requests access to this app. Null if no default is configured.
+        provisioning_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: The provisioning webhook optionally associated with this config.
+        access_removal_inline_webhook:
+          anyOf:
+          - $ref: '#/components/schemas/InlineWebhook'
+          - type: 'null'
+          description: A deprovisioning webhook can be optionally associated with this config.
+      type: object
+      title: AppStoreAppSettingsProvisioningOutput
+    UserWithCustomAttributes:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+        custom_attributes:
+          anyOf:
+          - additionalProperties:
+              $ref: '#/components/schemas/CustomAttribute'
+            type: object
+          - type: 'null'
+          title: Custom Attributes
+          description: Custom attributes configured on the user
+      type: object
+      required:
+      - id
+      title: UserWithCustomAttributes
+    Page_User_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[User]
+    AccessPolicyAppInput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+        is_preapproved:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Preapproved
+          description: Whether approval is required for this app grant.
+        permissions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AccessPolicyPermissionInput'
+            type: array
+          - type: 'null'
+          title: Permissions
+          description: List of permissions granted for this app. Empty list means app-level grant.
+      type: object
+      required:
+      - id
+      title: AccessPolicyAppInput
+      description: 'An app granted by this access policy.
+
+        Extends BaseApp with access-policy-specific fields.'
+    ActivityRecordInput:
+      properties:
+        records:
+          items:
+            $ref: '#/components/schemas/ActivityRecord'
+          type: array
+          title: Records
+          description: The activity records to upload.
+      type: object
+      required:
+      - records
+      title: ActivityRecordInput
+    AccessPolicyInput:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the access policy.
+        business_justification:
+          type: string
+          maxLength: 500
+          title: Business Justification
+          description: Explanation for why this policy exists.
+        status:
+          anyOf:
+          - type: string
+            enum:
+            - DRAFT
+            - PUBLISHED
+          - type: 'null'
+          title: Status
+          description: The status of the access policy. Defaults to DRAFT when supported.
+        is_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+          description: Whether the access policy is enabled. Defaults to false when supported.
+        apps:
+          items:
+            $ref: '#/components/schemas/AccessPolicyAppInput'
+          type: array
+          minItems: 1
+          title: Apps
+          description: List of apps granted by this access policy.
+        access_condition:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          description: The Lumos Condition object determining which identities qualify for this policy. Required unless `is_everyone_condition` is `true`. This is a recursive JSON structure that allows you to define complex rules for filtering and matching identities using operators like `equals`, `in`, `and`, `or`, and `not`. For more information, see the [Lumos Conditions documentation](https://support.lumos.com/articles/8646284496-building-conditions-in-lumos).
+        is_everyone_condition:
+          type: boolean
+          title: Is Everyone Condition
+          description: Whether the access policy applies to everyone. If true, `access_condition` is ignored. Otherwise, `access_condition` must be provided.
+          default: false
+      type: object
+      required:
+      - name
+      - business_justification
+      - apps
+      title: AccessPolicyInput
+    Page_Group_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[Group]
+    IntegrationConnectionSchemaOutput:
+      properties:
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: Canonical identifier of the integration the schema is for (echoes the request).
+        auth_schema:
+          type: object
+          title: Auth Schema
+          description: JSON Schema (draft-07 style) describing the `auth` object to pass to `POST /apps`. Properties are the credential keys the integration accepts; secret fields are marked `writeOnly`, and fixed-choice fields carry an `enum`. Most integrations use a flat object with credential keys at the top level; some nest credentials under named groups when the integration supports multiple authentication methods — mirror that nesting in the connect request. An empty object (`{"type":"object","properties":{}}`) means no credentials are supplied up front (the connection is completed via browser consent in the Lumos UI). A manually-set instance id belongs in `settings_schema`, not `auth`.
+        settings_schema:
+          type: object
+          title: Settings Schema
+          description: JSON Schema of the non-secret `settings` object for `POST /apps`. Carries tenant URLs, routing configuration, and other non-secret values the integration needs beyond credentials. Some integrations require a manually-set instance id as `app_instance_identifier` (e.g. an Okta domain); others derive it from the credentials during connect. Integrations that run through an on-prem agent take `on_prem_agent_cluster_id` here. Integrations that need no non-secret configuration return an empty object.
+      type: object
+      required:
+      - app_class_id
+      - auth_schema
+      - settings_schema
+      title: IntegrationConnectionSchemaOutput
+      description: 'An integration''s *connection schema* — the `auth` and `settings` a caller
+
+        must supply to connect it — so the Terraform provider and SDK consumers can
+
+        discover how to connect an integration before connecting it. Field
+
+        descriptions flow verbatim into the generated OpenAPI spec, so they double
+
+        as the public reference.'
+    ActivityRecord:
+      properties:
+        account:
+          $ref: '#/components/schemas/ActivityRecordAccountInput'
+          description: Metadata that Lumos can use to match the activity record to a software account within Lumos.
+        event:
+          $ref: '#/components/schemas/ActivityRecordEventInput'
+          description: Metadata about the event being uploaded.
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+          description: The timestamp of this event, in ISO 8601 format.
+        source_app_id:
+          type: string
+          title: Source App Id
+          description: UUID of the application in Lumos where this activity record was sourced (e.g. the ID of Okta within Lumos found by going to Apps > Find your app in the list > Click '...' > Copy Stable Identifier)
+        app:
+          anyOf:
+          - $ref: '#/components/schemas/ActivityRecordAppInput'
+          - type: 'null'
+          description: Metadata that Lumos can use to match the activity record to an application within Lumos.
+      type: object
+      required:
+      - account
+      - event
+      - timestamp
+      - source_app_id
+      title: ActivityRecord
+    Account:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this account.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app that owns this account.
+        account_type:
+          $ref: '#/components/schemas/AccountType'
+          description: The type of this account, one of 'USER', 'ROLE' (e.g. AWS), 'SERVICE' (e.g. GCP).
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/AccountLifecycleStatus'
+          - type: 'null'
+          description: The status of the account.
+        app:
+          anyOf:
+          - $ref: '#/components/schemas/App'
+          - type: 'null'
+          description: The app this account is for
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: The stable identifier of this account from the associated service.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this account.
+        user_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Id
+          description: The ID of the user associated with this account.
+        discovered_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered At
+          description: The time that Lumos first discovered this account, in ISO 8601 format
+        last_login:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Login
+          description: The last time a user logged into this app, in ISO 8601 format
+        last_activity:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Activity
+          description: The last time a user completed an action tracked by Lumos, in ISO 8601 format
+        sources:
+          items:
+            $ref: '#/components/schemas/DiscoverySource'
+          type: array
+          title: Sources
+          description: The discovery methods through which Lumos identified this account
+      type: object
+      required:
+      - id
+      - app_id
+      - account_type
+      - unique_identifier
+      title: Account
+    LimitOffsetPage_ActivityLog_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ActivityLog'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        limit:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Limit
+        offset:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Offset
+        links:
+          $ref: '#/components/schemas/Links'
+      type: object
+      required:
+      - items
+      - total
+      - limit
+      - offset
+      - links
+      title: LimitOffsetPage[ActivityLog]
+    AttributeInput:
+      properties:
+        unique_identifier:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Unique Identifier
+          description: The unique identifier of the custom attribute
+        type:
+          type: string
+          title: Type
+          description: The type of the attribute.
+        name:
+          type: string
+          title: Name
+          description: The name of the attribute.
+      type: object
+      title: AttributeInput
+    DisconnectIntegrationOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The domain app UUID of the disconnected integration.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The canonical integration identifier.
+        disconnected:
+          type: boolean
+          title: Disconnected
+          description: Confirms the app was disconnected. Always `true` on a successful response — the app's stored credentials were removed and it was returned to a connectable state (or its record deleted when no users remained).
+      type: object
+      required:
+      - id
+      - app_class_id
+      - disconnected
+      title: DisconnectIntegrationOutput
+    App:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website, or other identifier.
+        instance_id:
+          type: string
+          title: Instance Id
+          description: The non-unique ID of the instance associated with this app. This will be the Okta app id if it’s an Okta app, or will be marked as custom_app_import if manually uploaded into Lumos.
+        user_friendly_label:
+          type: string
+          title: User Friendly Label
+          description: The user-friendly label of this app.
+        status:
+          $ref: '#/components/schemas/DomainAppStatus'
+          description: 'The status of this app. Possible values: ''DISCOVERED'', ''IN_REVIEW'', ''NEEDS_REVIEW'', ''APPROVED'', ''BLOCKLISTED'', ''DEPRECATED'''
+        sources:
+          items:
+            $ref: '#/components/schemas/DiscoverySource'
+          type: array
+          title: Sources
+          description: The sources of this app.
+        allow_multiple_permission_selection:
+          type: boolean
+          title: Allow Multiple Permission Selection
+          description: Determines whether users can request multiple permissions at once.This field will be removed in subsequent API versions.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The URL of the logo of this app.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The URL of the website of this app.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Request Instructions
+          description: The request instructions.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The user-facing description of the app
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: The category of the app, as shown in the AppStore
+        disconnected:
+          type: boolean
+          title: Disconnected
+          description: Whether this app has been disconnected (its stored credentials removed via `DELETE /apps/{app_id}`). A disconnected app is excluded from `GET /apps?disconnected=false`; reconnect it with `PUT /apps/{app_id}`.
+        links:
+          $ref: '#/components/schemas/AppLinks'
+          description: A collection of URLs related to this application
+        sync_status:
+          anyOf:
+          - $ref: '#/components/schemas/SyncStatus'
+          - type: 'null'
+          description: 'The state of this app''s most recent sync: `SYNCING` while one is running, `SUCCESS` or `FAILED` once it finished. Poll this after `POST /apps/{app_id}/sync` to follow that sync. `null` when no sync result is recorded — the app has never synced, or was disconnected.'
+      type: object
+      required:
+      - id
+      - app_class_id
+      - instance_id
+      - user_friendly_label
+      - status
+      - sources
+      - allow_multiple_permission_selection
+      - disconnected
+      - links
+      title: App
+    ActivityRecordEventInput:
+      properties:
+        type:
+          $ref: '#/components/schemas/ActivityRecordEventType'
+          description: The type of event being uploaded.
+      type: object
+      required:
+      - type
+      title: ActivityRecordEventInput
+    ApproverType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      title: ApproverType
+    AppSettingOutput:
+      properties:
+        custom_request_instructions:
+          type: string
+          title: Custom Request Instructions
+          description: AppStore App instructions that are shown to the requester.
+        redirect_url:
+          anyOf:
+          - type: string
+            maxLength: 2048
+          - type: 'null'
+          title: Redirect Url
+          description: If set, requesting this app redirects the user to this URL instead of going through the normal access-request flow. Send null to clear an existing redirect; omit the field to leave it unchanged. Max 2048 characters.
+        request_flow:
+          $ref: '#/components/schemas/AppStoreAppSettingsRequestFlowOutput'
+          description: Request flow configuration to request access to app.
+        provisioning:
+          $ref: '#/components/schemas/AppStoreAppSettingsProvisioningOutput'
+          description: Provisioning flow configuration to request access to app.
+        in_app_store:
+          type: boolean
+          title: In App Store
+          description: Whether the app is in the app store.
+          default: false
+      type: object
+      title: AppSettingOutput
+    SyncType:
+      type: string
+      enum:
+      - full_sync
+      const: full_sync
+      title: SyncType
+      description: 'The kind of sync to trigger. MVP supports full integration sync only.
+
+
+        The enum is the forward-compatible seam: new sync kinds (incremental,
+
+        groups-only, …) are added as additional members without changing the
+
+        request/response contract.'
+    AppLinks:
+      properties:
+        self:
+          type: string
+          title: Self
+          description: The canonical API URL for retrieving this specific application
+        admin_url:
+          type: string
+          title: Admin Url
+          description: A URL to access this application within the Lumos web UI
+      type: object
+      required:
+      - self
+      - admin_url
+      title: AppLinks
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    InlineWebhook:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this inline webhook.
+        hook_type:
+          $ref: '#/components/schemas/InlineWebhookType'
+          description: The type of this inline webhook.
+        name:
+          type: string
+          title: Name
+          description: The name of this inline webhook.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: The description of this inline webhook.
+      type: object
+      required:
+      - id
+      - hook_type
+      - name
+      title: InlineWebhook
+    TriggerSyncInput:
+      properties:
+        sync_type:
+          $ref: '#/components/schemas/SyncType'
+          description: Which sync to run. Required. Today only `full_sync` (a full integration sync that re-pulls accounts, groups, and entitlements) is supported; any other value is rejected with 422. The field is required even with one value so the contract stays stable as more sync kinds are added.
+      additionalProperties: false
+      type: object
+      required:
+      - sync_type
+      title: TriggerSyncInput
+    AccessPolicyPermissionInput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+      type: object
+      title: AccessPolicyPermissionInput
+      description: 'A permission for a given app granted by this access policy.
+
+        Inherits RequestablePermissionBase fields (i.e. id)'
+    FlowState:
+      type: string
+      enum:
+      - SUCCESS
+      - FAILURE
+      - RUNNING
+      - NOT_STARTED
+      title: FlowState
+    AccessPolicyAppOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+        label:
+          type: string
+          title: Label
+          description: The human-readable label of this app.
+        is_preapproved:
+          type: boolean
+          title: Is Preapproved
+          description: Whether requests created via this access policy are pre-approved.
+        permissions:
+          items:
+            $ref: '#/components/schemas/AccessPolicyPermissionOutput'
+          type: array
+          title: Permissions
+          description: List of permissions granted for this app. Empty list means app-level grant.
+      type: object
+      required:
+      - id
+      - label
+      - is_preapproved
+      - permissions
+      title: AccessPolicyAppOutput
+      description: 'An app granted by this access policy.
+
+        Extends BaseApp with access-policy-specific fields.'
+    AppInputUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The updated domain-specific display name of the app. Set to null to reset to the app's default name.
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: 'The updated domain-specific category of the app. Set to null to reset to the app''s default category. Possible values: ''Accounting & Finance'', ''Marketing & Analytics'', ''Content & Social Media'', ''Sales & Support'', ''Design & Creativity'', ''IT & Security'', ''Developers'', ''HR & Learning'', ''Office & Legal'', ''Communication'', ''Collaboration'', ''Commerce & Marketplaces'', ''Other'', ''Internal'''
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          maxLength: 1000
+          title: Description
+          description: The updated domain-specific description of the app. Set to null to reset to the app's default description.
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+          description: The updated domain-specific URL of the logo of the app. Set to null to reset to the app's default logo.
+        website_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Website Url
+          description: The updated URL of the website of the app. Set to null to clear it.
+        request_instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          maxLength: 511
+          title: Request Instructions
+          description: The updated request instructions.
+      additionalProperties: false
+      type: object
+      title: AppInputUpdate
+    AppStoreVisibility:
+      type: string
+      enum:
+      - FULL
+      - LIMITED
+      - NONE
+      title: AppStoreVisibility
+    RunInfoStatus:
+      type: string
+      enum:
+      - RUNNING
+      - DONE
+      title: RunInfoStatus
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    SyncTaskOutput:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+          description: The ID of the job.
+        state:
+          anyOf:
+          - $ref: '#/components/schemas/RunInfoStatus'
+          - type: 'null'
+          description: The state of the job.
+      type: object
+      required:
+      - job_id
+      title: SyncTaskOutput
+    RequestApprovalConfigOutput:
+      properties:
+        request_approval_config_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Request Approval Config Override
+          description: Indicates if approval flow is overridden.
+        manager_approval:
+          anyOf:
+          - $ref: '#/components/schemas/ManagerApprovalOption'
+          - type: 'null'
+          description: Manager approval can be configured as necessary to continue
+          default: NONE
+        require_additional_approval:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Require Additional Approval
+          description: When true, enables a second approval stage so requests require approval from both stage 1 and stage 2 approvers. When false, disables the second approval stage and merges any existing stage 2 approvers into stage 1. When omitted, the current multi-stage approval setting is left unchanged.
+        custom_approval_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Custom Approval Message
+          description: After the approval step, send a custom message to requesters. Note that the permission level approval message will override the App level approval message if custom_approval_message_override is set. Markdown for links and text formatting is supported.
+        custom_approval_message_override:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Custom Approval Message Override
+          description: Indicates if custom_approval_message is overridden.
+        approvers:
+          anyOf:
+          - $ref: '#/components/schemas/AppApproversOutput'
+          - type: 'null'
+          description: AppStore App approvers assigned.
+        approvers_stage_2:
+          anyOf:
+          - $ref: '#/components/schemas/AppApproversOutput'
+          - type: 'null'
+          description: AppStore App stage 2 approvers assigned.
+        request_approval_stages:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/RequestApprovalStageOutput'
+            type: array
+          - type: 'null'
+          title: Request Approval Stages
+          description: The stages of this request approval.
+          default:
+          - {}
+        response_describes_entire_approval_workflow:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Response Describes Entire Approval Workflow
+          description: Indicates whether the approval configuration is fully represented by the existing API. If False, the approval configuration may contain additional stages or conditional approval chains not reflected in the v1 API.
+      type: object
+      title: RequestApprovalConfigOutput
+    IdentityEvent:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Unique identifier for this identity event.
+        user_id:
+          type: string
+          title: User Id
+          description: UUID of the user whose attribute changed.
+        detected_time:
+          type: string
+          format: date-time
+          title: Detected Time
+          description: Timestamp (ISO-8601) when the change was detected.
+        changed_field:
+          type: string
+          title: Changed Field
+          description: The field that changed.
+        old_field_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Old Field Value
+          description: Previous value of the changed field.
+        new_field_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: New Field Value
+          description: New value of the changed field.
+      type: object
+      required:
+      - id
+      - user_id
+      - detected_time
+      - changed_field
+      title: IdentityEvent
+      description: API representation of a identity event.
+    PermissionInput:
+      properties:
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: The unique identifier of the permission.
+        type:
+          type: string
+          title: Type
+          description: The type of the permission.
+        name:
+          type: string
+          title: Name
+          description: The name of the permission.
+      type: object
+      title: PermissionInput
+    SyncStatus:
+      type: string
+      enum:
+      - SYNCING
+      - SUCCESS
+      - FAILED
+      title: SyncStatus
+    ApproverOutput:
+      properties:
+        type:
+          $ref: '#/components/schemas/ApproverType'
+          description: The type of this approver.
+        user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: Optionally, the approver can be a user.
+        group:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+          description: Optionally, the approver can be a group.
+      type: object
+      required:
+      - type
+      title: ApproverOutput
+    AccessPolicyOutput:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the access policy.
+        business_justification:
+          type: string
+          maxLength: 500
+          title: Business Justification
+          description: Explanation for why this policy exists.
+        id:
+          type: string
+          title: Id
+          description: The unique ID of the access policy.
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PUBLISHED
+          title: Status
+          description: The status of the access policy.
+        is_enabled:
+          type: boolean
+          title: Is Enabled
+          description: Whether the access policy is enabled.
+        apps:
+          items:
+            $ref: '#/components/schemas/AccessPolicyAppOutput'
+          type: array
+          title: Apps
+          description: The list of apps and permissions granted by this access policy.
+        access_condition:
+          type: object
+          description: The Lumos Condition object determining which identities qualify for this policy. For more information, see the [Lumos Conditions documentation](https://support.lumos.com/articles/8646284496-building-conditions-in-lumos).
+        is_everyone_condition:
+          type: boolean
+          title: Is Everyone Condition
+          readOnly: true
+      type: object
+      required:
+      - name
+      - business_justification
+      - id
+      - status
+      - is_enabled
+      - apps
+      - access_condition
+      - is_everyone_condition
+      title: AccessPolicyOutput
+      description: The full representation of an access policy returned by the API.
+    AppAdminsInput:
+      properties:
+        groups:
+          items:
+            $ref: '#/components/schemas/BaseGroup'
+          type: array
+          title: Groups
+          description: Groups assigned as app admins.
+        users:
+          items:
+            $ref: '#/components/schemas/BaseUser'
+          type: array
+          title: Users
+          description: Users assigned as app admins.
+      type: object
+      title: AppAdminsInput
+    RequestablePermissionOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this requestable permission.
+        type:
+          anyOf:
+          - $ref: '#/components/schemas/PermissionType'
+          - type: 'null'
+          description: The type of this requestable permission.
+        label:
+          type: string
+          title: Label
+          description: The label of this requestable permission.
+        app_id:
+          type: string
+          title: App Id
+          description: The ID of the app associated with this requestable permission.
+        app_class_id:
+          type: string
+          title: App Class Id
+          description: The non-unique ID of the service associated with this requestable permission. Depending on how it is sourced in Lumos, this may be the app's name, website,  or other identifier.
+        app_instance_id:
+          type: string
+          title: App Instance Id
+          description: The ID of the instance associated with this requestable permission. This may be an empty string.
+        request_config:
+          $ref: '#/components/schemas/RequestConfigOutput'
+          description: The request config associated with this requestable permission.
+      type: object
+      required:
+      - label
+      - app_id
+      - app_class_id
+      - app_instance_id
+      title: RequestablePermissionOutput
+    AppStoreVisibilityOption:
+      type: string
+      enum:
+      - HIDDEN
+      - VISIBLE
+      title: AppStoreVisibilityOption
+    ActivityRecordAccountInput:
+      properties:
+        external_id:
+          type: string
+          title: External Id
+          description: The external app's user ID for the account.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email associated with the account
+      type: object
+      title: ActivityRecordAccountInput
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

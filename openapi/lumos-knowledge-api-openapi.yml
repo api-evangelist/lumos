@@ -1,0 +1,675 @@
+openapi: 3.2.0
+info:
+  title: Lumos Knowledge API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Knowledge
+  description: 'Knowledge entries are the documents and notes Lumos agents draw on when they answer access
+
+    questions.'
+paths:
+  /v1/knowledge/context:
+    get:
+      tags:
+      - Knowledge
+      summary: List Knowledge Context
+      description: 'List knowledge entries for the caller''s domain with optional filters and cursor pagination.
+
+
+        Pass the `next_page_token` value from the previous response back as the `page_token` query parameter to fetch the next page. When `next_page_token` is `null`, the current page is the last one.'
+      operationId: listKnowledgeContext
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: title_search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Case-insensitive substring match against knowledge entry titles.
+          title: Title Search
+        description: Case-insensitive substring match against knowledge entry titles.
+      - name: product_scopes
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/KnowledgeProductScope'
+          - type: 'null'
+          description: Filter to entries tagged with any of these product scopes.
+          title: Product Scopes
+        description: Filter to entries tagged with any of these product scopes.
+      - name: page_token
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'Opaque cursor from a previous response''s `next_page_token`. Omit to fetch the first page. Treat as opaque: do not decode, construct, or interpret it.'
+          title: Page Token
+        description: 'Opaque cursor from a previous response''s `next_page_token`. Omit to fetch the first page. Treat as opaque: do not decode, construct, or interpret it.'
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Maximum number of items to return per page. Values above 25 are clamped to 25 rather than rejected.
+          default: 10
+          title: Page Size
+        description: Maximum number of items to return per page. Values above 25 are clamped to 25 rather than rejected.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListKnowledgeContextOutput'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conflict
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Too Many Requests
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal Server Error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Knowledge
+      summary: Create Knowledge Context
+      description: 'Create a new knowledge entry in the caller''s domain.
+
+
+        Send as `multipart/form-data`. The `file` field is optional — omit it to create an entry without an attachment.'
+      operationId: createKnowledgeContext
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_createKnowledgeContext'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeContextOutput'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Unauthorized
+        '403':
+          description: Forbidden — caller lacks the Knowledge Hub manage permission.
+        '404':
+          description: Not found — the referenced knowledge entry does not exist.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conflict
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Too Many Requests
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal Server Error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/knowledge/context/{knowledge_context_id}:
+    get:
+      tags:
+      - Knowledge
+      summary: Get Knowledge Context
+      description: Get a single knowledge entry by ID.
+      operationId: getKnowledgeContext
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: knowledge_context_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Knowledge Context Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeContextOutput'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conflict
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Too Many Requests
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal Server Error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Knowledge
+      summary: Update Knowledge Context
+      description: 'Patch an existing knowledge entry. Only supplied (non-empty) fields are updated.
+
+
+        Tag and scope lists replace existing values entirely — they do not append.
+
+
+        Send as `multipart/form-data`. To replace the attached file, include a `file` field. To remove the existing file without uploading a new one, set `clear_attachment=true`.'
+      operationId: updateKnowledgeContext
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: knowledge_context_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Knowledge Context Id
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_updateKnowledgeContext'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeContextOutput'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Unauthorized
+        '403':
+          description: Forbidden — caller lacks the Knowledge Hub manage permission.
+        '404':
+          description: Not found — the referenced knowledge entry does not exist.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conflict
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Too Many Requests
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal Server Error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Knowledge
+      summary: Delete Knowledge Context
+      description: Archive (soft-delete) a knowledge entry. The entry is marked ARCHIVED and will no longer appear in list results. This action is reversible at the database level.
+      operationId: deleteKnowledgeContext
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: knowledge_context_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Knowledge Context Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Unauthorized
+        '403':
+          description: Forbidden — caller lacks the Knowledge Hub manage permission.
+        '404':
+          description: Not found — the referenced knowledge entry does not exist.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conflict
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Too Many Requests
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal Server Error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ApiErrorField:
+      properties:
+        field:
+          type: string
+          title: Field
+          description: Input field this error refers to, e.g. 'steps[2].inputs.group_id'.
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code for this field error.
+        message:
+          type: string
+          title: Message
+          description: Human-readable description of the field error.
+      type: object
+      required:
+      - field
+      - code
+      - message
+      title: ApiErrorField
+      description: A single field-level error (used for validation failures).
+    ApiError:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          description: Human-readable summary of the error.
+        type:
+          $ref: '#/components/schemas/ErrorType'
+          description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable error code; branch on this, not 'detail'.
+        errors:
+          items:
+            $ref: '#/components/schemas/ApiErrorField'
+          type: array
+          title: Errors
+          description: Field-level errors; empty for non-validation errors.
+      type: object
+      required:
+      - detail
+      - type
+      - code
+      title: ApiError
+      description: The V1 error envelope.
+    Body_createKnowledgeContext:
+      properties:
+        title:
+          type: string
+          title: Title
+          description: Title of the knowledge entry. Must be unique within the domain.
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+          description: Body text (markdown supported). Omit when providing a file attachment instead.
+        generic_tags:
+          items:
+            type: string
+          type: array
+          title: Generic Tags
+          description: Freeform tag strings to attach.
+          default: []
+        product_scopes:
+          items:
+            $ref: '#/components/schemas/KnowledgeProductScope'
+          type: array
+          title: Product Scopes
+          description: Products that can consume this entry.
+          default: []
+        file:
+          anyOf:
+          - type: string
+            format: binary
+          - type: 'null'
+          title: File
+          description: Optional file attachment.
+      type: object
+      required:
+      - title
+      title: Body_createKnowledgeContext
+    KnowledgeProductScope:
+      type: string
+      enum:
+      - APPSTORE
+      - ACCESS_REVIEWS
+      - ALBUS
+      - GLOBAL
+      - ALBUS_DEEP_RESEARCH
+      - IDENTITY_INTELLIGENCE
+      title: KnowledgeProductScope
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Body_updateKnowledgeContext:
+      properties:
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+          description: New title. Omit to leave unchanged.
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+          description: New content body. Omit to leave unchanged.
+        generic_tags:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Generic Tags
+          description: Replacement tag list — replaces all existing tags. Omit to leave unchanged.
+        product_scopes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/KnowledgeProductScope'
+            type: array
+          - type: 'null'
+          title: Product Scopes
+          description: Replacement product scope list — replaces all existing scopes. Omit to leave unchanged.
+        clear_attachment:
+          type: boolean
+          title: Clear Attachment
+          description: When true, removes the existing file attachment without uploading a new one.
+          default: false
+        file:
+          anyOf:
+          - type: string
+            format: binary
+          - type: 'null'
+          title: File
+          description: Replacement file attachment. Omit to leave existing file unchanged.
+      type: object
+      title: Body_updateKnowledgeContext
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ListKnowledgeContextOutput:
+      properties:
+        next_page_token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Page Token
+          description: 'Token for the next page, or null when this is the last page. An absent token is the only end-of-results signal. A page holding fewer than `page_size` items does not mean the results are exhausted. Treat the value as opaque: do not decode, construct, or interpret it.'
+        knowledge_context:
+          items:
+            $ref: '#/components/schemas/KnowledgeContextOutput'
+          type: array
+          title: Knowledge Context
+          description: Knowledge entries on this page.
+      type: object
+      required:
+      - knowledge_context
+      title: ListKnowledgeContextOutput
+    KnowledgeContextOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the knowledge entry.
+        title:
+          type: string
+          title: Title
+          description: Title of the knowledge entry.
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+          description: Body text of the knowledge entry (markdown supported).
+        file_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: File Url
+          description: URL of the attached file, if any.
+        generic_tags:
+          items:
+            type: string
+          type: array
+          title: Generic Tags
+          description: Freeform tag strings attached to the entry.
+        application_tags:
+          items:
+            $ref: '#/components/schemas/ApplicationTagOutput'
+          type: array
+          title: Application Tags
+          description: Application tags attached to the entry.
+        product_scopes:
+          items:
+            $ref: '#/components/schemas/KnowledgeProductScope'
+          type: array
+          title: Product Scopes
+          description: Products that can consume this knowledge entry.
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+          description: ISO 8601 creation timestamp.
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+          description: ISO 8601 last-updated timestamp.
+      type: object
+      required:
+      - id
+      - title
+      - generic_tags
+      - application_tags
+      - product_scopes
+      title: KnowledgeContextOutput
+    ErrorType:
+      type: string
+      enum:
+      - validation
+      - authentication
+      - permission
+      - not_found
+      - conflict
+      - rate_limited
+      - runtime
+      title: ErrorType
+    ApplicationTagOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the application tag.
+        name:
+          type: string
+          title: Name
+          description: Display name of the application tag.
+      type: object
+      required:
+      - id
+      - name
+      title: ApplicationTagOutput
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

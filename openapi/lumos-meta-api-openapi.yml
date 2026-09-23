@@ -1,0 +1,50 @@
+openapi: 3.2.0
+info:
+  title: Lumos Meta API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Meta
+paths:
+  /art:
+    get:
+      tags:
+      - Meta
+      summary: Get Art
+      description: Return Lumos ASCII art. Can be used to verify the API is working.
+      operationId: Lumos Art.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+  /info:
+    get:
+      tags:
+      - Meta
+      summary: Get Info
+      description: Returns current git revision.
+      operationId: Lumos liveness check
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Lumos Liveness Check
+components:
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

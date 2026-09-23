@@ -1,199 +1,943 @@
 openapi: 3.2.0
 info:
-  title: Lumos REST AccessPolicies Tasks API
-  description: 'The Lumos REST API enables programmatic access to the Lumos identity
+  title: Lumos Tasks API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
 
-    platform for automating user, group, app, account, access policy, access
+    Our REST API provides a management interface for the AppStore and a read interface
 
-    request, access review, pre-approval rule, task, vendor agreement, and
+    for the Lumos Core.
 
-    activity log management. All requests use a Bearer token (prefixed `lsk_`)
-
-    in the Authorization header.
-
-    '
-  version: '1.0'
-  contact:
-    name: Lumos Developers
-    url: https://developers.lumos.com/
-  license:
-    name: Proprietary
-    url: https://www.lumos.com/terms
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
 servers:
 - url: https://api.lumos.com
-  description: Lumos API
-security:
-- BearerAuth: []
 tags:
 - name: Tasks
+  description: '**Tasks** are work items emitted by Lumos workflows — things that need a human (or an
+
+    automated caller) to make a decision or perform a step before the workflow can proceed.'
 paths:
   /tasks:
     get:
       tags:
       - Tasks
-      summary: List tasks
-      operationId: listTasks
+      summary: List Tasks
+      description: 'List tasks visible to the current user.
+
+
+        Combine `task_category`, `product_area`, and `status` to find the tasks you care about:
+
+
+        - **Pending access-request approvals**:
+
+        `GET /tasks?task_category=APPROVAL&product_area=APPSTORE&status=PENDING`
+
+
+        Pass `expand=actions` or `expand=assignees` to hydrate those fields on each result.
+
+        Admins may pass `show_all_tasks=true` to list tasks across the whole domain rather than
+
+        just the caller''s assigned set.'
+      operationId: list_tasks_tasks_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: show_all_tasks
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Show all tasks in the domain (admin only).
+          default: false
+          title: Show All Tasks
+        description: Show all tasks in the domain (admin only).
+      - name: task_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by task type.
+          title: Task Type
+        description: Filter by task type.
+      - name: task_category
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by task category.
+          title: Task Category
+        description: Filter by task category.
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by task status.
+          title: Status
+        description: Filter by task status.
+      - name: product_area
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by product area.
+          title: Product Area
+        description: Filter by product area.
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search string.
+          title: Search
+        description: Search string.
+      - name: sort_by
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Sort field (createdAt, taskType, app, targetUser).
+          title: Sort By
+        description: Sort field (createdAt, taskType, app, targetUser).
+      - name: sort_direction
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Sort direction (asc, desc).
+          title: Sort Direction
+        description: Sort direction (asc, desc).
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand: actions, assignees.'
+          title: Expand
+        description: 'Fields to expand: actions, assignees.'
+      - name: assigned_identity_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: Filter by assigned user IDs
+          title: Assigned Identity Ids
+        description: Filter by assigned user IDs
+      - name: assigned_group_ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: Filter by assigned group IDs
+          title: Assigned Group Ids
+        description: Filter by assigned group IDs
+      - name: access_request_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by access request ID.
+          title: Access Request Id
+        description: Filter by access request ID.
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
       responses:
         '200':
-          description: Tasks
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Page_Task_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     get:
       tags:
       - Tasks
-      summary: Get task details
-      operationId: getTask
+      summary: Get Task
+      description: Get a task by ID.
+      operationId: get_task_tasks__task_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
+      - name: expand
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+          description: 'Fields to expand: actions, assignees, comments.'
+          title: Expand
+        description: 'Fields to expand: actions, assignees, comments.'
       responses:
         '200':
-          description: A task
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Task'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/actions:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     get:
       tags:
       - Tasks
-      summary: Get available actions
-      operationId: getTaskActions
+      summary: Get Task Actions
+      description: Get available actions for a task.
+      operationId: get_task_actions_tasks__task_id__actions_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       responses:
         '200':
-          description: Available actions
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskAction'
+                title: Response Get Task Actions Tasks  Task Id  Actions Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/perform-action:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     post:
       tags:
       - Tasks
-      summary: Execute action on task
-      operationId: performTaskAction
+      summary: Perform Task Action
+      description: '**Perform a custom action on a task** — the generic escape hatch for tasks that expose
+
+        workflow-specific actions beyond approve/deny.
+
+
+        For approval tasks, prefer `POST /tasks/{task_id}/complete` or
+
+        `POST /tasks/{task_id}/dismiss` — those endpoints are simpler and do not require
+
+        discovering the action type.
+
+
+        Use this endpoint only when the task exposes custom actions. Discover the available
+
+        actions for a task with `GET /tasks/{task_id}/actions`; each returned action includes an
+
+        `action_type` (the value to pass in this request body) and the status transitions it can
+
+        produce.
+
+
+        `transition_to` is optional — if the action has exactly one possible target status, it
+
+        is inferred. Pass it explicitly when an action can transition to more than one status.
+
+
+        Responses:
+
+
+        - `204 No Content` — action performed.
+
+        - `400 Bad Request` — unknown action type or invalid transition.
+
+        - `403 Forbidden` — caller is not authorized to act on the task.
+
+        - `409 Conflict` — task is already in the requested status.'
+      operationId: perform_task_action_tasks__task_id__perform_action_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/PerformTaskActionInput'
       responses:
-        '200':
-          description: Action performed
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/reassign:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     post:
       tags:
       - Tasks
-      summary: Reassign task
-      operationId: reassignTask
+      summary: Reassign Task
+      description: Reassign a task.
+      operationId: reassign_task_tasks__task_id__reassign_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/ReassignTaskInput'
       responses:
-        '200':
-          description: Reassigned
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/comments:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     post:
       tags:
       - Tasks
-      summary: Add comment to task
-      operationId: addTaskComment
+      summary: Add Task Comment
+      description: Add a comment to a task.
+      operationId: add_task_comment_tasks__task_id__comments_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/AddCommentInput'
       responses:
         '201':
-          description: Comment added
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/complete:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     post:
       tags:
       - Tasks
-      summary: Complete task
-      operationId: completeTask
+      summary: Complete Task
+      description: '**Complete a task** — transition any task to `COMPLETED` by applying its unique
+
+        completion action. For approval tasks this is the "approve" primitive.
+
+
+        Common uses:
+
+
+        - **Approve an access request** (task with `task_category=APPROVAL` and `product_area=APPSTORE`).
+
+        - **Mark a non-approval task done** when it exposes exactly one action that transitions
+
+        to `COMPLETED` (e.g. acknowledging a manual provisioning step). Tasks with multiple
+
+        possible completion actions should use `POST /tasks/{task_id}/perform-action` instead.
+
+
+        This endpoint resolves the unique action on the task that transitions it to `COMPLETED`
+
+        and applies it on behalf of the caller. The caller must be an assignee of the task (or a
+
+        domain admin). There is no request body.
+
+
+        Responses:
+
+
+        - `204 No Content` — task completed.
+
+        - `403 Forbidden` — caller is not authorized to act on the task.
+
+        - `409 Conflict` — task is already in the requested status (safe to treat as idempotent).
+
+        - `404 Not Found` — task does not exist in this domain, or the Tasks API is not enabled.
+
+
+        To deny instead of approve, use `POST /tasks/{task_id}/dismiss`. For
+
+        tasks that expose custom workflow actions (not approvals), use
+
+        `POST /tasks/{task_id}/perform-action`.'
+      operationId: complete_task_tasks__task_id__complete_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       responses:
-        '200':
-          description: Task completed
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/HTTPValidationError'
   /tasks/{task_id}/dismiss:
-    parameters:
-    - name: task_id
-      in: path
-      required: true
-      schema:
-        type: string
     post:
       tags:
       - Tasks
-      summary: Dismiss task
-      operationId: dismissTask
+      summary: Dismiss Task
+      description: '**Dismiss a task** — transition any task to `DISMISSED` by applying its unique
+
+        dismissal action. For approval tasks this is the "deny / reject" primitive; for
+
+        non-approval tasks it cancels the task without performing its work.
+
+
+        Common uses:
+
+
+        - **Deny an access request**.
+
+        - **Cancel a non-approval task** (e.g. dismiss an error task once the underlying issue is
+
+        handled out-of-band). Tasks with multiple possible dismissal actions should use
+
+        `POST /tasks/{task_id}/perform-action` instead.
+
+
+        Resolves the unique action on the task that transitions it to `DISMISSED` and applies it
+
+        on behalf of the caller. The caller must be an assignee of the task (or a domain admin).
+
+        There is no request body.
+
+
+        Responses:
+
+
+        - `204 No Content` — task dismissed.
+
+        - `403 Forbidden` — caller is not authorized to act on the task.
+
+        - `409 Conflict` — task is already in the requested status.
+
+        - `404 Not Found` — task does not exist in this domain, or the Tasks API is not enabled.
+
+
+        To approve instead of deny, use `POST /tasks/{task_id}/complete`.'
+      operationId: dismiss_task_tasks__task_id__dismiss_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the task.
+          title: Task Id
+        description: The ID of the task.
       responses:
-        '200':
-          description: Task dismissed
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
+  schemas:
+    TaskActionTransition:
+      properties:
+        transition_to:
+          anyOf:
+          - $ref: '#/components/schemas/TaskStatus'
+          - type: 'null'
+          description: The status the task will transition to when this action is taken.
+      type: object
+      title: TaskActionTransition
+    Page_Task_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Task'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[Task]
+    TaskCategory:
+      type: string
+      enum:
+      - MANAGER_APPROVAL
+      - APPROVAL
+      - PROVISIONING
+      - DEPROVISIONING
+      - ERROR
+      - GENERIC
+      title: TaskCategory
+    UserLifecycleStatus:
+      type: string
+      enum:
+      - STAGED
+      - ACTIVE
+      - SUSPENDED
+      - INACTIVE
+      title: UserLifecycleStatus
+    PerformTaskActionInput:
+      properties:
+        action_type:
+          type: string
+          title: Action Type
+          description: The action type to perform.
+        transition_to:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Transition To
+          description: The status to transition to. If omitted and the action has exactly one transition target, it will be inferred.
+      type: object
+      required:
+      - action_type
+      title: PerformTaskActionInput
+    TaskAction:
+      properties:
+        action_type:
+          type: string
+          title: Action Type
+          description: The external identifier for this action type.
+        transitions:
+          items:
+            $ref: '#/components/schemas/TaskActionTransition'
+          type: array
+          title: Transitions
+          description: The possible status transitions for this action.
+      type: object
+      required:
+      - action_type
+      - transitions
+      title: TaskAction
+    TaskProductArea:
+      type: string
+      enum:
+      - ACCESS_REVIEWS
+      - APPSTORE
+      - MOVER
+      - ATTRIBUTE_SYNC
+      - OFFBOARDING
+      - ONBOARDING
+      - PLATFORM
+      - SAVINGS
+      title: TaskProductArea
+    TaskAssigneeType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      title: TaskAssigneeType
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ReassignTaskInput:
+      properties:
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: User Ids
+          description: IDs of users to assign.
+        group_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Group Ids
+          description: IDs of groups to assign.
+        replace:
+          type: boolean
+          title: Replace
+          description: Whether to replace existing assignees or add to them.
+          default: true
+      type: object
+      title: ReassignTaskInput
+    AddCommentInput:
+      properties:
+        comment:
+          type: string
+          maxLength: 4000
+          minLength: 1
+          title: Comment
+          description: The comment text to add.
+      type: object
+      required:
+      - comment
+      title: AddCommentInput
+    Task:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this task.
+        task_type:
+          type: string
+          title: Task Type
+          description: The type of this task.
+        task_category:
+          $ref: '#/components/schemas/TaskCategory'
+          description: The category of this task.
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+          description: The current status of this task.
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+          description: A description of this task.
+        instructions:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Instructions
+          description: Instructions for completing this task.
+        product_area:
+          anyOf:
+          - $ref: '#/components/schemas/TaskProductArea'
+          - type: 'null'
+          description: The product area this task is related to.
+        app:
+          anyOf:
+          - $ref: '#/components/schemas/BaseApp'
+          - type: 'null'
+          description: The app this task is related to.
+        target_user:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user this task is about.
+        resolved_by:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who resolved this task.
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: When this task was created.
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: When this task was last updated.
+        assignees:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskAssignee'
+            type: array
+          - type: 'null'
+          title: Assignees
+          description: The assignees of this task. Requires expand=assignees.
+        actions:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskAction'
+            type: array
+          - type: 'null'
+          title: Actions
+          description: Available actions for this task. Requires expand=actions.
+        comments:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/TaskComment'
+            type: array
+          - type: 'null'
+          title: Comments
+          description: Comments on this task. Requires expand=comments.
+        access_request_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Request Id
+          description: The access request this task is associated with, if applicable.
+        requestable_permission_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requestable Permission Id
+          description: The requestable permission this task is associated with, if applicable.
+      type: object
+      required:
+      - id
+      - task_type
+      - task_category
+      - status
+      - created_at
+      - updated_at
+      title: Task
+    TaskComment:
+      properties:
+        body:
+          type: string
+          title: Body
+          description: The text content of the comment.
+        created_by:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who created the comment.
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: When the comment was created.
+      type: object
+      required:
+      - body
+      - created_at
+      title: TaskComment
+    BaseApp:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this app.
+      type: object
+      required:
+      - id
+      title: BaseApp
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    TaskAssignee:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of the assignee.
+        type:
+          $ref: '#/components/schemas/TaskAssigneeType'
+          description: Whether this assignee is a user or group.
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The display name of the assignee.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of the assignee. Only set for users.
+      type: object
+      required:
+      - id
+      - type
+      title: TaskAssignee
+    User:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+      type: object
+      required:
+      - id
+      title: User
+    TaskStatus:
+      type: string
+      enum:
+      - PENDING
+      - ACCEPTED
+      - COMPLETED
+      - DISMISSED
+      - BLOCKED
+      - STAGED
+      - RETRIED
+      - EXPIRED
+      title: TaskStatus
   securitySchemes:
-    BearerAuth:
+    HTTPBearer:
       type: http
       scheme: bearer
-      bearerFormat: Lumos API key (lsk_ prefix)

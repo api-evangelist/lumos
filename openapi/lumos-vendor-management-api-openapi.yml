@@ -1,0 +1,778 @@
+openapi: 3.2.0
+info:
+  title: Lumos Vendor Management API
+  description: 'The Lumos API gives you the building blocks to administer and extend Lumos programmatically.
+
+    Our REST API provides a management interface for the AppStore and a read interface
+
+    for the Lumos Core.
+
+    Go to https://developers.lumos.com to see our complete documentation.'
+  version: 0.1.0
+servers:
+- url: https://api.lumos.com
+tags:
+- name: Vendor Management
+paths:
+  /vendor_agreements:
+    get:
+      tags:
+      - Vendor Management
+      summary: Get Vendor Agreements
+      description: List all of your company's vendor agreements.
+      operationId: listVendorAgreements
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: Page number
+          default: 1
+          title: Page
+        description: Page number
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Page size
+          default: 50
+          title: Size
+        description: Page size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_VendorAgreement_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /vendor_agreements/{vendor_agreement_id}/custom_attributes/{label}:
+    put:
+      tags:
+      - Vendor Management
+      summary: Update Vendor Agreement Custom Attribute
+      description: Update a custom attribute attached to a vendor agreement.
+      operationId: updateVendorAgreementCustomAttribute
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: vendor_agreement_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Vendor Agreement Id
+      - name: label
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Label
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorAgreementCustomAttributeUpdateInput'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorAgreementCustomAttribute-Output'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /found_documents:
+    post:
+      tags:
+      - Vendor Management
+      summary: Upload Found Documents
+      description: Upload a newly discovered document (e.g. Order Form, Quote) to Lumos for review
+      operationId: createFoundDocument
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoundDocumentsUpload'
+              properties:
+                unique_identifier:
+                  type: string
+                  title: Unique Identifier
+                  description: A unique identifier for the contract being uploaded. This can be an ID from an external system like Coupa, an internal ID such as a PO number, or simply the name of the file.
+                files:
+                  items:
+                    properties:
+                      type:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                  type: array
+                  title: Files
+                  description: A list of publicly accessible URLs that direct to files related to a Vendor Agreement. For example, the Order Form, Quote, MSA, or Terms and Conditions.
+                vendor_name:
+                  type: string
+                  title: Vendor Name
+                  description: The name of the vendor associated with this document
+                start_date:
+                  type: string
+                  format: date
+                  title: Start Date
+                  description: The start date of the attached contract
+                end_date:
+                  type: string
+                  format: date
+                  title: End Date
+                  description: The end date of the attached contract
+                source_app_id:
+                  type: string
+                  title: Source App ID
+                  description: The ID of the app that sourced this document. For example, if you are using this API to create a custom Google Drive integration, you might include the ID for the Google Workspaceapp in Lumos. This determines which app's logo is displayed in Lumos.
+                total_cost:
+                  allOf:
+                  - $ref: '#/components/schemas/Cost'
+                  title: Total Cost
+                  description: The total cost of the contract. If this is a multi-year contract, this should include the cost for future years.
+              type: object
+              required:
+              - unique_identifier
+              - files
+          multipart/form-data:
+            schema:
+              properties:
+                unique_identifier:
+                  type: string
+                  title: Unique Identifier
+                  description: A unique identifier for the contract being uploaded. This can be an ID from an external system like Coupa, an internal ID such as a PO number, or simply the name of the file.
+                files:
+                  items:
+                    type: string
+                    format: binary
+                  type: array
+                  title: Files
+                  description: A list of files related to a vendor agreement. For example, the Order Form, Quote, MSA, or Terms and Conditions.
+                vendor_name:
+                  type: string
+                  title: Vendor Name
+                  description: The name of the vendor associated with this document
+                start_date:
+                  type: string
+                  format: date
+                  title: Start Date
+                  description: The start date of the attached contract
+                end_date:
+                  type: string
+                  format: date
+                  title: End Date
+                  description: The end date of the attached contract
+                source_app_id:
+                  type: string
+                  title: Source App ID
+                  description: The ID of the app that sourced this document. For example, if you are using this API to create a custom Google Drive integration, you might include the ID for the Google Workspaceapp in Lumos. This determines which app's logo is displayed in Lumos.
+              type: object
+              required:
+              - unique_identifier
+              - files
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /orders:
+    post:
+      tags:
+      - Vendor Management
+      summary: Upload Order
+      description: Upload a newly discovered document (e.g. Order Form, Quote) to Lumos
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+components:
+  schemas:
+    VendorAgreementCustomAttribute-Input:
+      properties:
+        type:
+          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: VendorAgreementCustomAttribute
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    LineItem:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        type:
+          type: string
+          title: Type
+          description: The type of purchase that this line item refers to
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/LineItemUnitCost'
+          description: The unit cost of this line item
+        start_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+          description: The start of the line item
+        end_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+          description: The end of the line item. Null for monthly line items.
+      type: object
+      required:
+      - name
+      - type
+      - quantity
+      - unit_cost
+      - start_date
+      - end_date
+      title: LineItem
+    VendorAgreementCustomAttributeType:
+      type: string
+      enum:
+      - TEXT
+      - USER
+      - SINGLE_SELECT
+      title: VendorAgreementCustomAttributeType
+    VendorAgreementCustomAttribute-Output:
+      properties:
+        type:
+          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: VendorAgreementCustomAttribute
+    LineItemUnitCostInput:
+      properties:
+        period:
+          type: string
+          title: Period
+          description: The period which this cost covers. Available options are per_month or per_year
+        value:
+          anyOf:
+          - type: number
+          - type: string
+          title: Value
+          description: The cost in terms of the specified currency (4 decimal places supported)
+      type: object
+      required:
+      - period
+      - value
+      title: LineItemUnitCostInput
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    OrderInput:
+      properties:
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: A unique ID for the contract being uploaded. This can be an ID from an external system like Ironclad, an internal ID such as a PO number, or simply the name of the vendor + date of the contract.
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+          description: Information about the vendor associated with this contract. Currently, we will only support a name field.
+        start_date:
+          type: string
+          format: date
+          title: Start Date
+          description: The start date of the attached contract
+        end_date:
+          type: string
+          format: date
+          title: End Date
+          description: The end date of the attached contract
+        opt_out_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Opt Out Date
+          description: The date by which a vendor must be notified before terminating the order
+        auto_renewal:
+          type: boolean
+          title: Auto Renewal
+          description: Whether or not the contract auto-renews
+        currency:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Currency
+          description: The currency in which the contract is being paid in ISO 4217 format
+        line_items:
+          items:
+            $ref: '#/components/schemas/LineItemInput'
+          type: array
+          title: Line Items
+          description: The list of currently active line items for this Vendor Agreement. If there are no currently active line items, the most recent set of line items is returned.
+        custom_attributes:
+          additionalProperties:
+            $ref: '#/components/schemas/VendorAgreementCustomAttribute-Input'
+          type: object
+          title: Custom Attributes
+          description: Any additional attributes that you would like to save on the Order. The set of available options must be configured in advance in Lumos.
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: UUID of the application in Lumos where this order was sourced (e.g. the ID of Ironclad within Lumos)
+      type: object
+      required:
+      - unique_identifier
+      - vendor
+      - start_date
+      - end_date
+      - auto_renewal
+      - line_items
+      title: OrderInput
+    User:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+      type: object
+      required:
+      - id
+      title: User
+    LineItemUnitCost:
+      properties:
+        per_month:
+          $ref: '#/components/schemas/Cost'
+          description: The per unit cost associated with this line item, amortized to the cost per month
+      type: object
+      required:
+      - per_month
+      title: LineItemUnitCost
+    FileUploadType:
+      type: string
+      enum:
+      - url
+      - base64
+      title: FileUploadType
+    UserLifecycleStatus:
+      type: string
+      enum:
+      - STAGED
+      - ACTIVE
+      - SUSPENDED
+      - INACTIVE
+      title: UserLifecycleStatus
+    FileUpload:
+      properties:
+        type:
+          $ref: '#/components/schemas/FileUploadType'
+          description: The type of content being uploaded. The only supported type today is 'url'
+        value:
+          type: string
+          title: Value
+          description: The data to upload. This should be a publicly accessible URL that resolves to a file
+      type: object
+      required:
+      - type
+      - value
+      title: FileUpload
+    Page_VendorAgreement_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/VendorAgreement'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[VendorAgreement]
+    VendorAgreement:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: A unique identifier for this Vendor Agreement
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+          description: The vendor in which the agreement is created for
+        label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Label
+          description: The user-defined label for this agreement
+        start_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+          description: The start of the current term
+        end_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+          description: The end of the current term
+        opt_out_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Opt Out Date
+          description: The date by which the vendor must be notified if you want to terminate the agreement
+        renewal_stage:
+          type: string
+          title: Renewal Stage
+          description: The stage of the renewal process for this agreement
+        pricing_model:
+          type: string
+          title: Pricing Model
+          description: The pricing model for this agreement
+        contract_length_months:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Contract Length Months
+          description: The length of the contract in months
+        projected_annualized_cost:
+          anyOf:
+          - $ref: '#/components/schemas/Cost'
+          - type: 'null'
+          description: The projected annualized cost of the currently active order on the agreement
+        renewal_owners:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+          title: Renewal Owners
+          description: The individuals responsible for managing renewals and true-ups for this agreement. They will receive all notifications configured in Lumos.
+        total_contract_cost:
+          $ref: '#/components/schemas/Cost'
+          description: The total cost of the current service term, including all line items and true ups, and including future years for multi-year agreements.
+        line_items:
+          items:
+            $ref: '#/components/schemas/LineItem'
+          type: array
+          title: Line Items
+          description: The list of currently active line items for this Vendor Agreement. If there are no currently active line items, the most recent set of line items is returned.
+        custom_attributes:
+          additionalProperties:
+            $ref: '#/components/schemas/VendorAgreementCustomAttribute-Output'
+          type: object
+          title: Custom Attributes
+          description: Custom metadata tracked about each of your Vendor Agreements. The set of available options must be configured within the Lumos admin panel.
+      type: object
+      required:
+      - id
+      - vendor
+      - start_date
+      - end_date
+      - opt_out_date
+      - renewal_stage
+      - pricing_model
+      - contract_length_months
+      - projected_annualized_cost
+      - total_contract_cost
+      - line_items
+      title: VendorAgreement
+    LineItemInput:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        type:
+          type: string
+          title: Type
+          description: The type of purchase that this line item refers to
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/LineItemUnitCostInput'
+          description: The per-unit cost of the line item
+        start_date:
+          type: string
+          format: date
+          title: Start Date
+          description: The start date of the line item
+        end_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+          description: The end date of the line item.
+      type: object
+      required:
+      - name
+      - type
+      - quantity
+      - unit_cost
+      - start_date
+      - end_date
+      title: LineItemInput
+    VendorAgreementCustomAttributeUpdateInput:
+      properties:
+        value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Value
+          description: The value to store for this custom attribute. Set to null to remove the value.
+      type: object
+      title: VendorAgreementCustomAttributeUpdateInput
+    LineItemUpload:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/Cost'
+          description: The unit cost of this line item
+      type: object
+      required:
+      - name
+      - quantity
+      - unit_cost
+      title: LineItemUpload
+    Cost:
+      properties:
+        currency:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Currency
+          description: The currency in which this cost is stored
+        value:
+          type: number
+          title: Value
+          description: The quantity of the cost in terms of the specified currency
+      type: object
+      required:
+      - value
+      title: Cost
+    FoundDocumentsUpload:
+      properties:
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: A value that can be used to uniquely identify this contract (e.g. PO number, file name, etc)
+        files:
+          items:
+            $ref: '#/components/schemas/FileUpload'
+          type: array
+          title: Files
+          description: A list of URLs that resolve to files that should be attached to the Found Document
+        vendor_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vendor Name
+          description: The name of the vendor that this document is for
+        start_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start Date
+          description: The start of the vendor agreement
+        end_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End Date
+          description: The end of the vendor agreement
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: By passing the ID of an application within Lumos, it will appear as if this Found Document was sourced from that app
+        total_cost:
+          anyOf:
+          - $ref: '#/components/schemas/Cost'
+          - type: 'null'
+          description: The total cost of the contract. If this is a multi-year contract, this should include the cost for future years
+        line_items:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/LineItemUpload'
+            type: array
+          - type: 'null'
+          title: Line Items
+          description: The line items on the contract
+      type: object
+      required:
+      - unique_identifier
+      - files
+      title: FoundDocumentsUpload
+    Vendor:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: A user friendly name for the vendor
+      type: object
+      required:
+      - name
+      title: Vendor
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
