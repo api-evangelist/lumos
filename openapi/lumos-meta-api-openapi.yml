@@ -20,7 +20,7 @@ paths:
       - Meta
       summary: Get Art
       description: Return Lumos ASCII art. Can be used to verify the API is working.
-      operationId: Lumos Art.
+      operationId: LumosArt.
       responses:
         '200':
           description: Successful Response
@@ -28,13 +28,15 @@ paths:
             text/plain:
               schema:
                 type: string
+      x-operation-id-source: normalized
+      x-operation-id-original: Lumos Art.
   /info:
     get:
       tags:
       - Meta
       summary: Get Info
       description: Returns current git revision.
-      operationId: Lumos liveness check
+      operationId: LumosLivenessCheck
       responses:
         '200':
           description: Successful Response
@@ -43,6 +45,8 @@ paths:
               schema:
                 type: object
                 title: Response Lumos Liveness Check
+      x-operation-id-source: normalized
+      x-operation-id-original: Lumos liveness check
 components:
   securitySchemes:
     HTTPBearer:

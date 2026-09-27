@@ -395,53 +395,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ApiErrorField:
-      properties:
-        field:
-          type: string
-          title: Field
-          description: Input field this error refers to, e.g. 'steps[2].inputs.group_id'.
-        code:
-          type: string
-          title: Code
-          description: Stable machine-readable code for this field error.
-        message:
-          type: string
-          title: Message
-          description: Human-readable description of the field error.
-      type: object
-      required:
-      - field
-      - code
-      - message
-      title: ApiErrorField
-      description: A single field-level error (used for validation failures).
-    ApiError:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          description: Human-readable summary of the error.
-        type:
-          $ref: '#/components/schemas/ErrorType'
-          description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
-        code:
-          type: string
-          title: Code
-          description: Stable machine-readable error code; branch on this, not 'detail'.
-        errors:
-          items:
-            $ref: '#/components/schemas/ApiErrorField'
-          type: array
-          title: Errors
-          description: Field-level errors; empty for non-validation errors.
-      type: object
-      required:
-      - detail
-      - type
-      - code
-      title: ApiError
-      description: The V1 error envelope.
     Body_createKnowledgeContext:
       properties:
         title:
@@ -479,16 +432,58 @@ components:
       required:
       - title
       title: Body_createKnowledgeContext
-    KnowledgeProductScope:
+    ApplicationTagOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the application tag.
+        name:
+          type: string
+          title: Name
+          description: Display name of the application tag.
+      type: object
+      required:
+      - id
+      - name
+      title: ApplicationTagOutput
+    ApiError:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          description: Human-readable summary of the error.
+        type:
+          $ref: '#/components/schemas/ErrorType'
+          description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable error code; branch on this, not 'detail'.
+        errors:
+          items:
+            $ref: '#/components/schemas/ApiErrorField'
+          type: array
+          title: Errors
+          description: Field-level errors; empty for non-validation errors.
+      type: object
+      required:
+      - detail
+      - type
+      - code
+      title: ApiError
+      description: The V1 error envelope.
+    ErrorType:
       type: string
       enum:
-      - APPSTORE
-      - ACCESS_REVIEWS
-      - ALBUS
-      - GLOBAL
-      - ALBUS_DEEP_RESEARCH
-      - IDENTITY_INTELLIGENCE
-      title: KnowledgeProductScope
+      - validation
+      - authentication
+      - permission
+      - not_found
+      - conflict
+      - rate_limited
+      - runtime
+      title: ErrorType
     ValidationError:
       properties:
         loc:
@@ -510,6 +505,37 @@ components:
       - msg
       - type
       title: ValidationError
+    KnowledgeProductScope:
+      type: string
+      enum:
+      - APPSTORE
+      - ACCESS_REVIEWS
+      - ALBUS
+      - GLOBAL
+      - ALBUS_DEEP_RESEARCH
+      - IDENTITY_INTELLIGENCE
+      title: KnowledgeProductScope
+    ApiErrorField:
+      properties:
+        field:
+          type: string
+          title: Field
+          description: Input field this error refers to, e.g. 'steps[2].inputs.group_id'.
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code for this field error.
+        message:
+          type: string
+          title: Message
+          description: Human-readable description of the field error.
+      type: object
+      required:
+      - field
+      - code
+      - message
+      title: ApiErrorField
+      description: A single field-level error (used for validation failures).
     Body_updateKnowledgeContext:
       properties:
         title:
@@ -554,33 +580,6 @@ components:
           description: Replacement file attachment. Omit to leave existing file unchanged.
       type: object
       title: Body_updateKnowledgeContext
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    ListKnowledgeContextOutput:
-      properties:
-        next_page_token:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Next Page Token
-          description: 'Token for the next page, or null when this is the last page. An absent token is the only end-of-results signal. A page holding fewer than `page_size` items does not mean the results are exhausted. Treat the value as opaque: do not decode, construct, or interpret it.'
-        knowledge_context:
-          items:
-            $ref: '#/components/schemas/KnowledgeContextOutput'
-          type: array
-          title: Knowledge Context
-          description: Knowledge entries on this page.
-      type: object
-      required:
-      - knowledge_context
-      title: ListKnowledgeContextOutput
     KnowledgeContextOutput:
       properties:
         id:
@@ -643,32 +642,33 @@ components:
       - application_tags
       - product_scopes
       title: KnowledgeContextOutput
-    ErrorType:
-      type: string
-      enum:
-      - validation
-      - authentication
-      - permission
-      - not_found
-      - conflict
-      - rate_limited
-      - runtime
-      title: ErrorType
-    ApplicationTagOutput:
+    ListKnowledgeContextOutput:
       properties:
-        id:
-          type: string
-          title: Id
-          description: UUID of the application tag.
-        name:
-          type: string
-          title: Name
-          description: Display name of the application tag.
+        next_page_token:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Page Token
+          description: 'Token for the next page, or null when this is the last page. An absent token is the only end-of-results signal. A page holding fewer than `page_size` items does not mean the results are exhausted. Treat the value as opaque: do not decode, construct, or interpret it.'
+        knowledge_context:
+          items:
+            $ref: '#/components/schemas/KnowledgeContextOutput'
+          type: array
+          title: Knowledge Context
+          description: Knowledge entries on this page.
       type: object
       required:
-      - id
-      - name
-      title: ApplicationTagOutput
+      - knowledge_context
+      title: ListKnowledgeContextOutput
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
   securitySchemes:
     HTTPBearer:
       type: http
