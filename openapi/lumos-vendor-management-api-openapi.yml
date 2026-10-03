@@ -234,62 +234,6 @@ paths:
       - HTTPBearer: []
 components:
   schemas:
-    VendorAgreementCustomAttribute-Output:
-      properties:
-        type:
-          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
-          description: The type of custom attribute. Only text and user options are available today
-        value:
-          anyOf:
-          - type: string
-          - items:
-              $ref: '#/components/schemas/User'
-            type: array
-          - type: 'null'
-          title: Value
-          description: The value of the attribute for an individual Order
-      type: object
-      required:
-      - type
-      title: VendorAgreementCustomAttribute
-    LineItemInput:
-      properties:
-        name:
-          type: string
-          title: Name
-          description: The name of the line item as stored in Lumos
-        type:
-          type: string
-          title: Type
-          description: The type of purchase that this line item refers to
-        quantity:
-          type: integer
-          title: Quantity
-          description: The number of units purchased for this line item
-        unit_cost:
-          $ref: '#/components/schemas/LineItemUnitCostInput'
-          description: The per-unit cost of the line item
-        start_date:
-          type: string
-          format: date
-          title: Start Date
-          description: The start date of the line item
-        end_date:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: End Date
-          description: The end date of the line item.
-      type: object
-      required:
-      - name
-      - type
-      - quantity
-      - unit_cost
-      - start_date
-      - end_date
-      title: LineItemInput
     LineItemUnitCostInput:
       properties:
         period:
@@ -307,25 +251,6 @@ components:
       - period
       - value
       title: LineItemUnitCostInput
-    LineItemUpload:
-      properties:
-        name:
-          type: string
-          title: Name
-          description: The name of the line item as stored in Lumos
-        quantity:
-          type: integer
-          title: Quantity
-          description: The number of units purchased for this line item
-        unit_cost:
-          $ref: '#/components/schemas/Cost'
-          description: The unit cost of this line item
-      type: object
-      required:
-      - name
-      - quantity
-      - unit_cost
-      title: LineItemUpload
     VendorAgreementCustomAttributeUpdateInput:
       properties:
         value:
@@ -342,6 +267,44 @@ components:
       - url
       - base64
       title: FileUploadType
+    Page_VendorAgreement_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/VendorAgreement'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[VendorAgreement]
     Cost:
       properties:
         currency:
@@ -358,214 +321,20 @@ components:
       required:
       - value
       title: Cost
-    FoundDocumentsUpload:
-      properties:
-        unique_identifier:
-          type: string
-          title: Unique Identifier
-          description: A value that can be used to uniquely identify this contract (e.g. PO number, file name, etc)
-        files:
-          items:
-            $ref: '#/components/schemas/FileUpload'
-          type: array
-          title: Files
-          description: A list of URLs that resolve to files that should be attached to the Found Document
-        vendor_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Vendor Name
-          description: The name of the vendor that this document is for
-        start_date:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Start Date
-          description: The start of the vendor agreement
-        end_date:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: End Date
-          description: The end of the vendor agreement
-        source_app_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Source App Id
-          description: By passing the ID of an application within Lumos, it will appear as if this Found Document was sourced from that app
-        total_cost:
-          anyOf:
-          - $ref: '#/components/schemas/Cost'
-          - type: 'null'
-          description: The total cost of the contract. If this is a multi-year contract, this should include the cost for future years
-        line_items:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/LineItemUpload'
-            type: array
-          - type: 'null'
-          title: Line Items
-          description: The line items on the contract
-      type: object
-      required:
-      - unique_identifier
-      - files
-      title: FoundDocumentsUpload
-    LineItem:
-      properties:
-        name:
-          type: string
-          title: Name
-          description: The name of the line item as stored in Lumos
-        type:
-          type: string
-          title: Type
-          description: The type of purchase that this line item refers to
-        quantity:
-          type: integer
-          title: Quantity
-          description: The number of units purchased for this line item
-        unit_cost:
-          $ref: '#/components/schemas/LineItemUnitCost'
-          description: The unit cost of this line item
-        start_date:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: Start Date
-          description: The start of the line item
-        end_date:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: End Date
-          description: The end of the line item. Null for monthly line items.
-      type: object
-      required:
-      - name
-      - type
-      - quantity
-      - unit_cost
-      - start_date
-      - end_date
-      title: LineItem
-    VendorAgreementCustomAttribute-Input:
+    FileUpload:
       properties:
         type:
-          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
-          description: The type of custom attribute. Only text and user options are available today
+          $ref: '#/components/schemas/FileUploadType'
+          description: The type of content being uploaded. The only supported type today is 'url'
         value:
-          anyOf:
-          - type: string
-          - items:
-              $ref: '#/components/schemas/User'
-            type: array
-          - type: 'null'
+          type: string
           title: Value
-          description: The value of the attribute for an individual Order
+          description: The data to upload. This should be a publicly accessible URL that resolves to a file
       type: object
       required:
       - type
-      title: VendorAgreementCustomAttribute
-    User:
-      properties:
-        id:
-          type: string
-          title: Id
-          description: The ID of this user.
-        email:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Email
-          description: The email of this user.
-        given_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Given Name
-          description: The given name of this user.
-        family_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Family Name
-          description: The family name of this user.
-        status:
-          anyOf:
-          - $ref: '#/components/schemas/UserLifecycleStatus'
-          - type: 'null'
-          description: The status of this user.
-      type: object
-      required:
-      - id
-      title: User
-    OrderInput:
-      properties:
-        unique_identifier:
-          type: string
-          title: Unique Identifier
-          description: A unique ID for the contract being uploaded. This can be an ID from an external system like Ironclad, an internal ID such as a PO number, or simply the name of the vendor + date of the contract.
-        vendor:
-          $ref: '#/components/schemas/Vendor'
-          description: Information about the vendor associated with this contract. Currently, we will only support a name field.
-        start_date:
-          type: string
-          format: date
-          title: Start Date
-          description: The start date of the attached contract
-        end_date:
-          type: string
-          format: date
-          title: End Date
-          description: The end date of the attached contract
-        opt_out_date:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: Opt Out Date
-          description: The date by which a vendor must be notified before terminating the order
-        auto_renewal:
-          type: boolean
-          title: Auto Renewal
-          description: Whether or not the contract auto-renews
-        currency:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Currency
-          description: The currency in which the contract is being paid in ISO 4217 format
-        line_items:
-          items:
-            $ref: '#/components/schemas/LineItemInput'
-          type: array
-          title: Line Items
-          description: The list of currently active line items for this Vendor Agreement. If there are no currently active line items, the most recent set of line items is returned.
-        custom_attributes:
-          additionalProperties:
-            $ref: '#/components/schemas/VendorAgreementCustomAttribute-Input'
-          type: object
-          title: Custom Attributes
-          description: Any additional attributes that you would like to save on the Order. The set of available options must be configured in advance in Lumos.
-        source_app_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Source App Id
-          description: UUID of the application in Lumos where this order was sourced (e.g. the ID of Ironclad within Lumos)
-      type: object
-      required:
-      - unique_identifier
-      - vendor
-      - start_date
-      - end_date
-      - auto_renewal
-      - line_items
-      title: OrderInput
+      - value
+      title: FileUpload
     VendorAgreement:
       properties:
         id:
@@ -656,6 +425,58 @@ components:
       - total_contract_cost
       - line_items
       title: VendorAgreement
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    User:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of this user.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of this user.
+        given_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Given Name
+          description: The given name of this user.
+        family_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Family Name
+          description: The family name of this user.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/UserLifecycleStatus'
+          - type: 'null'
+          description: The status of this user.
+      type: object
+      required:
+      - id
+      title: User
+    Vendor:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: A user friendly name for the vendor
+      type: object
+      required:
+      - name
+      title: Vendor
     VendorAgreementCustomAttributeType:
       type: string
       enum:
@@ -663,6 +484,238 @@ components:
       - USER
       - SINGLE_SELECT
       title: VendorAgreementCustomAttributeType
+    OrderInput:
+      properties:
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: A unique ID for the contract being uploaded. This can be an ID from an external system like Ironclad, an internal ID such as a PO number, or simply the name of the vendor + date of the contract.
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+          description: Information about the vendor associated with this contract. Currently, we will only support a name field.
+        start_date:
+          type: string
+          format: date
+          title: Start Date
+          description: The start date of the attached contract
+        end_date:
+          type: string
+          format: date
+          title: End Date
+          description: The end date of the attached contract
+        opt_out_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Opt Out Date
+          description: The date by which a vendor must be notified before terminating the order
+        auto_renewal:
+          type: boolean
+          title: Auto Renewal
+          description: Whether or not the contract auto-renews
+        currency:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Currency
+          description: The currency in which the contract is being paid in ISO 4217 format
+        line_items:
+          items:
+            $ref: '#/components/schemas/LineItemInput'
+          type: array
+          title: Line Items
+          description: The list of currently active line items for this Vendor Agreement. If there are no currently active line items, the most recent set of line items is returned.
+        custom_attributes:
+          additionalProperties:
+            $ref: '#/components/schemas/VendorAgreementCustomAttribute-Input'
+          type: object
+          title: Custom Attributes
+          description: Any additional attributes that you would like to save on the Order. The set of available options must be configured in advance in Lumos.
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: UUID of the application in Lumos where this order was sourced (e.g. the ID of Ironclad within Lumos)
+      type: object
+      required:
+      - unique_identifier
+      - vendor
+      - start_date
+      - end_date
+      - auto_renewal
+      - line_items
+      title: OrderInput
+    LineItem:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        type:
+          type: string
+          title: Type
+          description: The type of purchase that this line item refers to
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/LineItemUnitCost'
+          description: The unit cost of this line item
+        start_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+          description: The start of the line item
+        end_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+          description: The end of the line item. Null for monthly line items.
+      type: object
+      required:
+      - name
+      - type
+      - quantity
+      - unit_cost
+      - start_date
+      - end_date
+      title: LineItem
+    LineItemInput:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        type:
+          type: string
+          title: Type
+          description: The type of purchase that this line item refers to
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/LineItemUnitCostInput'
+          description: The per-unit cost of the line item
+        start_date:
+          type: string
+          format: date
+          title: Start Date
+          description: The start date of the line item
+        end_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+          description: The end date of the line item.
+      type: object
+      required:
+      - name
+      - type
+      - quantity
+      - unit_cost
+      - start_date
+      - end_date
+      title: LineItemInput
+    LineItemUpload:
+      properties:
+        name:
+          type: string
+          title: Name
+          description: The name of the line item as stored in Lumos
+        quantity:
+          type: integer
+          title: Quantity
+          description: The number of units purchased for this line item
+        unit_cost:
+          $ref: '#/components/schemas/Cost'
+          description: The unit cost of this line item
+      type: object
+      required:
+      - name
+      - quantity
+      - unit_cost
+      title: LineItemUpload
+    FoundDocumentsUpload:
+      properties:
+        unique_identifier:
+          type: string
+          title: Unique Identifier
+          description: A value that can be used to uniquely identify this contract (e.g. PO number, file name, etc)
+        files:
+          items:
+            $ref: '#/components/schemas/FileUpload'
+          type: array
+          title: Files
+          description: A list of URLs that resolve to files that should be attached to the Found Document
+        vendor_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Vendor Name
+          description: The name of the vendor that this document is for
+        start_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start Date
+          description: The start of the vendor agreement
+        end_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End Date
+          description: The end of the vendor agreement
+        source_app_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source App Id
+          description: By passing the ID of an application within Lumos, it will appear as if this Found Document was sourced from that app
+        total_cost:
+          anyOf:
+          - $ref: '#/components/schemas/Cost'
+          - type: 'null'
+          description: The total cost of the contract. If this is a multi-year contract, this should include the cost for future years
+        line_items:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/LineItemUpload'
+            type: array
+          - type: 'null'
+          title: Line Items
+          description: The line items on the contract
+      type: object
+      required:
+      - unique_identifier
+      - files
+      title: FoundDocumentsUpload
+    VendorAgreementCustomAttribute-Input:
+      properties:
+        type:
+          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: VendorAgreementCustomAttribute
     UserLifecycleStatus:
       type: string
       enum:
@@ -671,6 +724,33 @@ components:
       - SUSPENDED
       - INACTIVE
       title: UserLifecycleStatus
+    LineItemUnitCost:
+      properties:
+        per_month:
+          $ref: '#/components/schemas/Cost'
+          description: The per unit cost associated with this line item, amortized to the cost per month
+      type: object
+      required:
+      - per_month
+      title: LineItemUnitCost
+    VendorAgreementCustomAttribute-Output:
+      properties:
+        type:
+          $ref: '#/components/schemas/VendorAgreementCustomAttributeType'
+          description: The type of custom attribute. Only text and user options are available today
+        value:
+          anyOf:
+          - type: string
+          - items:
+              $ref: '#/components/schemas/User'
+            type: array
+          - type: 'null'
+          title: Value
+          description: The value of the attribute for an individual Order
+      type: object
+      required:
+      - type
+      title: VendorAgreementCustomAttribute
     ValidationError:
       properties:
         loc:
@@ -692,86 +772,6 @@ components:
       - msg
       - type
       title: ValidationError
-    Vendor:
-      properties:
-        name:
-          type: string
-          title: Name
-          description: A user friendly name for the vendor
-      type: object
-      required:
-      - name
-      title: Vendor
-    Page_VendorAgreement_:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/VendorAgreement'
-          type: array
-          title: Items
-        total:
-          anyOf:
-          - type: integer
-            minimum: 0.0
-          - type: 'null'
-          title: Total
-        page:
-          anyOf:
-          - type: integer
-            minimum: 1.0
-          - type: 'null'
-          title: Page
-        size:
-          anyOf:
-          - type: integer
-            minimum: 1.0
-          - type: 'null'
-          title: Size
-        pages:
-          anyOf:
-          - type: integer
-            minimum: 0.0
-          - type: 'null'
-          title: Pages
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - size
-      title: Page[VendorAgreement]
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    LineItemUnitCost:
-      properties:
-        per_month:
-          $ref: '#/components/schemas/Cost'
-          description: The per unit cost associated with this line item, amortized to the cost per month
-      type: object
-      required:
-      - per_month
-      title: LineItemUnitCost
-    FileUpload:
-      properties:
-        type:
-          $ref: '#/components/schemas/FileUploadType'
-          description: The type of content being uploaded. The only supported type today is 'url'
-        value:
-          type: string
-          title: Value
-          description: The data to upload. This should be a publicly accessible URL that resolves to a file
-      type: object
-      required:
-      - type
-      - value
-      title: FileUpload
   securitySchemes:
     HTTPBearer:
       type: http

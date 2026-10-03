@@ -103,15 +103,6 @@ components:
       - msg
       - type
       title: ValidationError
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     AirbasePurchaseRequestEvent:
       properties:
         id:
@@ -144,6 +135,15 @@ components:
         for each. We are using `dict` here to be permissive to other webhook events (so we can warn if
 
         the customer misconfigures for a different webhook), and we actually only use 2 fields from it.'
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
   securitySchemes:
     HTTPBearer:
       type: http
