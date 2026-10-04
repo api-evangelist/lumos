@@ -36,6 +36,9 @@ accessModel:
   generated: '2026-09-03'
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/lumos.png
+x-docs-platform: readme
+x-docs-platform-confidence: high
+x-docs-platform-checked: 2026-10-03
 tags:
   - Access Management
   - Access Reviews
@@ -262,6 +265,9 @@ apis:
   - type: OpenAPI
     url: openapi/lumos-app-store-api-openapi.yml
 common:
+  - type: CapabilityMap
+    url: capabilities/lumos-capability-edges.yml
+    name: Lumos Business Capability Map
   - type: AgenticAccess
     url: agentic-access/lumos-agentic-access.yml
   - type: DomainSecurity
