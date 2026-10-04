@@ -395,6 +395,127 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    Body_updateKnowledgeContext:
+      properties:
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+          description: New title. Omit to leave unchanged.
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+          description: New content body. Omit to leave unchanged.
+        generic_tags:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Generic Tags
+          description: Replacement tag list — replaces all existing tags. Omit to leave unchanged.
+        product_scopes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/KnowledgeProductScope'
+            type: array
+          - type: 'null'
+          title: Product Scopes
+          description: Replacement product scope list — replaces all existing scopes. Omit to leave unchanged.
+        clear_attachment:
+          type: boolean
+          title: Clear Attachment
+          description: When true, removes the existing file attachment without uploading a new one.
+          default: false
+        file:
+          anyOf:
+          - type: string
+            format: binary
+          - type: 'null'
+          title: File
+          description: Replacement file attachment. Omit to leave existing file unchanged.
+      type: object
+      title: Body_updateKnowledgeContext
+    KnowledgeProductScope:
+      type: string
+      enum:
+      - APPSTORE
+      - ACCESS_REVIEWS
+      - ALBUS
+      - GLOBAL
+      - ALBUS_DEEP_RESEARCH
+      - IDENTITY_INTELLIGENCE
+      title: KnowledgeProductScope
+    ErrorType:
+      type: string
+      enum:
+      - validation
+      - authentication
+      - permission
+      - not_found
+      - conflict
+      - rate_limited
+      - runtime
+      title: ErrorType
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ApiError:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          description: Human-readable summary of the error.
+        type:
+          $ref: '#/components/schemas/ErrorType'
+          description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable error code; branch on this, not 'detail'.
+        errors:
+          items:
+            $ref: '#/components/schemas/ApiErrorField'
+          type: array
+          title: Errors
+          description: Field-level errors; empty for non-validation errors.
+      type: object
+      required:
+      - detail
+      - type
+      - code
+      title: ApiError
+      description: The V1 error envelope.
+    ApiErrorField:
+      properties:
+        field:
+          type: string
+          title: Field
+          description: Input field this error refers to, e.g. 'steps[2].inputs.group_id'.
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code for this field error.
+        message:
+          type: string
+          title: Message
+          description: Human-readable description of the field error.
+      type: object
+      required:
+      - field
+      - code
+      - message
+      title: ApiErrorField
+      description: A single field-level error (used for validation failures).
     ListKnowledgeContextOutput:
       properties:
         next_page_token:
@@ -413,16 +534,79 @@ components:
       required:
       - knowledge_context
       title: ListKnowledgeContextOutput
-    KnowledgeProductScope:
-      type: string
-      enum:
-      - APPSTORE
-      - ACCESS_REVIEWS
-      - ALBUS
-      - GLOBAL
-      - ALBUS_DEEP_RESEARCH
-      - IDENTITY_INTELLIGENCE
-      title: KnowledgeProductScope
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ApplicationTagOutput:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: UUID of the application tag.
+        name:
+          type: string
+          title: Name
+          description: Display name of the application tag.
+      type: object
+      required:
+      - id
+      - name
+      title: ApplicationTagOutput
+    Body_createKnowledgeContext:
+      properties:
+        title:
+          type: string
+          title: Title
+          description: Title of the knowledge entry. Must be unique within the domain.
+        content:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Content
+          description: Body text (markdown supported). Omit when providing a file attachment instead.
+        generic_tags:
+          items:
+            type: string
+          type: array
+          title: Generic Tags
+          description: Freeform tag strings to attach.
+          default: []
+        product_scopes:
+          items:
+            $ref: '#/components/schemas/KnowledgeProductScope'
+          type: array
+          title: Product Scopes
+          description: Products that can consume this entry.
+          default: []
+        file:
+          anyOf:
+          - type: string
+            format: binary
+          - type: 'null'
+          title: File
+          description: Optional file attachment.
+      type: object
+      required:
+      - title
+      title: Body_createKnowledgeContext
     KnowledgeContextOutput:
       properties:
         id:
@@ -485,190 +669,6 @@ components:
       - application_tags
       - product_scopes
       title: KnowledgeContextOutput
-    ApplicationTagOutput:
-      properties:
-        id:
-          type: string
-          title: Id
-          description: UUID of the application tag.
-        name:
-          type: string
-          title: Name
-          description: Display name of the application tag.
-      type: object
-      required:
-      - id
-      - name
-      title: ApplicationTagOutput
-    ApiErrorField:
-      properties:
-        field:
-          type: string
-          title: Field
-          description: Input field this error refers to, e.g. 'steps[2].inputs.group_id'.
-        code:
-          type: string
-          title: Code
-          description: Stable machine-readable code for this field error.
-        message:
-          type: string
-          title: Message
-          description: Human-readable description of the field error.
-      type: object
-      required:
-      - field
-      - code
-      - message
-      title: ApiErrorField
-      description: A single field-level error (used for validation failures).
-    Body_updateKnowledgeContext:
-      properties:
-        title:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Title
-          description: New title. Omit to leave unchanged.
-        content:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Content
-          description: New content body. Omit to leave unchanged.
-        generic_tags:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Generic Tags
-          description: Replacement tag list — replaces all existing tags. Omit to leave unchanged.
-        product_scopes:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/KnowledgeProductScope'
-            type: array
-          - type: 'null'
-          title: Product Scopes
-          description: Replacement product scope list — replaces all existing scopes. Omit to leave unchanged.
-        clear_attachment:
-          type: boolean
-          title: Clear Attachment
-          description: When true, removes the existing file attachment without uploading a new one.
-          default: false
-        file:
-          anyOf:
-          - type: string
-            format: binary
-          - type: 'null'
-          title: File
-          description: Replacement file attachment. Omit to leave existing file unchanged.
-      type: object
-      title: Body_updateKnowledgeContext
-    ApiError:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          description: Human-readable summary of the error.
-        type:
-          $ref: '#/components/schemas/ErrorType'
-          description: 'Category: validation|authentication|permission|not_found|conflict|rate_limited|runtime.'
-        code:
-          type: string
-          title: Code
-          description: Stable machine-readable error code; branch on this, not 'detail'.
-        errors:
-          items:
-            $ref: '#/components/schemas/ApiErrorField'
-          type: array
-          title: Errors
-          description: Field-level errors; empty for non-validation errors.
-      type: object
-      required:
-      - detail
-      - type
-      - code
-      title: ApiError
-      description: The V1 error envelope.
-    ErrorType:
-      type: string
-      enum:
-      - validation
-      - authentication
-      - permission
-      - not_found
-      - conflict
-      - rate_limited
-      - runtime
-      title: ErrorType
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    Body_createKnowledgeContext:
-      properties:
-        title:
-          type: string
-          title: Title
-          description: Title of the knowledge entry. Must be unique within the domain.
-        content:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Content
-          description: Body text (markdown supported). Omit when providing a file attachment instead.
-        generic_tags:
-          items:
-            type: string
-          type: array
-          title: Generic Tags
-          description: Freeform tag strings to attach.
-          default: []
-        product_scopes:
-          items:
-            $ref: '#/components/schemas/KnowledgeProductScope'
-          type: array
-          title: Product Scopes
-          description: Products that can consume this entry.
-          default: []
-        file:
-          anyOf:
-          - type: string
-            format: binary
-          - type: 'null'
-          title: File
-          description: Optional file attachment.
-      type: object
-      required:
-      - title
-      title: Body_createKnowledgeContext
   securitySchemes:
     HTTPBearer:
       type: http
