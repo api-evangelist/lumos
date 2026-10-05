@@ -1,0 +1,56 @@
+slug: lumos
+provider: Lumos
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: Access Reviews
+  spec_file: lumos-access-reviews-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.92
+  evidence: POST /access_reviews  createAccessReview  Create Access Review; AccessReviewRemovalAction;
+    AccessReviewDomainAppConfigurableEvidenceUpload
+  reason: Creates, scopes and administers user access review (access certification) campaigns across connected
+    apps — squarely Identity & Access Management within Cybersecurity Management.
+- tag: App Store
+  spec_file: lumos-app-store-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.85
+  evidence: POST /appstore/requestable_permissions  Create Appstore Requestable Permission; POST /appstore/pre_approval_rules  Create
+    Pre Approval Rule; schemas AccessRequest, RequestApprovalConfigInput, AppApproversInput
+  reason: Manages requestable app permissions, approval flows, pre-approval rules and provisioning settings
+    for self-service access requests — access request/entitlement administration, i.e. Identity & Access
+    Management.
+- tag: Lifecycle Management
+  spec_file: lumos-lifecycle-management-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.85
+  evidence: POST /lifecycle-management/user-offboardings  createUserOffboarding
+  reason: Creates, tracks and cancels user offboarding flows that revoke application access — the leaver
+    side of joiners-movers-leavers, i.e. Identity & Access Management rather than HR administration.
+- tag: Core
+  spec_file: lumos-core-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.72
+  evidence: GET /apps  listApps; GET /users/{user_id}  getUser; schemas AccessPolicyInput, AccessPolicyPermissionInput,
+    Account
+  reason: Read/management interface over connected apps, users, accounts and access policies in an identity
+    platform — primarily identity and access administration. Some surface (app connection/catalogue) edges
+    toward IT application management, hence moderate confidence on the sub-capability.
