@@ -1,0 +1,12 @@
+{
+ "url": "https://api.lumos.com/openapi.json",
+ "requested_url": "https://api.lumos.com/openapi.json",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 288344,
+ "sha256": "6da9b335224e74b9d7a6eac6b5ee2ca7d82806a0ac3c66b89eae20b08bf4815c",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
