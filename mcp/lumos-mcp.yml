@@ -146,3 +146,19 @@ related:
   governance_note: Lumos also sells governance OF other MCP servers — the `mcp-governance` scope pair
     is advertised by the authorization server even though no mcp-governance toolset is documented on the
     admin page yet.
+rfc9728:
+  endpoint: https://api.lumos.com/mcp/user
+  metadata_url: https://api.lumos.com/.well-known/oauth-protected-resource/mcp/user
+  discovered_via: WWW-Authenticate resource_metadata on an anonymous POST initialize
+  fetched: '2026-09-25'
+  http_status: 200
+  content_type: application/json
+  document:
+    resource: https://api.lumos.com/mcp/user
+    authorization_servers:
+    - https://b.app.lumosidentity.com
+    scopes_supported:
+    - lumos:user:read
+    - lumos:user:write
+    bearer_methods_supported:
+    - header
