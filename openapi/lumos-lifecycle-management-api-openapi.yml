@@ -120,6 +120,65 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    UserOffboardingInput:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+          description: The UUID of the identity to offboard.
+        scheduled_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Scheduled At
+          description: When to run the offboarding, as an ISO 8601 datetime. Omit to trigger the offboarding immediately; provide a future datetime to schedule it.
+      additionalProperties: false
+      type: object
+      required:
+      - user_id
+      title: UserOffboardingInput
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    FlowsV2NormalizedDisplayStatus:
+      type: string
+      enum:
+      - SCHEDULED
+      - IN_PROGRESS
+      - DIVERTED
+      - CANCELLED
+      - FAILED
+      - EXPIRED
+      - COMPLETED
+      title: FlowsV2NormalizedDisplayStatus
     UserOffboardingOutput:
       properties:
         id:
@@ -171,65 +230,6 @@ components:
       - cancelled_at
       - completed_at
       title: UserOffboardingOutput
-    FlowsV2NormalizedDisplayStatus:
-      type: string
-      enum:
-      - SCHEDULED
-      - IN_PROGRESS
-      - DIVERTED
-      - CANCELLED
-      - FAILED
-      - EXPIRED
-      - COMPLETED
-      title: FlowsV2NormalizedDisplayStatus
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    UserOffboardingInput:
-      properties:
-        user_id:
-          type: string
-          title: User Id
-          description: The UUID of the identity to offboard.
-        scheduled_at:
-          anyOf:
-          - type: string
-            format: date-time
-          - type: 'null'
-          title: Scheduled At
-          description: When to run the offboarding, as an ISO 8601 datetime. Omit to trigger the offboarding immediately; provide a future datetime to schedule it.
-      additionalProperties: false
-      type: object
-      required:
-      - user_id
-      title: UserOffboardingInput
   securitySchemes:
     HTTPBearer:
       type: http

@@ -549,24 +549,27 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    TaskAssigneeType:
-      type: string
-      enum:
-      - USER
-      - GROUP
-      title: TaskAssigneeType
-    TaskStatus:
-      type: string
-      enum:
-      - PENDING
-      - ACCEPTED
-      - COMPLETED
-      - DISMISSED
-      - BLOCKED
-      - STAGED
-      - RETRIED
-      - EXPIRED
-      title: TaskStatus
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
     BaseApp:
       properties:
         id:
@@ -577,32 +580,6 @@ components:
       required:
       - id
       title: BaseApp
-    TaskAssignee:
-      properties:
-        id:
-          type: string
-          title: Id
-          description: The ID of the assignee.
-        type:
-          $ref: '#/components/schemas/TaskAssigneeType'
-          description: Whether this assignee is a user or group.
-        name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-          description: The display name of the assignee.
-        email:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Email
-          description: The email of the assignee. Only set for users.
-      type: object
-      required:
-      - id
-      - type
-      title: TaskAssignee
     User:
       properties:
         id:
@@ -636,6 +613,189 @@ components:
       required:
       - id
       title: User
+    TaskAssignee:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: The ID of the assignee.
+        type:
+          $ref: '#/components/schemas/TaskAssigneeType'
+          description: Whether this assignee is a user or group.
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: The display name of the assignee.
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          description: The email of the assignee. Only set for users.
+      type: object
+      required:
+      - id
+      - type
+      title: TaskAssignee
+    TaskProductArea:
+      type: string
+      enum:
+      - ACCESS_REVIEWS
+      - APPSTORE
+      - MOVER
+      - ATTRIBUTE_SYNC
+      - OFFBOARDING
+      - ONBOARDING
+      - PLATFORM
+      - SAVINGS
+      title: TaskProductArea
+    TaskAction:
+      properties:
+        action_type:
+          type: string
+          title: Action Type
+          description: The external identifier for this action type.
+        transitions:
+          items:
+            $ref: '#/components/schemas/TaskActionTransition'
+          type: array
+          title: Transitions
+          description: The possible status transitions for this action.
+      type: object
+      required:
+      - action_type
+      - transitions
+      title: TaskAction
+    Page_Task_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Task'
+          type: array
+          title: Items
+        total:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Total
+        page:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Page
+        size:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Size
+        pages:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Pages
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[Task]
+    TaskCategory:
+      type: string
+      enum:
+      - MANAGER_APPROVAL
+      - APPROVAL
+      - PROVISIONING
+      - DEPROVISIONING
+      - ERROR
+      - GENERIC
+      title: TaskCategory
+    TaskStatus:
+      type: string
+      enum:
+      - PENDING
+      - ACCEPTED
+      - COMPLETED
+      - DISMISSED
+      - BLOCKED
+      - STAGED
+      - RETRIED
+      - EXPIRED
+      title: TaskStatus
+    ReassignTaskInput:
+      properties:
+        user_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: User Ids
+          description: IDs of users to assign.
+        group_ids:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Group Ids
+          description: IDs of groups to assign.
+        replace:
+          type: boolean
+          title: Replace
+          description: Whether to replace existing assignees or add to them.
+          default: true
+      type: object
+      title: ReassignTaskInput
+    TaskComment:
+      properties:
+        body:
+          type: string
+          title: Body
+          description: The text content of the comment.
+        created_by:
+          anyOf:
+          - $ref: '#/components/schemas/User'
+          - type: 'null'
+          description: The user who created the comment.
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: When the comment was created.
+      type: object
+      required:
+      - body
+      - created_at
+      title: TaskComment
+    PerformTaskActionInput:
+      properties:
+        action_type:
+          type: string
+          title: Action Type
+          description: The action type to perform.
+        transition_to:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Transition To
+          description: The status to transition to. If omitted and the action has exactly one transition target, it will be inferred.
+      type: object
+      required:
+      - action_type
+      title: PerformTaskActionInput
+    TaskAssigneeType:
+      type: string
+      enum:
+      - USER
+      - GROUP
+      title: TaskAssigneeType
     Task:
       properties:
         id:
@@ -748,73 +908,6 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
-    TaskComment:
-      properties:
-        body:
-          type: string
-          title: Body
-          description: The text content of the comment.
-        created_by:
-          anyOf:
-          - $ref: '#/components/schemas/User'
-          - type: 'null'
-          description: The user who created the comment.
-        created_at:
-          type: string
-          format: date-time
-          title: Created At
-          description: When the comment was created.
-      type: object
-      required:
-      - body
-      - created_at
-      title: TaskComment
-    PerformTaskActionInput:
-      properties:
-        action_type:
-          type: string
-          title: Action Type
-          description: The action type to perform.
-        transition_to:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Transition To
-          description: The status to transition to. If omitted and the action has exactly one transition target, it will be inferred.
-      type: object
-      required:
-      - action_type
-      title: PerformTaskActionInput
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    TaskActionTransition:
-      properties:
-        transition_to:
-          anyOf:
-          - $ref: '#/components/schemas/TaskStatus'
-          - type: 'null'
-          description: The status the task will transition to when this action is taken.
-      type: object
-      title: TaskActionTransition
     AddCommentInput:
       properties:
         comment:
@@ -827,44 +920,15 @@ components:
       required:
       - comment
       title: AddCommentInput
-    Page_Task_:
+    TaskActionTransition:
       properties:
-        items:
-          items:
-            $ref: '#/components/schemas/Task'
-          type: array
-          title: Items
-        total:
+        transition_to:
           anyOf:
-          - type: integer
-            minimum: 0.0
+          - $ref: '#/components/schemas/TaskStatus'
           - type: 'null'
-          title: Total
-        page:
-          anyOf:
-          - type: integer
-            minimum: 1.0
-          - type: 'null'
-          title: Page
-        size:
-          anyOf:
-          - type: integer
-            minimum: 1.0
-          - type: 'null'
-          title: Size
-        pages:
-          anyOf:
-          - type: integer
-            minimum: 0.0
-          - type: 'null'
-          title: Pages
+          description: The status the task will transition to when this action is taken.
       type: object
-      required:
-      - items
-      - total
-      - page
-      - size
-      title: Page[Task]
+      title: TaskActionTransition
     UserLifecycleStatus:
       type: string
       enum:
@@ -873,70 +937,6 @@ components:
       - SUSPENDED
       - INACTIVE
       title: UserLifecycleStatus
-    ReassignTaskInput:
-      properties:
-        user_ids:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: User Ids
-          description: IDs of users to assign.
-        group_ids:
-          anyOf:
-          - items:
-              type: string
-            type: array
-          - type: 'null'
-          title: Group Ids
-          description: IDs of groups to assign.
-        replace:
-          type: boolean
-          title: Replace
-          description: Whether to replace existing assignees or add to them.
-          default: true
-      type: object
-      title: ReassignTaskInput
-    TaskProductArea:
-      type: string
-      enum:
-      - ACCESS_REVIEWS
-      - APPSTORE
-      - MOVER
-      - ATTRIBUTE_SYNC
-      - OFFBOARDING
-      - ONBOARDING
-      - PLATFORM
-      - SAVINGS
-      title: TaskProductArea
-    TaskCategory:
-      type: string
-      enum:
-      - MANAGER_APPROVAL
-      - APPROVAL
-      - PROVISIONING
-      - DEPROVISIONING
-      - ERROR
-      - GENERIC
-      title: TaskCategory
-    TaskAction:
-      properties:
-        action_type:
-          type: string
-          title: Action Type
-          description: The external identifier for this action type.
-        transitions:
-          items:
-            $ref: '#/components/schemas/TaskActionTransition'
-          type: array
-          title: Transitions
-          description: The possible status transitions for this action.
-      type: object
-      required:
-      - action_type
-      - transitions
-      title: TaskAction
   securitySchemes:
     HTTPBearer:
       type: http
