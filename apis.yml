@@ -40,6 +40,16 @@ x-docs-platform: readme
 x-docs-platform-confidence: high
 x-docs-platform-checked: 2026-10-03
 tags:
+  - Identity and Access Management
+  - Access Reviews
+  - Deprovisioning
+  - Identity Governance
+  - Identity Platform
+  - Least Privilege
+  - Provisioning
+  - SaaS Management
+  - Shadow IT
+tags_raw:
   - Access Management
   - Access Reviews
   - Deprovisioning
